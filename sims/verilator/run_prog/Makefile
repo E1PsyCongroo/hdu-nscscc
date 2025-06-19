@@ -7,9 +7,8 @@ VERILATOR_HOME=$(VERILATOR_HOME1)
 else ifeq ($(VERILATOR_HOME2), $(wildcard $(VERILATOR_HOME2)))
 VERILATOR_HOME=$(VERILATOR_HOME2)
 else
-#add your verilator include path to this var, then delete this line.
-VERILATOR_HOME=/home/yangzhaoxin/opt/verilator/share/verilator
-#$(error Please install verilator or config the installed path here.)
+VERILATOR_HOME=/usr/local/share/verilator
+$(error Please install verilator or config the installed path here.)
 endif
 
 
@@ -22,10 +21,10 @@ endif
 OBJ_DIR = ./obj_dir
 #add your verilator include path to this var, then delete this line.
 
-INCLUDE = -I${VERILATOR_HOME}/include 
+INCLUDE = -I${VERILATOR_HOME}/include
 INCLUDE+= -I$(VERILATOR_HOME)/include/vltstd
-VERILATED_SRC = ${VERILATOR_HOME}/include/verilated.cpp ${VERILATOR_HOME}/include/verilated_threads.cpp 
-VCD_SRC = ${VERILATOR_HOME}/include/verilated_vcd_c.cpp 
+VERILATED_SRC = ${VERILATOR_HOME}/include/verilated.cpp ${VERILATOR_HOME}/include/verilated_threads.cpp
+VCD_SRC = ${VERILATOR_HOME}/include/verilated_vcd_c.cpp
 FST_SRC = ${VERILATOR_HOME}/include/verilated_fst_c.cpp
 SAVE_SRC = ${VERILATOR_HOME}/include/verilated_save.cpp
 ALL_LIB = ${OBJ_DIR}/*__ALL.a
@@ -39,52 +38,52 @@ INCLUDE += -I${TESTBENCH_INCLUDE}
 INCLUDE += -I${OBJ_DIR}
 
 comma=,
-empty= 
-space=${empty} 
+empty=
+space=${empty}
 soft_list=$(subst ${comma},${space},${RUN_SOFTWARE})
 
-all:env_test func 
-func:compile 
-	make soft 
+all:env_test func
+func:compile
+	make soft
 	make run
-compile:link 
+compile:link
 	$(MAKE) -j8 verilator
 	$(MAKE) -j8 testbench
-soft:soft_compile 
+soft:soft_compile
 	#+make golden_trace
 run:simulation_run_prog
 
 link:
 	ln -sf ../../../chip/config-generator.mak ./
-	echo ${soft_compile_list} 
+	echo ${soft_compile_list}
 	echo ${golden_trace_list}
 
-include ../../../chip/config-generator.mak 
+include ../../../chip/config-generator.mak
 
-ifeq ('${MYCPU}', 'y') 
-VERILATOR_INCLUDE += -y ${MYCPU_SRC} 
-VERILATOR_SRC += ${MYCPU_SRC}/*.v
+ifeq ('${MYCPU}', 'y')
+VERILATOR_INCLUDE += -y ${MYCPU_SRC}
+VERILATOR_SRC += $(shell find $(MYCPU_SRC) -type f -name "*.v" -or -name "*.sv")
 endif
 
-ifeq ('${BRIDGE}', 'y') 
-VERILATOR_INCLUDE += -y ${BRIDGE_SRC} 
+ifeq ('${BRIDGE}', 'y')
+VERILATOR_INCLUDE += -y ${BRIDGE_SRC}
 VERILATOR_SRC += ${BRIDGE_SRC}/*.v
 endif
 
-ifeq ('${CONFREG}', 'y') 
-VERILATOR_INCLUDE += -y ${CONFREG_SRC} 
+ifeq ('${CONFREG}', 'y')
+VERILATOR_INCLUDE += -y ${CONFREG_SRC}
 VERILATOR_SRC += ${CONFREG_SRC}/confreg_sim.v
-endif 
+endif
 
-ifeq ('${AXI_RAND}', 'y') 
-VERILATOR_INCLUDE += -y ${AXI_RAND_SRC} 
+ifeq ('${AXI_RAND}', 'y')
+VERILATOR_INCLUDE += -y ${AXI_RAND_SRC}
 VERILATOR_SRC += ${AXI_RAND_SRC}/*.v
-endif 
+endif
 
-ifeq ('${AXI_SRAM}', 'y') 
-VERILATOR_INCLUDE += -y ${AXI_SRAM_SRC} 
+ifeq ('${AXI_SRAM}', 'y')
+VERILATOR_INCLUDE += -y ${AXI_SRAM_SRC}
 VERILATOR_SRC += ${AXI_SRAM_SRC}/*.v
-endif 
+endif
 
 VERILATOR_INCLUDE += -y ${AMBA_SRC}
 VERILATOR_SRC += ${AMBA_SRC}/axi2apb.v ${AMBA_SRC}/axi_mux_sim.v
@@ -111,19 +110,19 @@ endif
 
 ifeq ('${RUN_FUNC}', 'y')
 CFLAGS += -DRUN_FUNC
-endif 
+endif
 
 ifeq ('${TRACE_COMP}', 'y')
 CFLAGS += -DTRACE_COMP
-endif 
+endif
 
 ifeq ('${SIMU_TRACE}', 'y')
-CFLAGS += -DSIMU_TRACE 
-endif 
+CFLAGS += -DSIMU_TRACE
+endif
 
 ifeq ('${MEM_TRACE}', 'y')
-CFLAGS += -DMEM_TRACE 
-endif 
+CFLAGS += -DMEM_TRACE
+endif
 
 ifeq ('${OUTPUT_PC_INFO}', 'y')
 CFLAGS += -DOUTPUT_PC_INFO
@@ -141,46 +140,46 @@ ifeq ('${PRINT_CLK_TIME}', 'y')
 CFLAGS += -DPRINT_CLK_TIME
 endif
 
-ifeq ('${DUMP_VCD}', 'y') 
-CFLAGS += -DDUMP_VCD 
-WAVEFILE = vcd 
-WAVEOPTION = 
+ifeq ('${DUMP_VCD}', 'y')
+CFLAGS += -DDUMP_VCD
+WAVEFILE = vcd
+WAVEOPTION =
 endif
- 
-ifeq ('${DUMP_FST}', 'y') 
-CFLAGS += -DDUMP_FST 
-WAVEFILE = fst 
+
+ifeq ('${DUMP_FST}', 'y')
+CFLAGS += -DDUMP_FST
+WAVEFILE = fst
 WAVEOPTION = --trace-fst
 endif
 
-ifeq ('${SLICE_WAVEFORM}', 'y') 
+ifeq ('${SLICE_WAVEFORM}', 'y')
 CFLAGS += -DSLICE_WAVEFORM
-endif  
+endif
 
-ifeq ('${SLICE_SIMU_TRACE}', 'y') 
+ifeq ('${SLICE_SIMU_TRACE}', 'y')
 CFLAGS += -DSLICE_SIMU_TRACE
-endif  
+endif
 
-ifeq ('${TAIL_WAVEFORM}', 'y') 
+ifeq ('${TAIL_WAVEFORM}', 'y')
 CFLAGS += -DTAIL_WAVEFORM
-endif  
+endif
 
-ifeq ('${TAIL_SIMU_TRACE}', 'y') 
+ifeq ('${TAIL_SIMU_TRACE}', 'y')
 CFLAGS += -DTAIL_SIMU_TRACE
-endif  
+endif
 
 ifeq ('${DEAD_CLOCK_EN}', 'y')
 CFLAGS += -DDEAD_CLOCK_EN
 endif
 
 ifeq ('${RANDTEST}', 'y')
-CFLAGS += -DRAND_TEST 
-VFLAGS += -DRAND_TEST 
-endif 
+CFLAGS += -DRAND_TEST
+VFLAGS += -DRAND_TEST
+endif
 ifeq ('${CPU_2CMT}', 'y')
-VFLAGS += -DCPU_2CMT 
-CFLAGS += -DCPU_2CMT 
-endif 
+VFLAGS += -DCPU_2CMT
+CFLAGS += -DCPU_2CMT
+endif
 
 ifeq ('$(AXI64)', 'y')
 CFLAGS += -DAXI64
@@ -194,13 +193,13 @@ endif
 
 VFLAGS += -DDIFFTEST_EN
 
-VERILATOR_INCLUDE += -y ${SIMU_TOP} 
+VERILATOR_INCLUDE += -y ${SIMU_TOP}
 ALL_VERILATOR_SRC += ${SIMU_TOP}/*.v
 
-VERILATOR_INCLUDE += -y ${SIMU_INCLUDE} 
+VERILATOR_INCLUDE += -y ${SIMU_INCLUDE}
 ALL_VERILATOR_SRC += ${SIMU_INCLUDE}/*.v
 
-soft_compile_list_tmp_1 = $(foreach soft, ${soft_list}, ${wildcard ./obj/${soft}_obj}) 
+soft_compile_list_tmp_1 = $(foreach soft, ${soft_list}, ${wildcard ./obj/${soft}_obj})
 soft_compile_list_tmp_2 = $(foreach soft, ${soft_compile_list_tmp_1}, ${subst ./obj/,${empty},${soft}})
 soft_compile_list_tmp_3 = $(foreach soft, ${soft_compile_list_tmp_2}, ${subst _obj,${empty},${soft}})
 soft_compile_list = $(filter-out $(soft_compile_list_tmp_3), $(soft_list))
@@ -211,7 +210,7 @@ golden_trace_list_tmp_3 = $(foreach soft, ${golden_trace_list_tmp_2}, ${subst _l
 golden_trace_list = $(filter-out $(golden_trace_list_tmp_3), $(soft_list))
 
 
-env_test: guard-CHIPLAB_HOME 
+env_test: guard-CHIPLAB_HOME
 	@echo "CHIPLAB_HOME=${CHIPLAB_HOME}"
 
 guard-%:
@@ -220,7 +219,7 @@ guard-%:
 		exit 1; \
 	fi
 
-verilator:${VERILATOR_SRC} 
+verilator:${VERILATOR_SRC}
 	@echo "============================================================================================================="
 	@echo "============================================================================================================="
 	@echo "COMPILING verilog..."
@@ -231,7 +230,7 @@ verilator:${VERILATOR_SRC}
 	verilator ${VERILATOR_INCLUDE} ${WAVEOPTION} --savable --threads ${THREAD} -O3 -Wno-fatal -DSIMU -DSIMULATION=1 -Wall --trace -cc ${VFLAGS} ${SIMU_TOP_NAME}.v ${DIFFTEST}.v ${VERILATOR_SRC} 2>&1 | tee log/compile.log
 	$(MAKE) -C ${OBJ_DIR} -f "V${SIMU_TOP_NAME}.mk" || exit "$$?"
 
-testbench:${TESTBENCH_SRC}/*.cpp 
+testbench:${TESTBENCH_SRC}/*.cpp
 	@echo "============================================================================================================="
 	@echo "============================================================================================================="
 	@echo "COMPILING testbench..."
@@ -252,7 +251,7 @@ soft_compile:
 	mkdir -p ./obj/$${soft}_obj;  \
 	mv ${CHIPLAB_HOME}/software/examples/$${soft}/obj ./obj/$${soft}_obj;	\
 	mkdir -p ./log/$${soft}_log;	\
-	done 
+	done
 
 golden_trace:
 ifeq ('${TRACE_COMP}', 'y')
@@ -272,8 +271,8 @@ ifeq ('${TRACE_COMP}', 'y')
 	mkdir -p ./log/$${soft}_log;	\
 	mv ./tmp/golden_trace.txt ./log/$${soft}_log/; \
 	rm -rf ./tmp;    \
-	done 
-endif 
+	done
+endif
 
 simulation_run_prog:
 	@echo "============================================================================================================="
@@ -296,8 +295,8 @@ ifeq ('${TRACE_COMP}', 'y')
 	mv ./tmp/mem_trace.txt ./log/$${soft}_log/;         \
 	mv ./tmp/logs/*.${WAVEFILE} ./log/$${soft}_log/;	\
 	rm -rf ./tmp;    \
-	done 
-else 
+	done
+else
 	@for soft in ${soft_list}; \
 	do 	\
 	mkdir -p tmp;	\
@@ -312,7 +311,7 @@ else
 	mv ./tmp/mem_trace.txt ./log/$${soft}_log/;         \
 	mv ./tmp/logs/*.${WAVEFILE} ./log/$${soft}_log/;	\
 	rm -rf ./tmp; \
-	done 
+	done
 endif
 
 
@@ -335,10 +334,10 @@ clean:
 
 clean_all:
 	rm -f output
-	rm -rf obj_dir 
+	rm -rf obj_dir
 	rm -rf log
-	rm -rf obj 
+	rm -rf obj
 	rm -rf ./tmp
-	rm -f config-generator.mak 
+	rm -f config-generator.mak
 	rm -f config.log
 

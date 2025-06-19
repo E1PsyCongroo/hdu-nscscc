@@ -1,5 +1,10 @@
 .vscode
 .idea
+.metals
+.bloop
+.bsp
+.scala-build
+build
 cmake-build-debug
 CMakeLists.txt
 toolchains/*
@@ -8,6 +13,7 @@ software/random_res
 sims/verilator/run_prog/single.log
 *.o
 *.d
+*.tar.gz
 ~*
 chip/soc_demo/nscscc-team/xilinx_ip/*/gen
 fpga/nscscc-team/run_vivado/*.dmp
@@ -33,3 +39,4 @@ inst_data.bin
 .Xil
 *.a
 convert
+

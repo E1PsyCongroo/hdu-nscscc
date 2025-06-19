@@ -1,6 +1,6 @@
 # DIFFTEST 使用说明
 
-DIFFTEST 框架基于ysyx提供的oscpu开发框架修改：hhttps://github.com/OpenXiangShan/difftest.
+DIFFTEST 框架基于ysyx提供的oscpu开发框架修改：https://github.com/OpenXiangShan/difftest.
 
 DIFFTEST的比对对象是两个核，一个是用户设计的核，一个是参考核。 比对原理是设计核在每执行一条指令的同时使参考核执行相同的指令，之后比对所有的通用寄存器和csr寄存器(除estat寄存器)的值，如果完全相同则认为设计核执行正确。 同时， DIFFTEST比对机制也实现了对于store指令的比对，一旦store指令中的物理地址和存储数据与参考核不同，也会立即暂停仿真，以此来尽早定位错误。
 
