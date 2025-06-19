@@ -1,5 +1,5 @@
-RUN_SOFTWARE=func/func_lab19
-TRACE_COMP=y
+RUN_SOFTWARE=func/func_lab3
+TRACE_COMP=n
 SIMU_TRACE=y
 MEM_TRACE=n
 RUN_FUNC=y
