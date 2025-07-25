@@ -1,13 +1,13 @@
 .DEFAULT_GOAL := build
 
 help:
-	@./mill -i MultiCycleCore.run --help
+	@./mill -i superscalar.run --help
 
 debug:
-	@./mill -i MultiCycleCore.run -td build
+	@./mill -i superscalar.run -td build
 
 build:
-	@./mill -i MultiCycleCore.run -td build --firtool-option -disable-all-randomization --firtool-option -strip-debug-info
+	@./mill -i superscalar.run -td build --firtool-option -disable-all-randomization --firtool-option -strip-debug-info
 
 clean:
 	-@rm -rf build

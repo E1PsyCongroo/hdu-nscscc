@@ -17,7 +17,19 @@ case class Instruction(
     inst.getWidth == 32,
     s"Instruction pattern must be 32 bits long, got: ${inst.getWidth} bits",
   )
-  def bitPat: BitPat = inst
+  def bitPat: BitPat    = inst
+  def rd: BitPat        = inst(4, 0)
+  def rj: BitPat        = inst(9, 5)
+  def rk: BitPat        = inst(14, 10)
+  def ui5: BitPat       = inst(14, 10)
+  def si12: BitPat      = inst(21, 12)
+  def ui12: BitPat      = inst(21, 12)
+  def csr: BitPat       = inst(23, 12)
+  def cacopCode: BitPat = inst(4, 0)
+  def si20: BitPat      = inst(24, 5)
+  def si14: BitPat      = inst(23, 12)
+  def si16: BitPat      = inst(25, 10)
+  def si26: BitPat      = inst(0, 9) ## inst(25, 10)
 }
 
 object Instruction {
