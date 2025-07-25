@@ -11,6 +11,10 @@ case class CommonParameters(
     pcReset: BigInt = 0x1c00_0000L,
     debug: Boolean = true,
 ) {
+  val dataBytes: Int  = dataWidth / 8
+  val instBytes: Int  = instWidth / 8
+  val vaddrBytes: Int = vaddrWidth / 8
+  val paddrBytes: Int = paddrWidth / 8
   require(vaddrWidth == 32)
   require(paddrWidth >= vaddrWidth)
 }

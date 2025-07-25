@@ -20,34 +20,41 @@ object FUType extends ChiselEnum {
   val FUT_CSR    = Value(32.U)
 }
 
+object CFIType extends ChiselEnum {
+  val CFI_NONE = Value(0.U)
+  val CFI_BR   = Value(1.U)
+  val CFI_JMP  = Value(2.U)
+  val CFI_JIRL = Value(3.U)
+}
+
 /** MicroOp passing through the pipeline
   */
 class MicroOp(implicit params: CoreParameters) extends Bundle {
-  import params.{commonParams, axiParams, icacheParams}
-  val inst    = UInt(commonParams.instWidth.W)
-  val iq_type = UInt(IQType.getWidth.W) // which issue unit do we use?
-  val fu_code = UInt(FUType.getWidth.W) // which functional unit do we use?
+  import params.{commonParams, axiParams, icacheParams, frontendParams, backendParams}
+  val inst   = UInt(commonParams.instWidth.W)
+  val iqType = UInt(IQType.getWidth.W) // which issue unit do we use?
+  val fuType = UInt(FUType.getWidth.W) // which functional unit do we use?
 
-  val br_type = UInt(BRType.getWidth.W)
+  val brType = UInt(BRType.getWidth.W)
 
   // Was this a branch that was predicted taken?
   val taken = Bool()
 
-  val imm_sel    = UInt(IMMType.getWidth.W)
-  val imm_packed = UInt(LONGEST_IMM_WIDTH.W) // densely pack the imm in decode
+  val immSel    = UInt(IMMType.getWidth.W)
+  val immPacked = UInt(LONGEST_IMM_WIDTH.W) // densely pack the imm in decode
 
-  val op1_sel = UInt(OP1Type.getWidth.W)
-  val op2_sel = UInt(OP2Type.getWidth.W)
+  val op1Sel = UInt(OP1Type.getWidth.W)
+  val op2Sel = UInt(OP2Type.getWidth.W)
 
-  val rob_idx = UInt(params.robIdxWidth.W)
-  val pdst    = UInt(log2Ceil(params.pregWidth).W) // physical destination register
-  val prs1    = UInt(log2Ceil(params.pregWidth).W) // physical source register 1
-  val prs2    = UInt(log2Ceil(params.pregWidth).W) // physical source register 2
+  val robIdx = UInt(backendParams.robIdxWidth.W)
+  val pdst   = UInt(log2Ceil(backendParams.pregWidth).W) // physical destination register
+  val prs1   = UInt(log2Ceil(backendParams.pregWidth).W) // physical source register 1
+  val prs2   = UInt(log2Ceil(backendParams.pregWidth).W) // physical source register 2
 
   val prs1Busy = Bool()
   val prs2Busy = Bool()
 
-  val stalePdst = UInt(log2Ceil(params.pregWidth).W) // stale physical destination register
+  val stalePdst = UInt(log2Ceil(backendParams.pregWidth).W) // stale physical destination register
   // val exception        = Bool()
   // val exc_cause        = UInt(xLen.W)          // TODO compress this down, xlen is insanity
   // val mem_cmd          = UInt(M_SZ.W)          // sync primitives/cache flushes
@@ -60,10 +67,12 @@ class MicroOp(implicit params: CoreParameters) extends Bundle {
   // val flush_on_commit  = Bool()                      // some instructions need to flush the pipeline behind them
   // val csr_cmd          = UInt(freechips.rocketchip.rocket.CSR.SZ.W)
 
-  val ldst = UInt(log2Ceil(params.lregWidth).W) // logical destination register
-  val lrs1 = UInt(log2Ceil(params.lregWidth).W) // logical source register 1
-  val lrs2 = UInt(log2Ceil(params.lregWidth).W) // logical source register 2
+  val ldst = UInt(log2Ceil(backendParams.lregWidth).W) // logical destination register
+  val lrs1 = UInt(log2Ceil(backendParams.lregWidth).W) // logical source register 1
+  val lrs2 = UInt(log2Ceil(backendParams.lregWidth).W) // logical source register 2
 
-  val debug_inst = UInt(commonParams.instWidth.W)
-  val debug_pc   = UInt(commonParams.vaddrWidth.W)
+  val debug = new Bundle {
+    val inst = UInt(commonParams.instWidth.W)
+    val pc   = UInt(commonParams.vaddrWidth.W)
+  }
 }

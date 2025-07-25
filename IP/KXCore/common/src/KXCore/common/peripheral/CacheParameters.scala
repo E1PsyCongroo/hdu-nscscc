@@ -9,9 +9,10 @@ case class CacheParameters(
     id: Int = 0,
     nSets: Int = 128,
     nWays: Int = 4,
+    nBanks: Int = 1,
     replacer: Option[String] = Some("random"),
     latency: Int = 2,
-    fetchBytes: Int = 4,
+    fetchBytes: Int = 16,
     singlePorted: Boolean = true,
 ) {
   val setWidth: Int   = log2Ceil(nSets)
@@ -19,7 +20,6 @@ case class CacheParameters(
   val blockBytes: Int = fetchBytes
   val blockBits: Int  = blockBytes * 8
   val blockWidth: Int = log2Ceil(blockBytes)
-  val nBanks: Int     = if (fetchBytes <= 4 * 4) 1 else 2
   val bankBytes: Int  = blockBytes / nBanks
   val bankBits: Int   = bankBytes * 8
   require(id >= 0 && id < 16)
