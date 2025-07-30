@@ -5,7 +5,32 @@ import chisel3.util._
 import scala.math._
 import KXCore.common.CommonParameters
 import KXCore.common.peripheral.{AXIBundleParameters, CacheParameters}
-import KXCore.superscalar.core.frontend._
+
+case class FAMicroBTBParameters(
+    nWays: Int = 16,
+    tagWidth: Int = 12,
+    useDualEntries: Boolean = true,
+) {
+  require(isPow2(nWays))
+}
+
+case class BIMParams(
+    nSets: Int = 2048,
+) {
+  require(isPow2(nSets))
+}
+
+case class BTBParams(
+    nSets: Int = 128,
+    nWays: Int = 2,
+    offsetWidth: Int = 16,
+    extendedNSets: Int = 128,
+) {
+  require(isPow2(nSets))
+  require(isPow2(extendedNSets) || extendedNSets == 0)
+  require(extendedNSets <= nSets)
+  require(extendedNSets >= 1)
+}
 
 case class FrontendParmaeters(
     fetchWidth: Int = 4, // Number of instructions fetched per request
@@ -41,13 +66,13 @@ case class CoreParameters()(
   def fetchIdx(addr: UInt): UInt = {
     addr >> log2Ceil(fetchBytes)
   }
-  def fetchAlign(addr: UInt) = addr & ~(fetchBytes - 1).U
+  def fetchAlign(addr: UInt) = addr & ~(fetchBytes - 1).U(commonParams.vaddrWidth.W)
   def nextFetch(addr: UInt) = {
     fetchAlign(addr) + fetchBytes.U
   }
   def fetchMask(addr: UInt) = {
     val idx = addr(log2Ceil(fetchBytes) - 1, log2Ceil(commonParams.instBytes))
-    (fetchBytes - 1).U << idx
+    ((fetchBytes - 1).U << idx)(frontendParams.fetchWidth - 1, 0)
   }
 
 }

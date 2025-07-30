@@ -10,7 +10,6 @@ class StageBundle[In <: Bundle, Out <: Bundle](inNum: Int, outNum: Int, genIn: =
 
 object PipeConnect {
   def apply[T <: Data](
-      init: Option[T],
       flush: Option[Bool],
       fanIn: DecoupledIO[T],
       fanOut: DecoupledIO[T]*,
@@ -18,8 +17,8 @@ object PipeConnect {
     require(!fanOut.isEmpty)
     val write  = fanIn.valid
     val finish = Cat(fanOut.map(_.ready).reverse)
-    val bits   = if (init.nonEmpty) RegEnable(fanIn.bits, init.get, fanIn.fire) else RegEnable(fanIn.bits, fanIn.fire)
-    val en     = RegInit(Fill(fanOut.length, init.nonEmpty.B))
+    val bits   = RegEnable(fanIn.bits, fanIn.fire)
+    val en     = RegInit(Fill(fanOut.length, false.B))
     val nextEn = WireDefault(en & ~finish)
     en          := Mux(fanIn.ready, Fill(fanOut.length, write), nextEn)
     fanIn.ready := (nextEn === 0.U) || flush.getOrElse(false.B)
@@ -28,5 +27,24 @@ object PipeConnect {
       right.valid := !flush.getOrElse(false.B) && en(idx)
     }
     (bits, en)
+  }
+}
+
+object ReadyValidIOExpand {
+  def apply[T <: Data](io: ReadyValidIO[T], num: Int) = {
+    val ioExt = Wire(new Bundle {
+      val valid = Vec(num, Bool())
+      val bits  = io.bits.cloneType
+      val ready = Vec(num, Bool())
+    })
+    val en     = RegInit(Fill(num, 1.B))
+    val nextEn = WireDefault(en & ~ioExt.ready.asUInt)
+    en         := Mux(io.valid, Mux(nextEn === 0.U, Fill(num, 1.B), nextEn), Fill(num, 1.B))
+    io.ready   := nextEn === 0.U
+    ioExt.bits := io.bits
+    for (i <- 0 until num) {
+      ioExt.valid(i) := io.valid && en(i)
+    }
+    ioExt
   }
 }

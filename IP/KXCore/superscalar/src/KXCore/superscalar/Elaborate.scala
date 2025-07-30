@@ -18,7 +18,7 @@ object Elaborate extends App {
 
   implicit val params: CoreParameters = CoreParameters()
   circt.stage.ChiselStage.emitSystemVerilogFile(
-    new core_top,
+    new core_top(),
     args,
     firtoolOptions,
   )

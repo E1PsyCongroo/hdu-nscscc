@@ -38,3 +38,31 @@ object Sext {
     else return Cat(Fill(length - x.getWidth, x(x.getWidth - 1)), x)
   }
 }
+
+/** Object to increment an input value, wrapping it if necessary.
+  */
+object WrapInc {
+  // "n" is the number of increments, so we wrap at n-1.
+  def apply(value: UInt, n: Int): UInt = {
+    if (isPow2(n)) {
+      (value + 1.U)(log2Ceil(n) - 1, 0)
+    } else {
+      val wrap = (value === (n - 1).U)
+      Mux(wrap, 0.U, value + 1.U)
+    }
+  }
+}
+
+/** Object to decrement an input value, wrapping it if necessary.
+  */
+object WrapDec {
+  // "n" is the number of increments, so we wrap at n-1.
+  def apply(value: UInt, n: Int): UInt = {
+    if (isPow2(n)) {
+      (value - 1.U)(log2Ceil(n) - 1, 0)
+    } else {
+      val wrap = (value === 0.U)
+      Mux(wrap, (n - 1).U, value - 1.U)
+    }
+  }
+}

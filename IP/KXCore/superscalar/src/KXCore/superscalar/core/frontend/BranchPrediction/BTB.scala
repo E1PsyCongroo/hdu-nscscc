@@ -6,18 +6,6 @@ import chisel3.util.random._
 import KXCore.superscalar._
 import scala.annotation.implicitNotFound
 
-case class BTBParams(
-    nSets: Int = 128,
-    nWays: Int = 2,
-    offsetWidth: Int = 16,
-    extendedNSets: Int = 128,
-) {
-  require(isPow2(nSets))
-  require(isPow2(extendedNSets) || extendedNSets == 0)
-  require(extendedNSets <= nSets)
-  require(extendedNSets >= 1)
-}
-
 class BTB(implicit params: CoreParameters) extends Module {
   import params._
   import commonParams.{vaddrWidth, instBytes}
@@ -95,7 +83,7 @@ class BTB(implicit params: CoreParameters) extends Module {
     updateBtbData.offset   := newOffset
     updateBtbData.extended := offsetIsExtended
     val updateBtbMask  = UIntToOH(updateBits.cfiIdx) & Fill(fetchWidth, io.update.valid && updateBits.cfiTaken)
-    val updateMetaData = Vec(fetchWidth, Wire(new BTBMeta))
+    val updateMetaData = Wire(Vec(fetchWidth, new BTBMeta))
     val updateMetaMask = UIntToOH(updateBits.cfiIdx) & Fill(fetchWidth, io.update.valid)
     for (i <- 0 until fetchWidth) {
       updateMetaData(i).isBr := updateBits.cfiIsBr

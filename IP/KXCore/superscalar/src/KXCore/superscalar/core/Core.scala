@@ -44,8 +44,8 @@ class Core(implicit params: CoreParameters) extends Module {
   frontend.io.itlbResp        := tlb.io.transResp
   frontend.io.redirect.valid  := false.B
   frontend.io.redirect.bits   := DontCare
-  frontend.io.brupdate.valid  := false.B
-  frontend.io.brupdate.bits   := DontCare
+  frontend.io.brUpdate.valid  := false.B
+  frontend.io.brUpdate.bits   := DontCare
   frontend.io.commit.valid    := false.B
   frontend.io.commit.bits     := DontCare
 
