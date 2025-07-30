@@ -89,7 +89,7 @@ class ICacheStage0to1(implicit commonParams: CommonParameters, cacheParams: Cach
   io.resp.valid := en && !io.flush
 
   val readEn  = io.req.fire || nextEn
-  val readSet = getSet(Mux(io.req.fire, io.req.bits, io.keepRead))
+  val readSet = getSet(Mux(en, io.keepRead, io.req.bits))
 
   val validWriteEn = io.validWrite.valid
   val validWrite   = io.validWrite.bits
@@ -298,8 +298,8 @@ class ICacheStage1to2(implicit commonParams: CommonParameters, cacheParams: Cach
   io.resp.valid := en && !io.flush
 
   val readEn  = io.req.fire || nextEn
-  val readSet = Mux(io.req.fire, io.req.bits.set, io.keepRead.set)
-  val readWay = Mux(io.req.fire, io.req.bits.way, io.keepRead.way)
+  val readSet = Mux(en, io.keepRead.set, io.req.bits.set)
+  val readWay = Mux(en, io.keepRead.way, io.req.bits.way)
 
   if (!singlePorted) {
     val dataWrite = io.dataWrite.bits
@@ -333,7 +333,7 @@ class ICacheStage1to2(implicit commonParams: CommonParameters, cacheParams: Cach
   } else {
     VecInit(
       cacheData.map { cacheDataBanks =>
-        VecInit(cacheDataBanks.map(_.read(readSet, io.req.fire)))(readWay)
+        VecInit(cacheDataBanks.map(_.read(readSet, readEn)))(readWay)
       },
     ).asUInt
   }
@@ -400,4 +400,6 @@ class ICache(implicit commonParams: CommonParameters, cacheParams: CacheParamete
   stage1to2.io.req          <> stage1.io.resp
   stage1to2.io.keepRead.set := stage1to2Keep.set
   stage1to2.io.keepRead.way := stage1to2Keep.way
+
+  io.resp.stage2 <> stage1to2.io.resp
 }

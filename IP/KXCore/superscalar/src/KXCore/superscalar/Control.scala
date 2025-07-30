@@ -23,7 +23,7 @@ object FUType extends ChiselEnum {
 object CFIType extends ChiselEnum {
   val CFI_NONE = Value(0.U)
   val CFI_BR   = Value(1.U)
-  val CFI_JMP  = Value(2.U)
+  val CFI_B    = Value(2.U)
   val CFI_JIRL = Value(3.U)
 }
 

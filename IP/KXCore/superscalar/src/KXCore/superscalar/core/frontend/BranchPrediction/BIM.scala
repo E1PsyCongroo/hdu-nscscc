@@ -5,12 +5,6 @@ import chisel3.util._
 import chisel3.util.random._
 import KXCore.superscalar._
 
-case class BIMParams(
-    nSets: Int = 2048,
-) {
-  require(isPow2(nSets))
-}
-
 class BIM(bimParams: BIMParams = BIMParams())(implicit params: CoreParameters) extends Module {
   import params._
   import commonParams.{vaddrWidth}

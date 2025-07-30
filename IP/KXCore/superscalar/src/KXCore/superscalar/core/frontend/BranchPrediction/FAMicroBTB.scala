@@ -5,18 +5,10 @@ import chisel3.util._
 import chisel3.util.random._
 import KXCore.superscalar._
 
-case class FAMicroBTBParameters(
-    nWays: Int = 16,
-    tagWidth: Int = 12,
-    useDualEntries: Boolean = true,
-) {
-  require(isPow2(nWays))
-}
-
 class FAMicroBTB(implicit params: CoreParameters) extends Module {
   import params.{commonParams, frontendParams, fetchIdx}
   import commonParams.{vaddrWidth, instWidth}
-  import frontendParams._
+  import frontendParams.{fetchWidth, faubtbParams}
   import faubtbParams._
   require(tagWidth <= vaddrWidth - 2)
 
