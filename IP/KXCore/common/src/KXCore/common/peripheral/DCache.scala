@@ -40,7 +40,7 @@ object DCache {
 
   class DCacheStageResp(implicit commonParams: CommonParameters, cacheParams: CacheParameters) extends Bundle {
     val data      = UInt(commonParams.xlen.W)
-    val exception = Bool() // Indicates whether an exception occurred
+    val exception = Bool()
   }
 
   class DCacheValidWrite(implicit commonParams: CommonParameters, cacheParams: CacheParameters) extends Bundle {
@@ -293,7 +293,6 @@ class DCacheStage1(implicit commonParams: CommonParameters, cacheParams: CachePa
   io.tagWrite.bits.way  := replacedSel
   io.tagWrite.bits.data := tag
 
-  // Construct write mask for cache line update
   val blockMask = WireDefault(0.U((blockBits / 8).W))
   val offsetBytes = offset >> log2Ceil(xlen / 8)
   val writeMaskShifted = writeMask << offsetBytes
@@ -308,14 +307,12 @@ class DCacheStage1(implicit commonParams: CommonParameters, cacheParams: CachePa
   io.dataWrite.bits.way  := Mux(state === sWriteBack, replacedSel, matched)
   io.dataWrite.bits.data := Mux(state === sWriteBack, lineData.asUInt, 
     Mux(isWrite && hit, 
-      // Merge write data with existing cache line
       (lineData.asUInt & ~(Fill(xlen, 1.U) << (offset * 8.U))) | (writeData << (offset * 8.U)),
       lineData.asUInt
     )
   )
   io.dataWrite.bits.mask := blockMask
 
-  // AXI AR channel (read requests)
   io.axi.ar.valid     := (state === sSendBusReadReq) || (state === sFlushBusReq)
   io.axi.ar.bits.addr := paddr
   io.axi.ar.bits.id   := id.U
@@ -328,7 +325,6 @@ class DCacheStage1(implicit commonParams: CommonParameters, cacheParams: CachePa
 
   io.axi.r.ready := (state === sReadBusResp) || (state === sFlushBusResp)
 
-  // AXI AW channel (write address)
   io.axi.aw.valid     := (state === sSendBusWriteReq)
   io.axi.aw.bits.addr := writeBackAddr
   io.axi.aw.bits.id   := id.U
@@ -339,13 +335,11 @@ class DCacheStage1(implicit commonParams: CommonParameters, cacheParams: CachePa
   io.axi.aw.bits.cache := 0.U
   io.axi.aw.bits.prot  := 0.U
 
-  // AXI W channel (write data)
   io.axi.w.valid := (state === sWriteBusReq)
   io.axi.w.bits.data := lineData(writeBackCnt)
   io.axi.w.bits.strb := Fill(axiParams.dataBits / 8, 1.U)
   io.axi.w.bits.last := writeBackCnt === (burstLen - 1).U
 
-  // AXI B channel (write response)
   io.axi.b.ready := (state === sWriteBusResp)
 }
 
