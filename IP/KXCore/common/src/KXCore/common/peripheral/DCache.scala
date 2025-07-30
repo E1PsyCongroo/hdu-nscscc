@@ -30,8 +30,8 @@ object DCache {
     val paddr            = UInt(paddrWidth.W)
     val cacop            = UInt(CACOP.getWidth.W)
     val isWrite          = Bool()
-    val writeData        = UInt(commonParams.xlen.W)
-    val writeMask        = UInt((commonParams.xlen / 8).W)
+    val writeData        = UInt(commonParams.dataWidth.W)
+    val writeMask        = UInt((commonParams.dataWidth / 8).W)
     val wayValid         = Vec(nWays, Bool())
     val wayDirty         = Vec(nWays, Bool())
     val wayTag           = Vec(nWays, UInt(tagWidth.W))
@@ -39,7 +39,7 @@ object DCache {
   }
 
   class DCacheStageResp(implicit commonParams: CommonParameters, cacheParams: CacheParameters) extends Bundle {
-    val data      = UInt(commonParams.xlen.W)
+    val data      = UInt(commonParams.dataWidth.W)
     val exception = Bool()
   }
 
@@ -154,7 +154,7 @@ class DCacheStage0to1(implicit commonParams: CommonParameters, cacheParams: Cach
 }
 
 class DCacheStage1(implicit commonParams: CommonParameters, cacheParams: CacheParameters, axiParams: AXIBundleParameters) extends Module {
-  import commonParams.{vaddrWidth, paddrWidth, xlen}
+  import commonParams.{vaddrWidth, paddrWidth}
   import cacheParams._
   private val tagWidth = paddrWidth - setWidth - blockWidth
   private val burstLen = blockBits / axiParams.dataBits
@@ -170,8 +170,8 @@ class DCacheStage1(implicit commonParams: CommonParameters, cacheParams: CachePa
       val paddr      = UInt(paddrWidth.W)
       val cacop      = UInt(CACOP.getWidth.W)
       val isWrite    = Bool()
-      val writeData  = UInt(xlen.W)
-      val writeMask  = UInt((xlen / 8).W)
+      val writeData  = UInt(commonParams.dataWidth.W)
+      val writeMask  = UInt((commonParams.dataWidth / 8).W)
       val cacheValid = Vec(nSets, Vec(nWays, Bool()))
       val cacheDirty = Vec(nSets, Vec(nWays, Bool()))
       val wayTag     = Vec(nWays, UInt(tagWidth.W))
@@ -201,8 +201,7 @@ class DCacheStage1(implicit commonParams: CommonParameters, cacheParams: CachePa
   val isIdxInv = cacop === CACOP_IDX_INV.asUInt
   val isHitInv = cacop === CACOP_HIT_INV.asUInt
 
-  val sHandleReq :: sSendBusReadReq :: sReadBusResp :: sSendBusWriteReq :: sWriteBusReq :: sWriteBusResp ::
-    sFlushBusReq :: sFlushBusResp :: sWriteBack :: sSendReadResp :: Nil = Enum(10)
+  val sHandleReq :: sSendBusReadReq :: sReadBusResp :: sSendBusWriteReq :: sWriteBusReq :: sWriteBusResp :: sFlushBusReq :: sFlushBusResp :: sWriteBack :: sSendReadResp :: Nil = Enum(10)
 
   val state     = RegInit(sHandleReq)
   val nextState = WireDefault(sHandleReq)
@@ -283,10 +282,17 @@ class DCacheStage1(implicit commonParams: CommonParameters, cacheParams: CachePa
   io.validWrite.bits.way  := Mux(isIdxInv, idxWay, Mux(isHitInv, matched, replacedSel))
   io.validWrite.bits.data := (isRead || isWrite)
 
-  io.dirtyWrite.valid     := io.req.valid && (state === sWriteBack) && isWrite
+  io.dirtyWrite.valid     := io.req.valid && ( ((state === sWriteBack) && isWrite) ||
+                                            (isWrite && hit && (state === sHandleReq)) ||
+                                            (state === sWriteBusResp && io.axi.b.valid) ||
+                                            ((isHitInv && hit) || isIdxInv) )
   io.dirtyWrite.bits.set  := set
-  io.dirtyWrite.bits.way  := replacedSel
-  io.dirtyWrite.bits.data := true.B
+  io.dirtyWrite.bits.way := MuxCase(matched, Seq(
+    (state === sWriteBack)    -> replacedSel,
+    (state === sWriteBusResp) -> replacedSel,
+    (isIdxInv)                -> idxWay
+  ))
+  io.dirtyWrite.bits.data := Mux((state === sWriteBusResp) || ((isHitInv && hit) || isIdxInv), false.B, true.B)
 
   io.tagWrite.valid     := io.req.valid && (state === sWriteBack)
   io.tagWrite.bits.set  := set
@@ -294,7 +300,7 @@ class DCacheStage1(implicit commonParams: CommonParameters, cacheParams: CachePa
   io.tagWrite.bits.data := tag
 
   val blockMask = WireDefault(0.U((blockBits / 8).W))
-  val offsetBytes = offset >> log2Ceil(xlen / 8)
+  val offsetBytes = offset >> log2Ceil(commonParams.dataWidth / 8)
   val writeMaskShifted = writeMask << offsetBytes
   when(isWrite && hit) {
     blockMask := writeMaskShifted
@@ -307,7 +313,7 @@ class DCacheStage1(implicit commonParams: CommonParameters, cacheParams: CachePa
   io.dataWrite.bits.way  := Mux(state === sWriteBack, replacedSel, matched)
   io.dataWrite.bits.data := Mux(state === sWriteBack, lineData.asUInt, 
     Mux(isWrite && hit, 
-      (lineData.asUInt & ~(Fill(xlen, 1.U) << (offset * 8.U))) | (writeData << (offset * 8.U)),
+      (lineData.asUInt & ~(Fill(commonParams.dataWidth / 8, 1.U) << (offset * 8.U))) | (writeData << (offset * 8.U)),
       lineData.asUInt
     )
   )
@@ -344,7 +350,7 @@ class DCacheStage1(implicit commonParams: CommonParameters, cacheParams: CachePa
 }
 
 class DCacheStage1to2(implicit commonParams: CommonParameters, cacheParams: CacheParameters) extends Module {
-  import commonParams.{vaddrWidth, paddrWidth, xlen}
+  import commonParams.{vaddrWidth, paddrWidth}
   import cacheParams._
   private val tagWidth = paddrWidth - setWidth - blockWidth
 
@@ -357,7 +363,7 @@ class DCacheStage1to2(implicit commonParams: CommonParameters, cacheParams: Cach
       val exception = Bool()
     }))
     val resp = Decoupled(new Bundle {
-      val data      = UInt(xlen.W)
+      val data      = UInt(commonParams.dataWidth.W)
       val exception = Bool()
     })
     val keepRead = Input(new Bundle {
@@ -424,15 +430,15 @@ class DCacheStage1to2(implicit commonParams: CommonParameters, cacheParams: Cach
   }
 
   // Extract the requested word from the cache line
-  val wordOffset = readOffset >> log2Ceil(xlen / 8)
-  val extractedData = (data >> (wordOffset * xlen.U))(xlen - 1, 0)
+  val wordOffset = readOffset >> log2Ceil(commonParams.dataWidth / 8)
+  val extractedData = (data >> (wordOffset * commonParams.dataWidth.U))(commonParams.dataWidth - 1, 0)
 
   io.resp.bits.exception := RegEnable(io.req.bits.exception, io.req.fire)
   io.resp.bits.data      := extractedData
 }
 
 class DCache(implicit commonParams: CommonParameters, cacheParams: CacheParameters, axiParams: AXIBundleParameters) extends Module {
-  import commonParams.{vaddrWidth, paddrWidth, xlen}
+  import commonParams.{vaddrWidth, paddrWidth}
   import cacheParams._
   private val tagWidth = paddrWidth - setWidth - blockWidth
 
@@ -451,13 +457,13 @@ class DCache(implicit commonParams: CommonParameters, cacheParams: CacheParamete
         val paddr     = UInt(paddrWidth.W)
         val cacop     = UInt(CACOP.getWidth.W)
         val isWrite   = Bool()
-        val writeData = UInt(xlen.W)
-        val writeMask = UInt((xlen / 8).W)
+        val writeData = UInt(commonParams.dataWidth.W)
+        val writeMask = UInt((commonParams.dataWidth / 8).W)
       }))
     }
     val resp = new Bundle {
       val stage2 = Decoupled(new Bundle {
-        val data      = UInt(xlen.W)
+        val data      = UInt(commonParams.dataWidth.W)
         val exception = Bool()
       })
     }
