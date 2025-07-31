@@ -4,7 +4,6 @@ import chisel3._
 import chisel3.util._
 import chisel3.util.random._
 import KXCore.superscalar._
-import scala.annotation.implicitNotFound
 
 class BTB(implicit params: CoreParameters) extends Module {
   import params._
@@ -74,7 +73,7 @@ class BTB(implicit params: CoreParameters) extends Module {
     val updateBits       = io.update.bits
     val updateSet        = getSet(updateBits.fetchPC)
     val updateTag        = getTag(updateBits.fetchPC)
-    val updateMeta       = updateBits.meta.btbMeta
+    val updateMeta       = updateBits.meta.btb
     val maxOffset        = Cat(0.B, Fill(offsetWidth - 1, 1.B)).asSInt
     val minOffset        = Cat(1.B, Fill(offsetWidth - 1, 0.B)).asSInt
     val newOffset        = (updateBits.target.asSInt - (updateBits.fetchPC + (updateBits.cfiIdx << log2Ceil(instBytes))).asSInt)

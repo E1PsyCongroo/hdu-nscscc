@@ -34,7 +34,8 @@ case class BTBParams(
 
 case class FrontendParmaeters(
     fetchWidth: Int = 4, // Number of instructions fetched per request
-    ftqNum: Int = 64,    // Number of entries in the fetch target queue
+    fbNum: Int = 16,     // Number of entries in the fetch buffer
+    ftqNum: Int = 32,    // Number of entries in the fetch target queue
     rasNum: Int = 16,    // Number of entries in the return address stack
     faubtbParams: FAMicroBTBParameters = FAMicroBTBParameters(),
     bimParams: BIMParams = BIMParams(),

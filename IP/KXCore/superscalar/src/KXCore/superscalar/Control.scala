@@ -31,11 +31,14 @@ object CFIType extends ChiselEnum {
   */
 class MicroOp(implicit params: CoreParameters) extends Bundle {
   import params.{commonParams, axiParams, icacheParams, frontendParams, backendParams}
+  val pcLow  = UInt(log2Ceil(params.fetchBytes).W)
   val inst   = UInt(commonParams.instWidth.W)
   val iqType = UInt(IQType.getWidth.W) // which issue unit do we use?
   val fuType = UInt(FUType.getWidth.W) // which functional unit do we use?
 
   val brType = UInt(BRType.getWidth.W)
+
+  val ftqIdx = UInt(log2Ceil(frontendParams.ftqNum).W)
 
   // Was this a branch that was predicted taken?
   val taken = Bool()
@@ -72,7 +75,6 @@ class MicroOp(implicit params: CoreParameters) extends Bundle {
   val lrs2 = UInt(log2Ceil(backendParams.lregWidth).W) // logical source register 2
 
   val debug = new Bundle {
-    val inst = UInt(commonParams.instWidth.W)
-    val pc   = UInt(commonParams.vaddrWidth.W)
+    val pc = UInt(commonParams.vaddrWidth.W)
   }
 }
