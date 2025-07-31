@@ -37,17 +37,17 @@ class Core(implicit params: CoreParameters) extends Module {
 
   val frontend = Module(new FrontEnd)
   val tlb      = Module(new TLB)
-  io.axi                      <> frontend.io.axi
-  frontend.io.icacheReq.valid := false.B
-  frontend.io.icacheReq.bits  := DontCare
-  tlb.io.transReq             := frontend.io.itlbReq
-  frontend.io.itlbResp        := tlb.io.transResp
-  frontend.io.redirect.valid  := false.B
-  frontend.io.redirect.bits   := DontCare
-  frontend.io.brUpdate.valid  := false.B
-  frontend.io.brUpdate.bits   := DontCare
-  frontend.io.commit.valid    := false.B
-  frontend.io.commit.bits     := DontCare
+  io.axi                        <> frontend.io.axi
+  frontend.io.icacheReq.valid   := false.B
+  frontend.io.icacheReq.bits    := DontCare
+  tlb.io.transReq               := frontend.io.itlbReq
+  frontend.io.itlbResp          := tlb.io.transResp
+  frontend.io.fetchPacket.ready := false.B
+  frontend.io.getPC.ftqIdx      := 0.U
+  frontend.io.commit.valid      := false.B
+  frontend.io.commit.bits       := DontCare
+  dontTouch(frontend.io.fetchPacket)
+  dontTouch(frontend.io.getPC)
 
   io.ws_valid    := false.B
   io.rf_rdata    := 0.U

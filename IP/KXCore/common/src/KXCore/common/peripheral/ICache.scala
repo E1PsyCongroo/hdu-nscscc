@@ -298,8 +298,8 @@ class ICacheStage1to2(implicit commonParams: CommonParameters, cacheParams: Cach
   io.resp.valid := en && !io.flush
 
   val readEn  = io.req.fire || nextEn
-  val readSet = Mux(en, io.keepRead.set, io.req.bits.set)
-  val readWay = Mux(en, io.keepRead.way, io.req.bits.way)
+  val readSet = Mux(io.req.ready, io.req.bits.set, io.keepRead.set)
+  val readWay = Mux(io.req.ready, io.req.bits.way, io.keepRead.way)
 
   if (!singlePorted) {
     val dataWrite = io.dataWrite.bits

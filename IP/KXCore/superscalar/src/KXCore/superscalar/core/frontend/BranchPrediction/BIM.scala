@@ -5,7 +5,7 @@ import chisel3.util._
 import chisel3.util.random._
 import KXCore.superscalar._
 
-class BIM(bimParams: BIMParams = BIMParams())(implicit params: CoreParameters) extends Module {
+class BIM(implicit params: CoreParameters) extends Module {
   import params._
   import commonParams.{vaddrWidth}
   import frontendParams._
@@ -54,7 +54,7 @@ class BIM(bimParams: BIMParams = BIMParams())(implicit params: CoreParameters) e
     val updateWmask = Wire(Vec(fetchWidth, Bool()))
     val updateBits  = io.update.bits
     val updateIndex = getSet(updateBits.fetchPC)
-    val updateMeta  = updateBits.meta.bimMeta
+    val updateMeta  = updateBits.meta.bim
 
     for (w <- 0 until fetchWidth) {
       updateWmask(w) := false.B
@@ -63,7 +63,7 @@ class BIM(bimParams: BIMParams = BIMParams())(implicit params: CoreParameters) e
       when(io.update.valid && io.update.bits.cfiIdx === w.U) {
         val isTaken = (io.update.bits.cfiIsBr && io.update.bits.cfiTaken) || io.update.bits.cfiIsB
         updateWmask(w) := true.B
-        updateWdata(w) := bimWrite(updateMeta, isTaken)
+        updateWdata(w) := bimWrite(updateMeta(w), isTaken)
       }
 
     }
