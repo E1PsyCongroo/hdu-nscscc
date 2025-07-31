@@ -9,6 +9,7 @@ case class CommonParameters(
     vaddrWidth: Int = 32,
     paddrWidth: Int = 32,
     pcReset: BigInt = 0x1c00_0000L,
+    tlbCount: Int = 16,
     debug: Boolean = true,
 ) {
   val dataBytes: Int  = dataWidth / 8
