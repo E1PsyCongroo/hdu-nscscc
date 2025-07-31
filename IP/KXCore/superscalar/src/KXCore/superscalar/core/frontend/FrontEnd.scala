@@ -231,8 +231,6 @@ class FrontEnd(implicit params: CoreParameters) extends Module {
       stage2BrMask(stage2CfiIdx) -> (stage2DataExt.bits.pcs(stage2CfiIdx) + Sext(Cat(stage2DataExt.bits.insts(stage2CfiIdx)(25, 10), 0.U(2.W)), 32)),
     ),
   )
-  dontTouch(stage2FetchBundle)
-  dontTouch(stage2Redirect)
 
   ras.io.write.valid := stage2Data.fire && stage2DataExt.bits.cfiIdx.valid && stage2CallMask(stage2CfiIdx)
   ras.io.write.idx   := rasIdx
@@ -251,4 +249,9 @@ class FrontEnd(implicit params: CoreParameters) extends Module {
   fb.io.enq.bits         := stage2DataExt.bits
   ftq.io.enq.valid       := stage2Fire
   ftq.io.enq.bits        := stage2DataExt.bits
+  dontTouch(stage0to1)
+  dontTouch(stage1to2)
+  dontTouch(stage2FetchBundle)
+  dontTouch(stage1Redirect)
+  dontTouch(stage2Redirect)
 }

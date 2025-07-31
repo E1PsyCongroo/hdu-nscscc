@@ -61,11 +61,14 @@ object Control {
   val LONGEST_IMM_WIDTH = 26
   object IMMType extends ChiselEnum {
     val IMM_NONE = Value // no immediate
-    val IMM_5    = Value
+    val IMM_5U   = Value
     val IMM_12   = Value
-    val IMM_14   = Value
+    val IMM_12U  = Value
+    val IMM_14U  = Value
+    val IMM_15U  = Value
     val IMM_16   = Value
     val IMM_20   = Value
     val IMM_26   = Value
   }
+
 }

@@ -37,17 +37,16 @@ class MicroOp(implicit params: CoreParameters) extends Bundle {
   val fuType = UInt(FUType.getWidth.W) // which functional unit do we use?
 
   val brType = UInt(BRType.getWidth.W)
-
-  val ftqIdx = UInt(log2Ceil(frontendParams.ftqNum).W)
-
   // Was this a branch that was predicted taken?
-  val taken = Bool()
+  val taken  = Bool()
+  val ftqIdx = UInt(log2Ceil(frontendParams.ftqNum).W)
 
   val immSel    = UInt(IMMType.getWidth.W)
   val immPacked = UInt(LONGEST_IMM_WIDTH.W) // densely pack the imm in decode
 
-  val op1Sel = UInt(OP1Type.getWidth.W)
-  val op2Sel = UInt(OP2Type.getWidth.W)
+  val op1Sel  = UInt(OP1Type.getWidth.W)
+  val op2Sel  = UInt(OP2Type.getWidth.W)
+  val alu_cmd = UInt(ALUType.getWidth.W)
 
   val robIdx = UInt(backendParams.robIdxWidth.W)
   val pdst   = UInt(log2Ceil(backendParams.pregWidth).W) // physical destination register
@@ -65,14 +64,13 @@ class MicroOp(implicit params: CoreParameters) extends Bundle {
   // val mem_signed       = Bool()
   // val uses_ldq         = Bool()
   // val uses_stq         = Bool()
-  // val is_unique        = Bool()                      // only allow this instruction in the pipeline, wait for STQ to
-  //                                                    // drain, clear fetcha fter it (tell ROB to un-ready until empty)
+  // val is_unique = Bool() // only allow this instruction in the pipeline, wait for STQ to drain, clear fetcha fter it (tell ROB to un-ready until empty)
   // val flush_on_commit  = Bool()                      // some instructions need to flush the pipeline behind them
   // val csr_cmd          = UInt(freechips.rocketchip.rocket.CSR.SZ.W)
 
-  val ldst = UInt(log2Ceil(backendParams.lregWidth).W) // logical destination register
-  val lrs1 = UInt(log2Ceil(backendParams.lregWidth).W) // logical source register 1
-  val lrs2 = UInt(log2Ceil(backendParams.lregWidth).W) // logical source register 2
+  val ldst = Valid(UInt(log2Ceil(backendParams.lregWidth).W)) // logical destination register
+  val lrs1 = UInt(log2Ceil(backendParams.lregWidth).W)        // logical source register 1
+  val lrs2 = UInt(log2Ceil(backendParams.lregWidth).W)        // logical source register 2
 
   val debug = new Bundle {
     val pc = UInt(commonParams.vaddrWidth.W)

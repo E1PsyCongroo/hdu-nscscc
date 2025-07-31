@@ -48,8 +48,7 @@ case class BackendParameters(
     coreWidth: Int = 2, // Number of instructions decoded per cycle
     lregNum: Int = 32,
     pregNum: Int = 64,
-    plWidth: Int = 1,   // Pipeline width
-    robRowNum: Int = 64,// Number of rows in the ROB
+    robRowNum: Int = 64, // Number of rows in the ROB
 ) {
   val lregWidth   = log2Ceil(lregNum)
   val pregWidth   = log2Ceil(pregNum)

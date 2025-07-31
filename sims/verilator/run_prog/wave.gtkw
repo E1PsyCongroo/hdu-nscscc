@@ -1,0 +1,95 @@
+[*]
+[*] GTKWave Analyzer v3.3.123 (w)1999-2025 BSI
+[*] Thu Jul 31 02:07:48 2025
+[*]
+[dumpfile] "/home/focused_xy/demo/nscscc/chiplab/sims/verilator/run_prog/log/func/func_lab3_log/simu_trace.fst"
+[dumpfile_mtime] "Thu Jul 31 01:56:04 2025"
+[dumpfile_size] 23198468
+[savefile] "/home/focused_xy/demo/nscscc/chiplab/sims/verilator/run_prog/wave.gtkw"
+[timestart] 852
+[size] 1920 997
+[pos] -1 -1
+*-6.600000 32 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] TOP.
+[treeopen] TOP.simu_top.
+[treeopen] TOP.simu_top.soc.
+[treeopen] TOP.simu_top.soc.cpu.
+[treeopen] TOP.simu_top.soc.cpu.core.
+[treeopen] TOP.simu_top.soc.cpu.core.frontend.
+[treeopen] TOP.simu_top.soc.cpu.core.frontend.bpu.
+[treeopen] TOP.simu_top.soc.cpu.core.frontend.icache.
+[treeopen] TOP.simu_top.soc.cpu.core.frontend.icache.stage0to1.
+[sst_width] 298
+[signals_width] 402
+[sst_expanded] 1
+[sst_vpaned_height] 295
+@28
+TOP.simu_top.soc.cpu.core.frontend.reset
+TOP.simu_top.soc.cpu.core.frontend.clock
+@200
+-npc
+@28
+TOP.simu_top.soc.cpu.core.frontend.npc.io_deq_valid
+TOP.simu_top.soc.cpu.core.frontend.npc.io_deq_ready
+@22
+TOP.simu_top.soc.cpu.core.frontend.npc.io_deq_bits[31:0]
+@200
+-stage0
+@28
+TOP.simu_top.soc.cpu.core.frontend.stage0Data_ready
+TOP.simu_top.soc.cpu.core.frontend.stage0to1_valid
+TOP.simu_top.soc.cpu.core.frontend.stage0to1_ready
+@22
+TOP.simu_top.soc.cpu.core.frontend.stage0to1_bits_fetchPC[31:0]
+@200
+-icache
+@28
+TOP.simu_top.soc.cpu.core.frontend.icache.stage0to1.io_req_valid
+TOP.simu_top.soc.cpu.core.frontend.icache.stage0to1.io_req_ready
+@22
+TOP.simu_top.soc.cpu.core.frontend.icache.stage0to1.io_req_bits[31:0]
+@200
+-bpu
+@28
+TOP.simu_top.soc.cpu.core.frontend.bpu.io_req_stage0_valid
+TOP.simu_top.soc.cpu.core.frontend.bpu.io_req_stage0_ready
+@22
+TOP.simu_top.soc.cpu.core.frontend.bpu.io_req_stage0_bits[31:0]
+@200
+-stage1
+@28
+TOP.simu_top.soc.cpu.core.frontend.stage1Data_valid
+TOP.simu_top.soc.cpu.core.frontend.stage1to2_valid
+@22
+TOP.simu_top.soc.cpu.core.frontend.stage1to2_bits_fetchPC[31:0]
+TOP.simu_top.soc.cpu.core.frontend.stage1to2_bits_stage1Redirect[31:0]
+@200
+-icache
+@28
+TOP.simu_top.soc.cpu.core.frontend.icache.stage1.io_req_valid
+TOP.simu_top.soc.cpu.core.frontend.icache.stage1.io_req_ready
+@22
+TOP.simu_top.soc.cpu.core.frontend.icache.stage1.io_req_bits_vaddr[31:0]
+TOP.simu_top.soc.cpu.core.frontend.icache.stage1.io_req_bits_paddr[31:0]
+@28
+TOP.simu_top.soc.cpu.core.frontend.icache.stage1.io_req_bits_cacop[1:0]
+@29
+TOP.simu_top.soc.cpu.core.frontend.icache.stage1.state[2:0]
+@200
+-bpu
+@28
+TOP.simu_top.soc.cpu.core.frontend.bpu.io_req_stage1_valid
+TOP.simu_top.soc.cpu.core.frontend.bpu.io_req_stage1_ready
+@22
+TOP.simu_top.soc.cpu.core.frontend.bpu.io_req_stage1_bits[31:0]
+@200
+-redirect
+@28
+TOP.simu_top.soc.cpu.core.frontend.stage1Redirect_valid
+TOP.simu_top.soc.cpu.core.frontend.stage1Redirect_ready
+@22
+TOP.simu_top.soc.cpu.core.frontend.stage1Redirect_bits[31:0]
+@200
+-stage2
+[pattern_trace] 1
+[pattern_trace] 0
