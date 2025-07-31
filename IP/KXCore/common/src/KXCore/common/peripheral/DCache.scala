@@ -10,19 +10,19 @@ import KXCore.common.Privilege._
 import KXCore.common.Privilege.CACOP._
 
 object DCache {
-  def getSet(vaddr: UInt)(implicit cacheParams: CacheParameters): UInt = {
+  def getSet(vaddr: UInt)(implicit cacheParams: DCacheParameters): UInt = {
     vaddr(cacheParams.setWidth + cacheParams.blockWidth - 1, cacheParams.blockWidth)
   }
 
-  def getTag(paddr: UInt)(implicit commonParams: CommonParameters, cacheParams: CacheParameters): UInt = {
+  def getTag(paddr: UInt)(implicit commonParams: CommonParameters, cacheParams: DCacheParameters): UInt = {
     paddr.head(commonParams.paddrWidth - cacheParams.setWidth - cacheParams.blockWidth)
   }
 
-  def getOffset(addr: UInt)(implicit cacheParams: CacheParameters): UInt = {
+  def getOffset(addr: UInt)(implicit cacheParams: DCacheParameters): UInt = {
     addr(cacheParams.blockWidth - 1, 0)
   }
 
-  class DCacheStageReq(implicit commonParams: CommonParameters, cacheParams: CacheParameters) extends Bundle {
+  class DCacheStageReq(implicit commonParams: CommonParameters, cacheParams: DCacheParameters) extends Bundle {
     import commonParams.{paddrWidth, vaddrWidth}
     import cacheParams.{blockBits, blockWidth, setWidth, nSets, nWays}
     private val tagWidth = paddrWidth - setWidth - blockWidth
@@ -38,12 +38,12 @@ object DCache {
     val wayData          = Vec(nWays, UInt(blockBits.W))
   }
 
-  class DCacheStageResp(implicit commonParams: CommonParameters, cacheParams: CacheParameters) extends Bundle {
+  class DCacheStageResp(implicit commonParams: CommonParameters, cacheParams: DCacheParameters) extends Bundle {
     val data      = UInt(commonParams.dataWidth.W)
     val exception = Bool()
   }
 
-  class DCacheValidWrite(implicit commonParams: CommonParameters, cacheParams: CacheParameters) extends Bundle {
+  class DCacheValidWrite(implicit commonParams: CommonParameters, cacheParams: DCacheParameters) extends Bundle {
     import cacheParams.{setWidth, wayWidth}
     val all  = Bool()
     val set  = UInt(setWidth.W)
@@ -51,14 +51,14 @@ object DCache {
     val data = Bool()
   }
 
-  class DCacheDirtyWrite(implicit commonParams: CommonParameters, cacheParams: CacheParameters) extends Bundle {
+  class DCacheDirtyWrite(implicit commonParams: CommonParameters, cacheParams: DCacheParameters) extends Bundle {
     import cacheParams.{setWidth, wayWidth}
     val set  = UInt(setWidth.W)
     val way  = UInt(wayWidth.W)
     val data = Bool()
   }
 
-  class DCacheTagWrite(implicit commonParams: CommonParameters, cacheParams: CacheParameters) extends Bundle {
+  class DCacheTagWrite(implicit commonParams: CommonParameters, cacheParams: DCacheParameters) extends Bundle {
     import commonParams.{paddrWidth}
     import cacheParams.{setWidth, wayWidth, blockWidth}
     private val tagWidth = paddrWidth - setWidth - blockWidth
@@ -68,7 +68,7 @@ object DCache {
     val data = UInt(tagWidth.W)
   }
 
-  class DCacheDataWrite(implicit commonParams: CommonParameters, cacheParams: CacheParameters) extends Bundle {
+  class DCacheDataWrite(implicit commonParams: CommonParameters, cacheParams: DCacheParameters) extends Bundle {
     import cacheParams.{setWidth, wayWidth, blockBits}
     val set  = UInt(setWidth.W)
     val way  = UInt(wayWidth.W)
@@ -79,7 +79,7 @@ object DCache {
 
 import DCache._
 
-class DCacheStage0to1(implicit commonParams: CommonParameters, cacheParams: CacheParameters) extends Module {
+class DCacheStage0to1(implicit commonParams: CommonParameters, cacheParams: DCacheParameters) extends Module {
   import commonParams.{vaddrWidth, paddrWidth}
   import cacheParams._
   private val tagWidth = paddrWidth - setWidth - blockWidth
@@ -153,7 +153,7 @@ class DCacheStage0to1(implicit commonParams: CommonParameters, cacheParams: Cach
   io.resp.bits.wayTag     := wayTag
 }
 
-class DCacheStage1(implicit commonParams: CommonParameters, cacheParams: CacheParameters, axiParams: AXIBundleParameters) extends Module {
+class DCacheStage1(implicit commonParams: CommonParameters, cacheParams: DCacheParameters, axiParams: AXIBundleParameters) extends Module {
   import commonParams.{vaddrWidth, paddrWidth}
   import cacheParams._
   private val tagWidth = paddrWidth - setWidth - blockWidth
@@ -349,7 +349,7 @@ class DCacheStage1(implicit commonParams: CommonParameters, cacheParams: CachePa
   io.axi.b.ready := (state === sWriteBusResp)
 }
 
-class DCacheStage1to2(implicit commonParams: CommonParameters, cacheParams: CacheParameters) extends Module {
+class DCacheStage1to2(implicit commonParams: CommonParameters, cacheParams: DCacheParameters) extends Module {
   import commonParams.{vaddrWidth, paddrWidth}
   import cacheParams._
   private val tagWidth = paddrWidth - setWidth - blockWidth
@@ -437,7 +437,7 @@ class DCacheStage1to2(implicit commonParams: CommonParameters, cacheParams: Cach
   io.resp.bits.data      := extractedData
 }
 
-class DCache(implicit commonParams: CommonParameters, cacheParams: CacheParameters, axiParams: AXIBundleParameters) extends Module {
+class DCache(implicit commonParams: CommonParameters, cacheParams: DCacheParameters, axiParams: AXIBundleParameters) extends Module {
   import commonParams.{vaddrWidth, paddrWidth}
   import cacheParams._
   private val tagWidth = paddrWidth - setWidth - blockWidth
