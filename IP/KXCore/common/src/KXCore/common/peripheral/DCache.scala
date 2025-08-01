@@ -293,7 +293,7 @@ class DCacheStage1(implicit commonParams: CommonParameters, cacheParams: CachePa
   state := nextState
 
   val matched = PriorityEncoder(wayTag.map(tag === _))
-  hit := wayValid(matched)
+  hit := wayValid(matched) && tag === wayTag(matched)
 
   val random        = if (nWays == 1) 0.U else GaloisLFSR.maxPeriod(wayWidth)
   val replacedSel   = RegEnable(Mux(wayValid.contains(false.B), PriorityEncoder(wayValid.map(!_)), random), io.axi.ar.fire || io.axi.aw.fire)
@@ -379,8 +379,8 @@ class DCacheStage1(implicit commonParams: CommonParameters, cacheParams: CachePa
   io.dataWrite.bits.way  := Mux(state === sWriteBack, replacedSel, matched)
   io.dataWrite.bits.data := Mux(state === sWriteBack, lineData.asUInt, 
     Mux(isWrite && hit, 
-      (lineData.asUInt & ~(Fill(commonParams.dataWidth / 8, 1.U) << (offset * 8.U))) | (writeData << (offset * 8.U)),
-      lineData.asUInt
+      (wayData(matched) & ~(Fill(commonParams.dataWidth / 8, 1.U) << (offset * 8.U))) | (writeData << (offset * 8.U)),
+      wayData(matched)
     )
   )
   io.dataWrite.bits.mask := blockMask
