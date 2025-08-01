@@ -5,6 +5,7 @@ import KXCore.common.peripheral.CacheParameters
 import KXCore.common.peripheral.AXIBundleParameters
 import KXCore.superscalar.core._
 import KXCore.superscalar.core.frontend._
+import KXCore.superscalar.core.backend._
 
 object Elaborate extends App {
   val firtoolOptions = Array(
@@ -18,7 +19,7 @@ object Elaborate extends App {
 
   implicit val params: CoreParameters = CoreParameters()
   circt.stage.ChiselStage.emitSystemVerilogFile(
-    new core_top(),
+    new Decoder(),
     args,
     firtoolOptions,
   )

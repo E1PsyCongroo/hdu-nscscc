@@ -12,12 +12,12 @@ object IQType extends ChiselEnum {
 
 object FUType extends ChiselEnum {
   // bit mask, since a given execution pipeline may support multiple functional units
-  val FUT_ALU    = Value(1.U)
-  val FUT_BRANCH = Value(2.U)
-  val FUT_MEM    = Value(4.U)
-  val FUT_MUL    = Value(8.U)
-  val FUT_DIV    = Value(16.U)
-  val FUT_CSR    = Value(32.U)
+  val FUT_ALU = Value(1.U)
+  val FUT_CFI = Value(2.U)
+  val FUT_MEM = Value(4.U)
+  val FUT_MUL = Value(8.U)
+  val FUT_DIV = Value(16.U)
+  val FUT_CSR = Value(32.U)
 }
 
 object CFIType extends ChiselEnum {
@@ -36,28 +36,24 @@ class MicroOp(implicit params: CoreParameters) extends Bundle {
   val iqType = UInt(IQType.getWidth.W) // which issue unit do we use?
   val fuType = UInt(FUType.getWidth.W) // which functional unit do we use?
 
-  val brType = UInt(BRType.getWidth.W)
-
+  // Was this a branch that was predicted taken?
+  val taken  = Bool()
   val ftqIdx = UInt(log2Ceil(frontendParams.ftqNum).W)
 
-  // Was this a branch that was predicted taken?
-  val taken = Bool()
-
-  val immSel    = UInt(IMMType.getWidth.W)
-  val immPacked = UInt(LONGEST_IMM_WIDTH.W) // densely pack the imm in decode
+  val imm = UInt(commonParams.dataWidth.W) // densely pack the imm in decode
 
   val op1Sel = UInt(OP1Type.getWidth.W)
   val op2Sel = UInt(OP2Type.getWidth.W)
-
-  val robIdx = UInt(backendParams.robIdxWidth.W)
-  val pdst   = UInt(log2Ceil(backendParams.pregWidth).W) // physical destination register
-  val prs1   = UInt(log2Ceil(backendParams.pregWidth).W) // physical source register 1
-  val prs2   = UInt(log2Ceil(backendParams.pregWidth).W) // physical source register 2
-
-  val prs1Busy = Bool()
-  val prs2Busy = Bool()
+  val aluCmd = UInt(ALUType.getWidth.W)
 
   val stalePdst = UInt(log2Ceil(backendParams.pregWidth).W) // stale physical destination register
+  val pdst      = UInt(log2Ceil(backendParams.pregWidth).W) // physical destination register
+  val prs1      = UInt(log2Ceil(backendParams.pregWidth).W) // physical source register 1
+  val prs2      = UInt(log2Ceil(backendParams.pregWidth).W) // physical source register 2
+  val prs1Busy  = Bool()
+  val prs2Busy  = Bool()
+
+  val robIdx = UInt(backendParams.robIdxWidth.W)
   // val exception        = Bool()
   // val exc_cause        = UInt(xLen.W)          // TODO compress this down, xlen is insanity
   // val mem_cmd          = UInt(M_SZ.W)          // sync primitives/cache flushes
