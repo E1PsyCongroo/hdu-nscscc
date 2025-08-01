@@ -75,3 +75,12 @@ object MaskUpper {
     (0 until n).map(i => (in << i.U)(n - 1, 0)).reduce(_ | _)
   }
 }
+
+/** Set all bits at or below the highest order '1'.
+  */
+object MaskLower {
+  def apply(in: UInt) = {
+    val n = in.getWidth
+    (0 until n).map(i => in >> i.U).reduce(_ | _)
+  }
+}

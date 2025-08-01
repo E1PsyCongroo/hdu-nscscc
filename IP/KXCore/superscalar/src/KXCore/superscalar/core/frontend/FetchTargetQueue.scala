@@ -3,7 +3,6 @@ package KXCore.superscalar.core.frontend
 import chisel3._
 import chisel3.util._
 import KXCore.common.utils._
-import KXCore.common.Control._
 import KXCore.superscalar._
 
 /** Queue to store the fetch PC and other relevant branch predictor signals that are inflight in the processor.
@@ -43,21 +42,19 @@ class FetchTargetQueue(implicit params: CoreParameters) extends Module {
   val full = deq_ptr === enq_ptr && maybe_full
   io.enq.ready := !full
 
-  val pcs  = Reg(Vec(ftqNum, UInt(vaddrWidth.W)))
-  val meta = Reg(Vec(ftqNum, io.enq.bits.bpuMeta.cloneType))
-  val ram  = Reg(Vec(ftqNum, new FTQBundle))
+  val ram = Reg(Vec(ftqNum, new FTQBundle))
 
   val do_enq = io.enq.fire
 
   when(do_enq) {
-    maybe_full   := true.B
-    pcs(enq_ptr) := io.enq.bits.pc
+    maybe_full := true.B
     val new_entry = Wire(new FTQBundle)
-    new_entry.taken   := io.enq.bits.cfiIdx.valid
-    new_entry.cfiType := io.enq.bits.cfiType
-    ram(enq_ptr)      := new_entry
-    meta(enq_ptr)     := io.enq.bits.bpuMeta
-    enq_ptr           := WrapInc(enq_ptr, ftqNum)
+    new_entry.fetchPC  := io.enq.bits.pc
+    new_entry.taken    := io.enq.bits.cfiIdx.valid
+    new_entry.meta.bim := io.enq.bits.bpuMeta.bim
+    new_entry.meta.btb := io.enq.bits.bpuMeta.btb
+    ram(enq_ptr)       := new_entry
+    enq_ptr            := WrapInc(enq_ptr, ftqNum)
   }
 
   io.enqIdx := enq_ptr
@@ -71,25 +68,24 @@ class FetchTargetQueue(implicit params: CoreParameters) extends Module {
   }
 
   val bpuUpdate = Wire(new BranchPredictionUpdate)
-  bpuUpdate.fetchPC   := pcs(io.deq.bits.idx)
+  bpuUpdate.fetchPC   := ram(io.deq.bits.idx).fetchPC
   bpuUpdate.cfiIdx    := io.deq.bits.brUpdate.bits.pcLow(log2Ceil(params.fetchBytes) - 1, 2)
-  bpuUpdate.cfiIsBr   := ram(io.deq.bits.idx).cfiType === CFIType.CFI_BR.asUInt
-  bpuUpdate.cfiIsB    := ram(io.deq.bits.idx).cfiType === CFIType.CFI_B.asUInt
-  bpuUpdate.cfiIsJirl := ram(io.deq.bits.idx).cfiType === CFIType.CFI_JIRL.asUInt
+  bpuUpdate.cfiIsBr   := io.deq.bits.brUpdate.bits.cfiType === CFIType.CFI_BR.asUInt
+  bpuUpdate.cfiIsB    := io.deq.bits.brUpdate.bits.cfiType === CFIType.CFI_B.asUInt
+  bpuUpdate.cfiIsJirl := io.deq.bits.brUpdate.bits.cfiType === CFIType.CFI_JIRL.asUInt
   bpuUpdate.target    := io.deq.bits.brUpdate.bits.target
   bpuUpdate.cfiTaken  := io.deq.bits.brUpdate.bits.taken
-  bpuUpdate.meta      := meta(io.deq.bits.idx)
+  bpuUpdate.meta      := ram(io.deq.bits.idx).meta
 
   io.bpuUpdate.valid := io.deq.valid && io.deq.bits.brUpdate.valid
   io.bpuUpdate.bits  := bpuUpdate
 
   // -------------------------------------------------------------
-  // **** Core Read PCs ****
+  // **** Core Read PC ****
   // -------------------------------------------------------------
 
-  io.getPC.entry   := ram(io.getPC.ftqIdx)
-  io.getPC.fetchPC := pcs(io.getPC.ftqIdx)
+  io.getPC.entry := ram(io.getPC.ftqIdx)
   val nextIdx = WrapInc(io.getPC.ftqIdx, ftqNum)
   io.getPC.nextPC.valid := nextIdx =/= enq_ptr || io.enq.fire
-  io.getPC.nextPC.bits  := Mux(nextIdx =/= enq_ptr, pcs(nextIdx), io.enq.bits.pc)
+  io.getPC.nextPC.bits  := Mux(nextIdx =/= enq_ptr, ram(io.deq.bits.idx).fetchPC, io.enq.bits.pc)
 }

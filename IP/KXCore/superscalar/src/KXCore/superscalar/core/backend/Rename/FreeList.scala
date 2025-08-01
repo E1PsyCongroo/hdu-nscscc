@@ -17,7 +17,7 @@ class RenameFreeList(
   val io = IO(new Bundle {
     val initial = Input(UInt(pregNum.W))
     // Physical register requests.
-    val allocPregs = Vec(allocWidth, Decoupled(UInt(pregWidth.W)))
+    val allocPregs = Vec(allocWidth, Flipped(Decoupled(UInt(pregWidth.W))))
 
     // Pregs returned by the ROB.
     val dealloc = Input(Vec(deallocWidth, Valid(UInt(pregWidth.W))))

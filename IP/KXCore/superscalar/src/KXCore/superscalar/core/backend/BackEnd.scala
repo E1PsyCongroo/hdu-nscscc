@@ -3,12 +3,11 @@ package KXCore.superscalar.core.backend
 import chisel3._
 import chisel3.util._
 import KXCore.common._
-import KXCore.common.Control._
 import KXCore.common.Privilege._
 import KXCore.common.peripheral._
 import KXCore.common.utils._
 import KXCore.superscalar._
-import KXCore.superscalar.core.frontend.FetchBufferResp
+import KXCore.superscalar.core.frontend._
 
 class BackEndIO(implicit params: CoreParameters) extends Bundle {
   import params.{commonParams, axiParams, backendParams}
@@ -16,6 +15,7 @@ class BackEndIO(implicit params: CoreParameters) extends Bundle {
   val dtlbReq     = Output(new TLBReq)
   val dtlbResp    = Input(new TLBResp)
   val fetchPacket = Flipped(Decoupled(new FetchBufferResp()))
+  val getPC       = Flipped(new GetPCFromFtqIO)
 }
 
 class BackEnd(implicit params: CoreParameters) extends Module {
@@ -28,14 +28,15 @@ class BackEnd(implicit params: CoreParameters) extends Module {
   val renameMapTable  = Module(new RenameMapTable(true))
   val renameFreeList  = Module(new RenameFreeList(coreWidth, 1))
   val renameBusyTable = Module(new RenameBusyTable(1, true))
+  val rob             = Module(new ReorderBuffer)
 
   val flush = Wire(Bool())
 
-  // decode
-  val uopFire    = Wire(UInt(coreWidth.W))
-  val uopFireReg = RegInit(0.U(coreWidth.W))
-  uopFireReg           := Mux(io.fetchPacket.ready, 0.U, uopFire)
-  io.fetchPacket.ready := uopFire.andR
+  // decode & rename
+  val decUopFire    = Wire(UInt(coreWidth.W))
+  val decUopFireReg = RegInit(0.U(coreWidth.W))
+  decUopFireReg        := Mux(io.fetchPacket.ready, 0.U, decUopFire)
+  io.fetchPacket.ready := decUopFire.andR || flush
 
   val decData = Wire(Decoupled(Vec(coreWidth, Valid(new MicroOp))))
   decData.valid := io.fetchPacket.valid
@@ -44,7 +45,7 @@ class BackEnd(implicit params: CoreParameters) extends Module {
     renameMapTable.io.mapReqs(i).ldst := io.fetchPacket.bits.uops(i).bits.ldst
     renameMapTable.io.mapReqs(i).lrs1 := io.fetchPacket.bits.uops(i).bits.lrs1
     renameMapTable.io.mapReqs(i).lrs2 := io.fetchPacket.bits.uops(i).bits.lrs2
-    decData.bits(i).valid             := io.fetchPacket.bits.uops(i).valid && !uopFireReg(i)
+    decData.bits(i).valid             := io.fetchPacket.bits.uops(i).valid && !decUopFireReg(i)
     decData.bits(i).bits              := decoder.io.resp(i)
     decData.bits(i).bits.stalePdst    := renameMapTable.io.mapResps(i).stalePdst
     decData.bits(i).bits.prs1         := renameMapTable.io.mapResps(i).prs1
@@ -54,40 +55,52 @@ class BackEnd(implicit params: CoreParameters) extends Module {
   val decToRen = Wire(Decoupled(Vec(coreWidth, Valid(new MicroOp))))
   PipeConnect(Some(flush), decData, decToRen)
 
-  uopFire := uopFireReg | (Fill(coreWidth, decData.fire) & VecInit(decData.bits.map(_.valid)).asUInt)
+  decUopFire := decUopFireReg | (Fill(coreWidth, decData.fire) & VecInit(decData.bits.map(_.valid)).asUInt)
 
-  // rename
-  val renData      = Wire(Decoupled(Vec(coreWidth, Valid(new MicroOp))))
-  val renDataFires = Wire(Vec(coreWidth, Bool()))
-  renData.valid := decToRen.valid && renDataFires.reduce(_ || _)
+  // rename & dispatch
+  val disUopReady   = Wire(UInt(coreWidth.W))
+  val disUopFire    = Wire(UInt(coreWidth.W))
+  val disUopFireReg = RegInit(0.U(coreWidth.W))
+  decUopFireReg  := Mux(decToRen.ready, 0.U, disUopFire)
+  decToRen.ready := VecInit(decToRen.bits.map(_.valid)).asUInt === disUopFire || flush
+
+  val disData = Wire(Decoupled(Vec(coreWidth, Valid(new MicroOp))))
   for (i <- 0 until coreWidth) {
-    renData.bits(i).valid                 := decToRen.bits(i).valid
-    renData.bits(i).bits                  := decToRen.bits(i).bits
-    renData.bits(i).bits.pdst             := renameFreeList.io.allocPregs(i).bits
-    renameFreeList.io.allocPregs(i).ready := renData.bits(i).valid && renData.bits(i).bits.ldst =/= 0.U && renData.fire
-    renDataFires(i)                       := !renData.bits(i).valid || renameFreeList.io.allocPregs(i).valid || renData.bits(i).bits.ldst === 0.U
+    renameFreeList.io.allocPregs(i).valid := disData.bits(i).valid && disData.bits(i).bits.ldst =/= 0.U &&
+      disUopReady(i)
+
+    renameMapTable.io.renRemapReqs(i).valid := disData.bits(i).valid && disUopReady(i)
+    renameMapTable.io.renRemapReqs(i).ldst  := disData.bits(i).bits.ldst
+    renameMapTable.io.renRemapReqs(i).pdst  := disData.bits(i).bits.pdst
+
+    renameBusyTable.io.uopReqs(i)    := disData.bits(i).bits
+    renameBusyTable.io.rebusyReqs(i) := disData.bits(i).valid
+
+    rob.io.alloc(i).valid := disData.bits(i).valid && disUopReady(i)
+    rob.io.alloc(i).uop   := disData.bits(i).bits
+
+    disData.bits(i).valid := decToRen.bits(i).valid &&
+      (renameFreeList.io.allocPregs(i).ready || disData.bits(i).bits.ldst === 0.U) &&
+      rob.io.alloc(i).ready
+    disData.bits(i).bits        := decToRen.bits(i).bits
+    disData.bits(i).bits.pdst   := renameFreeList.io.allocPregs(i).bits
+    disData.bits(i).bits.robIdx := rob.io.alloc(i).idx
     for (j <- 0 until i) {
-      when(renData.bits(j).valid) {
-        when(renData.bits(j).bits.ldst === renData.bits(i).bits.ldst) {
-          renData.bits(i).bits.stalePdst := renData.bits(j).bits.pdst
+      when(decToRen.bits(j).valid) {
+        when(decToRen.bits(j).bits.ldst === disData.bits(i).bits.ldst) {
+          disData.bits(i).bits.stalePdst := decToRen.bits(j).bits.pdst
         }
-        when(renData.bits(j).bits.ldst === renData.bits(i).bits.lrs1) {
-          renData.bits(i).bits.prs1 := renData.bits(j).bits.pdst
+        when(decToRen.bits(j).bits.ldst === disData.bits(i).bits.lrs1) {
+          disData.bits(i).bits.prs1 := decToRen.bits(j).bits.pdst
         }
-        when(renData.bits(j).bits.ldst === renData.bits(i).bits.lrs2) {
-          renData.bits(i).bits.prs2 := renData.bits(j).bits.pdst
+        when(decToRen.bits(j).bits.ldst === disData.bits(i).bits.lrs2) {
+          disData.bits(i).bits.prs2 := decToRen.bits(j).bits.pdst
         }
       }
     }
-    renameMapTable.io.renRemapReqs(i).valid := renData.fire && renData.bits(i).valid
-    renameMapTable.io.renRemapReqs(i).ldst  := renData.bits(i).bits.ldst
-    renameMapTable.io.renRemapReqs(i).pdst  := renData.bits(i).bits.pdst
+    disData.bits(i).bits.prs1Busy := renameBusyTable.io.busyResps(i).prs1Busy
+    disData.bits(i).bits.prs2Busy := renameBusyTable.io.busyResps(i).prs2Busy
   }
-
-  val renToDis = Wire(Decoupled(Vec(coreWidth, Valid(new MicroOp))))
-  PipeConnect(Some(flush), renData, renToDis)
-
-  // dispatch
 
   // issue
 }

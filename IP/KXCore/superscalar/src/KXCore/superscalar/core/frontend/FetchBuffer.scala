@@ -71,7 +71,6 @@ class FetchBuffer(numEntries: Int = 16)(implicit params: CoreParameters) extends
     in_uops(i).pcLow    := pc
     in_uops(i).ftqIdx   := io.enq.bits.ftqIdx
     in_uops(i).inst     := io.enq.bits.insts(i)
-    in_uops(i).taken    := io.enq.bits.cfiIdx.bits === i.U && io.enq.bits.cfiIdx.valid
   }
 
   // Step 2. Generate one-hot write indices.

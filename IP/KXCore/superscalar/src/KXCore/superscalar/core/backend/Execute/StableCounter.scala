@@ -1,10 +1,10 @@
 package KXCore.superscalar.core.backend
 
 import chisel3._
-import KXCore.superscalar.CoreParameters
+import KXCore.superscalar._
 
 class StableCounter(implicit params: CoreParameters) extends Module {
-  val io = IO(new Bundle{
+  val io = IO(new Bundle {
     val low  = Output(UInt(32.W))
     val high = Output(UInt(32.W))
   })

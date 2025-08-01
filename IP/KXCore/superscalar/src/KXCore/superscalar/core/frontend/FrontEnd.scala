@@ -3,7 +3,6 @@ package KXCore.superscalar.core.frontend
 import chisel3._
 import chisel3.util._
 import KXCore.common._
-import KXCore.common.Control._
 import KXCore.common.Privilege._
 import KXCore.common.peripheral._
 import KXCore.common.utils._
@@ -199,16 +198,8 @@ class FrontEnd(implicit params: CoreParameters) extends Module {
 
   stage2FetchBundle.cfiIdx.valid := stage2CfiMask.orR
   stage2FetchBundle.cfiIdx.bits  := stage2CfiIdx
-  stage2FetchBundle.cfiType := MuxCase(
-    CFIType.CFI_NONE.asUInt,
-    Seq(
-      stage2BrMask(stage2FetchBundle.cfiIdx.bits)   -> CFIType.CFI_BR.asUInt,
-      stage2BMask(stage2FetchBundle.cfiIdx.bits)    -> CFIType.CFI_B.asUInt,
-      stage2JIRLMask(stage2FetchBundle.cfiIdx.bits) -> CFIType.CFI_JIRL.asUInt,
-    ),
-  )
-  stage2FetchBundle.ftqIdx  := ftq.io.enqIdx
-  stage2FetchBundle.bpuMeta := bpu.io.resp.stage2.bits.meta
+  stage2FetchBundle.ftqIdx       := ftq.io.enqIdx
+  stage2FetchBundle.bpuMeta      := bpu.io.resp.stage2.bits.meta
 
   val stage2Data = Wire(Decoupled(stage2FetchBundle.cloneType))
   stage2Data.valid            := bpu.io.resp.stage2.valid && icache.io.resp.stage2.valid && stage1to2.valid

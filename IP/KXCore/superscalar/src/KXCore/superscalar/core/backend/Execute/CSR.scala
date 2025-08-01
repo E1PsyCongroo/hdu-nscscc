@@ -3,7 +3,7 @@ package KXCore.superscalar.core.backend
 import chisel3._
 import chisel3.util._
 import KXCore.common._
-import KXCore.superscalar.CoreParameters
+import KXCore.superscalar._
 
 class CRMD extends Bundle {
   val value = UInt(32.W)
@@ -119,7 +119,7 @@ class Timer extends Module {
 
     val tcfg = Output(UInt(32.W))
     val tval = Output(UInt(32.W))
-    
+
     val pending = Output(Bool())
   })
   val en = RegInit(false.B)
@@ -129,7 +129,7 @@ class Timer extends Module {
   val tval = RegInit(0.U(32.W))
 
   val write_tfcg = io.waddr === CSRAddr.TCFG.U && io.wen
-  
+
   en := Mux(write_tfcg, io.wdata(0), en)
   periodic := Mux(write_tfcg, io.wdata(1), periodic)
 
@@ -137,7 +137,7 @@ class Timer extends Module {
   initvalue := Mux(write_tfcg, tcfg_initvalue, initvalue)
 
   tval := Mux(
-    write_tfcg, 
+    write_tfcg,
     tcfg_initvalue,
     Mux(
       en,
@@ -152,11 +152,11 @@ class Timer extends Module {
 
   val write_ticlr = io.waddr === CSRAddr.TICLR.U && io.wen
   pending := Mux(
-    write_ticlr && io.wdata(0), 
-    false.B, 
+    write_ticlr && io.wdata(0),
+    false.B,
     Mux(en && tval === 1.U, true.B, pending)
   )
-  
+
   io.pending := pending
   io.tval := tval
   io.tcfg := Cat(initvalue, periodic, en)
@@ -189,7 +189,7 @@ class CSRIO(implicit params: CoreParameters) extends Bundle {
   val cmd   = Input(UInt(2.W))
   val raddr = Input(UInt(12.W))  // CSR address to read
   val rdata = Output(UInt(32.W)) // CSR read data
-  
+
   val waddr = Input(UInt(5.W))  // CSR address to write
   val wdata = Input(UInt(32.W)) // CSR write data
   val wmask = Input(UInt(32.W)) // CSR write mask
@@ -270,7 +270,7 @@ class CSR(implicit params: CoreParameters) extends Module {
   /* ------ Interrupt Pending ------ */
   io.interrupt.pending := (estat.is() & ecfg.lie()).orR & crmd.ie()
   /* ------ Interrupt Pending ------ */
-  
+
   /* ------ Write Logic ------ */
   when(io.excp_en) {
     crmd  := excp_crmd
@@ -285,7 +285,7 @@ class CSR(implicit params: CoreParameters) extends Module {
     for (i <- 0 until 4) {
       saved(i) := Mux(io.waddr === (CSRAddr.SAVED0 + i).U, (io.wdata & io.wmask) | (saved(i) & ~io.wmask), saved(i))
     }
-    
+
     crmd.value := Mux(io.waddr === CSRAddr.CRMD.U, crmd.write((io.wdata & io.wmask) | (crmd.value & ~io.wmask)), crmd.value)
     prmd.value := Mux(io.waddr === CSRAddr.PRMD.U, prmd.write((io.wdata & io.wmask) | (prmd.value & ~io.wmask)), prmd.value)
 

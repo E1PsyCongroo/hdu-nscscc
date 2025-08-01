@@ -192,8 +192,9 @@ class ICacheStage1(implicit commonParams: CommonParameters, cacheParams: CachePa
   )
   state := nextState
 
-  val matched = PriorityEncoder(wayTag.map(tag === _))
-  hit := wayValid(matched)
+  val matches = wayTag.map(tag === _)
+  val matched = PriorityEncoder(matches)
+  hit := matches.reduce(_ || _) && wayValid(matched)
 
   val random        = if (nWays == 1) 0.U else GaloisLFSR.maxPeriod(wayWidth)
   val replacedSel   = RegEnable(Mux(wayValid.contains(false.B), PriorityEncoder(wayValid.map(!_)), random), io.axi.ar.fire)

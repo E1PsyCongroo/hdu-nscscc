@@ -4,7 +4,6 @@ import chisel3._
 import chisel3.util._
 import chisel3.util.experimental.decode._
 import KXCore.common._
-import KXCore.common.Control._
 import KXCore.common.peripheral._
 import KXCore.common.utils._
 import KXCore.superscalar._

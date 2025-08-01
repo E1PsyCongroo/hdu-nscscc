@@ -42,6 +42,7 @@ case class FrontendParmaeters(
     btbParams: BTBParams = BTBParams(),
 ) {
   require(isPow2(fetchWidth))
+  val ftqIdxWidth = log2Ceil(ftqNum)
 }
 
 case class BackendParameters(
@@ -53,10 +54,13 @@ case class BackendParameters(
 ) {
   val lregWidth   = log2Ceil(lregNum)
   val pregWidth   = log2Ceil(pregNum)
-  val robIdxWidth = log2Ceil(robRowNum)
+  val robIdxWidth = log2Ceil(robRowNum) + log2Ceil(coreWidth)
+  val retireWidth = coreWidth
 }
 
-case class CoreParameters()(
+case class CoreParameters(
+    debug: Boolean = true,
+)(
     implicit val commonParams: CommonParameters = CommonParameters(),
     implicit val axiParams: AXIBundleParameters = AXIBundleParameters(),
     implicit val icacheParams: CacheParameters = CacheParameters(),
