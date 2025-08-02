@@ -20,5 +20,5 @@ class FuncUnitReq(implicit params: CoreParameters) extends Bundle {
 class ExeUnitResp(implicit params: CoreParameters) extends Bundle {
   val uop    = new MicroOp
   val data   = UInt(params.commonParams.dataWidth.W)
-  val brInfo = Output(new BrUpdateInfo)
+  val brInfo = new BrUpdateInfo
 }

@@ -89,9 +89,10 @@ class BranchPredictionUpdate(implicit params: CoreParameters) extends Bundle {
 class BrUpdateInfo(implicit params: CoreParameters) extends Bundle {
   import params.{commonParams, axiParams, frontendParams}
   val mispredict = Bool()
-  val cfiIdx     = UInt(log2Ceil(frontendParams.fetchWidth).W)
-  val cfiType    = UInt(CFIType.getWidth.W)
-  val taken      = Bool()
+  val cfiIdx     = Valid(UInt(log2Ceil(frontendParams.fetchWidth).W))
+  val cfiIsB     = Bool()
+  val cfiIsJirl  = Bool()
+  val cfiIsBr    = Bool()
   val target     = UInt(commonParams.vaddrWidth.W)
 }
 

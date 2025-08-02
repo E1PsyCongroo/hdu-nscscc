@@ -19,7 +19,6 @@ class BackEndIO(implicit params: CoreParameters) extends Bundle {
   val getPC       = Flipped(Vec(3, new GetPCFromFtqIO))
   val commit = Valid(new Bundle {
     val ftqIdx   = UInt(log2Ceil(frontendParams.ftqNum).W)
-    val redirect = Valid(UInt(commonParams.vaddrWidth.W)) // Redirect PC
     val brUpdate = Valid(new BrUpdateInfo)
   })
 }
@@ -55,11 +54,6 @@ class BackEnd(implicit params: CoreParameters) extends Module {
   intIssUnit.io.fu_types := VecInit(aluExeUnits.map(_.io_fu_types))
 
   // decode & rename
-  val decUopFire    = Wire(UInt(coreWidth.W))
-  val decUopFireReg = RegInit(0.U(coreWidth.W))
-  decUopFireReg        := Mux(io.fetchPacket.ready, 0.U, decUopFire)
-  io.fetchPacket.ready := decUopFire.andR || flush
-
   val decData = Wire(Decoupled(Vec(coreWidth, Valid(new MicroOp))))
   decData.valid := io.fetchPacket.valid
   for (i <- 0 until coreWidth) {
@@ -67,7 +61,7 @@ class BackEnd(implicit params: CoreParameters) extends Module {
     renameMapTable.io.mapReqs(i).ldst := io.fetchPacket.bits.uops(i).bits.ldst
     renameMapTable.io.mapReqs(i).lrs1 := io.fetchPacket.bits.uops(i).bits.lrs1
     renameMapTable.io.mapReqs(i).lrs2 := io.fetchPacket.bits.uops(i).bits.lrs2
-    decData.bits(i).valid             := io.fetchPacket.bits.uops(i).valid && !decUopFireReg(i)
+    decData.bits(i).valid             := io.fetchPacket.bits.uops(i).valid
     decData.bits(i).bits              := decoder.io.resp(i)
     decData.bits(i).bits.stalePdst    := renameMapTable.io.mapResps(i).stalePdst
     decData.bits(i).bits.prs1         := renameMapTable.io.mapResps(i).prs1
@@ -77,13 +71,12 @@ class BackEnd(implicit params: CoreParameters) extends Module {
   val decToRen = Wire(Decoupled(Vec(coreWidth, Valid(new MicroOp))))
   PipeConnect(Some(flush), decData, decToRen)
 
-  decUopFire := decUopFireReg | (Fill(coreWidth, decData.ready) & VecInit(decData.bits.map(_.valid)).asUInt)
-
   // rename & dispatch
+  // 可能存在 uniq 指令 需要 rob 为空时入队，此时 disData 可能部分握手
   val disUopReady   = Wire(UInt(coreWidth.W))
   val disUopFire    = Wire(UInt(coreWidth.W))
   val disUopFireReg = RegInit(0.U(coreWidth.W))
-  decUopFireReg  := Mux(decToRen.ready, 0.U, disUopFire)
+  disUopFireReg  := Mux(decToRen.ready, 0.U, disUopFire)
   decToRen.ready := VecInit(decToRen.bits.map(_.valid)).asUInt === disUopFire || flush
 
   val disData = Wire(Decoupled(Vec(coreWidth, Valid(new MicroOp))))
@@ -165,11 +158,14 @@ class BackEnd(implicit params: CoreParameters) extends Module {
   // commit
   io.getPC(0).ftqIdx := DontCare
   for (i <- 0 until coreWidth) {
-    renameMapTable.io.comRemapReqs(i).valid := rob.io.commit(i).valid
-    renameMapTable.io.comRemapReqs(i).ldst  := rob.io.commit(i).bits.uop.ldst
-    renameMapTable.io.comRemapReqs(i).pdst  := rob.io.commit(i).bits.uop.pdst
+    renameMapTable.io.comRemapReqs(i).valid := rob.io.commit.valids(i)
+    renameMapTable.io.comRemapReqs(i).ldst  := rob.io.commit.uop(i).ldst
+    renameMapTable.io.comRemapReqs(i).pdst  := rob.io.commit.uop(i).pdst
 
-    renameFreeList.io.dealloc(i).valid := rob.io.commit(i).valid
-    renameFreeList.io.dealloc(i).bits  := rob.io.commit(i).bits.uop.stalePdst
+    renameFreeList.io.dealloc(i).valid := rob.io.commit.valids(i)
+    renameFreeList.io.dealloc(i).bits  := rob.io.commit.uop(i).stalePdst
   }
+  io.commit.valid         := rob.io.commit.valids.reduce(_ || _)
+  io.commit.bits.ftqIdx   := rob.io.commit.ftqIdx
+  io.commit.bits.brUpdate := rob.io.commit.brInfo
 }

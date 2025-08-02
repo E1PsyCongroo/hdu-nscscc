@@ -58,27 +58,29 @@ class ALUUnit(implicit params: CoreParameters) extends FunctionalUnit(isAluUnit 
   val rs1 = io.req.bits.rs1_data
   val rs2 = io.req.bits.rs2_data
 
-  val brinfo = Wire(new BrUpdateInfo)
-  brinfo.mispredict := MuxLookup(io.req.bits.uop.cfiType, false.B)(
+  val brInfo = Wire(new BrUpdateInfo)
+  brInfo.mispredict := MuxLookup(io.req.bits.uop.cfiType, false.B)(
     Seq(
       CFIType.CFI_JIRL.asUInt -> (!io.req.bits.ftq_info(1).valid ||
-        brinfo.target =/= io.req.bits.ftq_info(1).entry.fetchPC),
-      CFIType.CFI_BR.asUInt -> (brinfo.taken =/= io.req.bits.uop.taken),
+        brInfo.target =/= io.req.bits.ftq_info(1).entry.fetchPC),
+      CFIType.CFI_BR.asUInt -> (alu.io.out(0) =/= io.req.bits.uop.taken),
     ),
   )
-  brinfo.cfiIdx  := io.req.bits.uop.idx
-  brinfo.cfiType := io.req.bits.uop.cfiType
-  brinfo.taken   := alu.io.out.asBool
-  brinfo.target := Mux(
+  brInfo.cfiIdx.valid := brInfo.cfiIsB || brInfo.cfiIsJirl || (brInfo.cfiIsBr && alu.io.out(0))
+  brInfo.cfiIdx.bits  := io.req.bits.uop.idx
+  brInfo.cfiIsB       := io.req.bits.uop.cfiType === CFIType.CFI_B.asUInt
+  brInfo.cfiIsJirl    := io.req.bits.uop.cfiType === CFIType.CFI_JIRL.asUInt
+  brInfo.cfiIsBr      := io.req.bits.uop.cfiType === CFIType.CFI_BR.asUInt
+  brInfo.target := Mux(
     io.req.bits.uop.cfiType === CFIType.CFI_JIRL.asUInt,
-    uop_pc,
     io.req.bits.rs1_data,
+    uop_pc,
   ) + io.req.bits.uop.imm
 
   io.resp.valid       := io.req.valid
   io.resp.bits.uop    := io.req.bits.uop
   io.resp.bits.data   := alu.io.out
-  io.resp.bits.brInfo := brinfo
+  io.resp.bits.brInfo := brInfo
   assert(io.resp.ready)
 }
 

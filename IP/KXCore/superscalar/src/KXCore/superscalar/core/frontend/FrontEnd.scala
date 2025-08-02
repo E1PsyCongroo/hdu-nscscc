@@ -22,7 +22,6 @@ class FrontEndIO(implicit params: CoreParameters) extends Bundle {
   val getPC       = new GetPCFromFtqIO
   val commit = Flipped(Valid(new Bundle {
     val ftqIdx   = UInt(log2Ceil(frontendParams.ftqNum).W)
-    val redirect = Valid(UInt(commonParams.vaddrWidth.W)) // Redirect PC
     val brUpdate = Valid(new BrUpdateInfo)
   }))
 }
@@ -47,8 +46,12 @@ class FrontEnd(implicit params: CoreParameters) extends Module {
   val stage1Redirect = Wire(Decoupled(UInt(vaddrWidth.W)))
   val stage2Redirect = Wire(Decoupled(UInt(vaddrWidth.W)))
 
-  flush.stage1 := io.commit.valid && io.commit.bits.redirect.valid || stage2Redirect.valid
-  flush.stage2 := io.commit.valid && io.commit.bits.redirect.valid
+  val backendRedirect = Wire(Valid(UInt(vaddrWidth.W)))
+  backendRedirect.valid := io.commit.valid && io.commit.bits.brUpdate.valid && io.commit.bits.brUpdate.bits.mispredict
+  backendRedirect.bits  := io.commit.bits.brUpdate.bits.target
+
+  flush.stage1 := backendRedirect.valid || stage2Redirect.valid
+  flush.stage2 := backendRedirect.valid
 
   io.axi          <> icache.io.axi
   icache.io.flush := flush
@@ -62,7 +65,7 @@ class FrontEnd(implicit params: CoreParameters) extends Module {
   io.getPC                 <> ftq.io.getPC
   ftq.io.deq.valid         := io.commit.valid
   ftq.io.deq.bits.idx      := io.commit.bits.ftqIdx
-  ftq.io.deq.bits.redirect := io.commit.bits.redirect.valid
+  ftq.io.deq.bits.redirect := backendRedirect.valid
   ftq.io.deq.bits.brUpdate := io.commit.bits.brUpdate
 
   // stage0: pre-fetch
@@ -71,15 +74,15 @@ class FrontEnd(implicit params: CoreParameters) extends Module {
   }))
   val npc = Module(new Queue(UInt(vaddrWidth.W), 1, false, true, false, true))
   npc.io.flush.get := flush.stage1
-  npc.io.enq.valid := RegNext(reset.asBool) || (io.commit.valid && io.commit.bits.redirect.valid) ||
+  npc.io.enq.valid := RegNext(reset.asBool) || backendRedirect.valid ||
     stage2Redirect.valid || stage1Redirect.valid
   npc.io.enq.bits := MuxCase(
     DontCare,
     Seq(
-      RegNext(reset.asBool)                              -> pcReset.U,
-      (io.commit.valid && io.commit.bits.redirect.valid) -> io.commit.bits.redirect.bits,
-      stage2Redirect.valid                               -> stage2Redirect.bits,
-      stage1Redirect.valid                               -> stage1Redirect.bits,
+      RegNext(reset.asBool) -> pcReset.U,
+      backendRedirect.valid -> backendRedirect.bits,
+      stage2Redirect.valid  -> stage2Redirect.bits,
+      stage1Redirect.valid  -> stage1Redirect.bits,
     ),
   )
   stage1Redirect.ready := npc.io.enq.ready

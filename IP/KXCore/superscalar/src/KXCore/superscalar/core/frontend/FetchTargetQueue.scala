@@ -67,12 +67,12 @@ class FetchTargetQueue(implicit params: CoreParameters) extends Module {
 
   val bpuUpdate = Wire(new BranchPredictionUpdate)
   bpuUpdate.fetchPC   := ram(io.deq.bits.idx).fetchPC
-  bpuUpdate.cfiIdx    := io.deq.bits.brUpdate.bits.cfiIdx
-  bpuUpdate.cfiIsBr   := io.deq.bits.brUpdate.bits.cfiType === CFIType.CFI_BR.asUInt
-  bpuUpdate.cfiIsB    := io.deq.bits.brUpdate.bits.cfiType === CFIType.CFI_B.asUInt
-  bpuUpdate.cfiIsJirl := io.deq.bits.brUpdate.bits.cfiType === CFIType.CFI_JIRL.asUInt
+  bpuUpdate.cfiIdx    := io.deq.bits.brUpdate.bits.cfiIdx.bits
+  bpuUpdate.cfiIsBr   := io.deq.bits.brUpdate.bits.cfiIsBr
+  bpuUpdate.cfiIsB    := io.deq.bits.brUpdate.bits.cfiIsB
+  bpuUpdate.cfiIsJirl := io.deq.bits.brUpdate.bits.cfiIsJirl
   bpuUpdate.target    := io.deq.bits.brUpdate.bits.target
-  bpuUpdate.cfiTaken  := io.deq.bits.brUpdate.bits.taken
+  bpuUpdate.cfiTaken  := io.deq.bits.brUpdate.bits.cfiIdx.valid
   bpuUpdate.meta      := ram(io.deq.bits.idx).meta
 
   io.bpuUpdate.valid := io.deq.valid && io.deq.bits.brUpdate.valid
