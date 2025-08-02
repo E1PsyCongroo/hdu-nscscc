@@ -14,18 +14,18 @@ abstract class RegisterFile(
 )(implicit params: CoreParameters)
     extends Module {
   import params.{commonParams, backendParams}
-  import commonParams.{vaddrWidth}
+  import commonParams.{dataWidth}
   import backendParams.{pregWidth, pregNum}
 
   val io = IO(new Bundle {
     val read_reqs  = Vec(numReadPorts, Flipped(Decoupled(UInt(log2Ceil(numRegisters).W))))
-    val read_resps = Vec(numReadPorts, Output(UInt(vaddrWidth.W)))
+    val read_resps = Vec(numReadPorts, Output(UInt(dataWidth.W)))
 
     val write_ports = Vec(
       numWritePorts,
       Flipped(Valid(new Bundle {
         val addr = UInt(pregWidth.W)
-        val data = UInt(vaddrWidth.W)
+        val data = UInt(dataWidth.W)
       })),
     )
   })
@@ -54,7 +54,7 @@ class FullyPortedRF(
 
   io.read_reqs.map(p => p.ready := true.B)
 
-  val regfile = Mem(numRegisters, UInt(params.commonParams.vaddrWidth.W))
+  val regfile = Mem(numRegisters, UInt(params.commonParams.dataBytes.W))
 
   (0 until numReadPorts) map { p => io.read_resps(p) := regfile(io.read_reqs(p).bits) }
 

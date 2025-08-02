@@ -8,16 +8,10 @@ import KXCore.superscalar.core._
 
 /** Specific type of issue unit
   *
-  * @param numWakeupPorts
-  *   number of wakeup ports for the issue queue
   * @param issueParams
   *   issue queue params
   */
-class IssueUnitCollapsing(
-    numWakeupPorts: Int,
-    issueParams: IssueParams,
-)(implicit params: CoreParameters)
-    extends IssueUnit(numWakeupPorts, issueParams) {
+class IssueUnitCollapsing(issueParams: IssueParams)(implicit params: CoreParameters) extends IssueUnit(issueParams) {
   import issueParams._
   // -------------------------------------------------------------
   // Figure out how much to shift entries by

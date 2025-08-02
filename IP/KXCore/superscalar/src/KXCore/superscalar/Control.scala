@@ -4,44 +4,38 @@ import chisel3._
 import chisel3.util._
 
 object ALUType extends ChiselEnum {
-  val ALU_ADD  = Value("b0000".U)
-  val ALU_SLL  = Value("b0001".U)
-  val ALU_SRL  = Value("b0010".U)
-  val ALU_SRA  = Value("b0011".U)
-  val ALU_NOR  = Value("b0100".U)
-  val ALU_AND  = Value("b0101".U)
-  val ALU_OR   = Value("b0110".U)
-  val ALU_XOR  = Value("b0111".U)
+  val ALU_SLL = Value("b0000".U)
+  val ALU_EQ  = Value("b0001".U)
+  val ALU_SRL = Value("b0010".U)
+  val ALU_SRA = Value("b0011".U)
+  val ALU_NEQ = Value("b0100".U)
+  val ALU_ADD = Value("b0101".U)
+  val ALU_NOR = Value("b0110".U)
+  val ALU_AND = Value("b0111".U)
+
   val ALU_SUB  = Value("b1000".U)
   val ALU_SLT  = Value("b1001".U)
   val ALU_SLTU = Value("b1010".U)
-  val ALU_NEQ  = Value("b1011".U)
+  val ALU_OR   = Value("b1011".U)
+  val ALU_XOR  = Value("b1100".U)
   val ALU_SGE  = Value("b1101".U)
   val ALU_SGEU = Value("b1110".U)
 
-  object MUL_DIV extends ChiselEnum {
-    val MUL         = Value("b0000".U)
-    val MULH        = Value("b0001".U)
-    val MULHU       = Value("b0011".U)
-    val DIV         = Value("b0100".U)
-    val MOD         = Value("b0101".U)
-    val DIVU        = Value("b0110".U)
-    val MODU        = Value("b0111".U)
-    val MUL_DIV_MAX = Value("b1111".U)
-  }
-
-  def ALU_MUL   = MUL_DIV.MUL
-  def ALU_MULH  = MUL_DIV.MULH
-  def ALU_MULHU = MUL_DIV.MULHU
-  def ALU_DIV   = MUL_DIV.DIV
-  def ALU_MOD   = MUL_DIV.MOD
-  def ALU_DIVU  = MUL_DIV.DIVU
-  def ALU_MODU  = MUL_DIV.MODU
+  def ALU_MUL   = ALU_ADD
+  def ALU_MULH  = ALU_SLL
+  def ALU_MULHU = ALU_SRA
+  def ALU_DIV   = ALU_NOR
+  def ALU_MOD   = ALU_AND
+  def ALU_DIVU  = ALU_OR
+  def ALU_MODU  = ALU_XOR
 
   def isSub(cmd: UInt)        = cmd(3)
+  def isCmp(cmd: UInt)        = cmd(3) & (cmd(0) ^ cmd(1))
   def cmpUnsigned(cmd: UInt)  = cmd(1)
+  def cmpInverted(cmd: UInt)  = cmd(2)
+  def cmpEq(cmd: UInt)        = !cmd(3)
   def shiftReverse(cmd: UInt) = cmd(1)
-  def bwInvRs2(cmd: UInt)     = cmd(3)
+  def shiftArith(cmd: UInt)   = cmd(0)
 }
 
 // RS1 Operand Select Signal
@@ -71,9 +65,9 @@ object IMMType extends ChiselEnum {
 }
 
 object IQType extends ChiselEnum {
-  val IQT_INT     = Value(0.U)
-  val IQT_MUL_DIV = Value(1.U)
-  val IQT_MEM     = Value(2.U)
+  val IQT_INT = Value(0.U)
+  val IQT_UNQ = Value(1.U)
+  val IQT_MEM = Value(2.U)
 }
 
 object FUType extends ChiselEnum {

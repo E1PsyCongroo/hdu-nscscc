@@ -11,33 +11,48 @@ import KXCore.superscalar.core._
 import KXCore.superscalar.core.frontend._
 
 class BackEndIO(implicit params: CoreParameters) extends Bundle {
-  import params.{commonParams, axiParams, backendParams}
+  import params.{commonParams, axiParams, frontendParams, backendParams}
   val axi         = new AXIBundle(axiParams)
   val dtlbReq     = Output(new TLBReq)
   val dtlbResp    = Input(new TLBResp)
   val fetchPacket = Flipped(Decoupled(new FetchBufferResp()))
-  val getPC       = Flipped(new GetPCFromFtqIO)
+  val getPC       = Flipped(Vec(3, new GetPCFromFtqIO))
+  val commit = Valid(new Bundle {
+    val ftqIdx   = UInt(log2Ceil(frontendParams.ftqNum).W)
+    val redirect = Valid(UInt(commonParams.vaddrWidth.W)) // Redirect PC
+    val brUpdate = Valid(new BrUpdateInfo)
+  })
 }
 
 class BackEnd(implicit params: CoreParameters) extends Module {
   import params.{commonParams, backendParams}
-  import backendParams.{coreWidth, issueParams}
+  import backendParams.{coreWidth, issueParams, pregNum, memIQParams, unqIQParams, intIQParams}
 
   val io = IO(new BackEndIO)
 
   val decoder         = Module(new Decoder)
   val renameMapTable  = Module(new RenameMapTable(true))
   val renameFreeList  = Module(new RenameFreeList(coreWidth, coreWidth))
-  val renameBusyTable = Module(new RenameBusyTable(1, true))
-  val rob             = Module(new ReorderBuffer(2))
+  val renameBusyTable = Module(new RenameBusyTable(true))
+  val rob             = Module(new ReorderBuffer)
   val dispatcher      = Module(new Dispatcher)
-  val memIq           = Module(new IssueUnitCollapsing(3, issueParams(0)))
-  val intIq           = Module(new IssueUnitCollapsing(3, issueParams(1)))
+  // val memIssUnit      = Module(new IssueUnitCollapsing(memIQParams))
+  // val unqIssUnit = Module(new IssueUnitCollapsing(unqIQParams))
+  // val intIssUnit = Module(new IssueUnitCollapsing(intIQParams))
+  val intIssUnit  = Module(new IssueUnitCollapsing(intIQParams))
+  val aluExeUnits = Seq.fill(1)(Module(new ALUExeUnit))
+  val regFile     = Module(new FullyPortedRF(pregNum, aluExeUnits.map(_.nReaders).sum, aluExeUnits.length))
 
   val flush = Wire(Bool())
 
-  memIq.io.flush := flush
-  intIq.io.flush := flush
+  renameMapTable.io.rollback := flush
+  renameFreeList.io.rollback := flush
+  // memIssUnit.io.flush := flush
+  // unqIssUnit.io.flush := flush
+  intIssUnit.io.flush := flush
+  aluExeUnits.foreach(unit => unit.io_kill := flush)
+
+  intIssUnit.io.fu_types := VecInit(aluExeUnits.map(_.io_fu_types))
 
   // decode & rename
   val decUopFire    = Wire(UInt(coreWidth.W))
@@ -116,6 +131,45 @@ class BackEnd(implicit params: CoreParameters) extends Module {
   disUopFire  := disUopFireReg | (disUopReady & VecInit(disData.bits.map(_.valid)).asUInt)
 
   // issue
-  memIq.io.dis_uops := dispatcher.io.dis_uops(0)
-  intIq.io.dis_uops := dispatcher.io.dis_uops(1)
+  // dispatcher.io.dis_uops(0) <> memIssUnit.io.dis_uops
+  // dispatcher.io.dis_uops(1) <>unqIssUnit.io.dis_uops
+  dispatcher.io.dis_uops(0) := DontCare
+  dispatcher.io.dis_uops(1) := DontCare
+  dispatcher.io.dis_uops(2) <> intIssUnit.io.dis_uops
+
+  // execute
+  intIssUnit.io.iss_uops zip aluExeUnits map { case (iss_uop, exu) => iss_uop <> exu.io_iss_uop }
+  (0 until aluExeUnits.length).foreach { i =>
+    aluExeUnits(i).io_read_reqs(0) <> regFile.io.read_reqs(2 * i)
+    aluExeUnits(i).io_read_reqs(1) <> regFile.io.read_reqs(2 * i + 1)
+    io.getPC(i + 1).ftqIdx         := aluExeUnits(i).io_ftq_req(0)
+    io.getPC(i + 2).ftqIdx         := aluExeUnits(i).io_ftq_req(1)
+    aluExeUnits(i).io_ftq_resp(0)  := io.getPC(i + 1).info
+    aluExeUnits(i).io_ftq_resp(1)  := io.getPC(i + 2).info
+  }
+
+  // write back
+  (0 until aluExeUnits.length).foreach { i =>
+    renameBusyTable.io.wbValids(i)      := aluExeUnits(i).io_alu_resp.valid
+    renameBusyTable.io.wbPdsts(i)       := aluExeUnits(i).io_alu_resp.bits.uop.pdst
+    intIssUnit.io.wakeup_ports(i).valid := aluExeUnits(i).io_alu_resp.valid
+    intIssUnit.io.wakeup_ports(i).bits  := aluExeUnits(i).io_alu_resp.bits.uop.pdst
+    regFile.io.write_ports(i).valid     := aluExeUnits(i).io_alu_resp.valid
+    regFile.io.write_ports(i).bits.addr := aluExeUnits(i).io_alu_resp.bits.uop.pdst
+    regFile.io.write_ports(i).bits.data := aluExeUnits(i).io_alu_resp.bits.data
+    rob.io.write(i).valid               := aluExeUnits(i).io_alu_resp.valid
+    rob.io.write(i).bits.uop            := aluExeUnits(i).io_alu_resp.bits.uop
+    rob.io.write(i).bits.brInfo         := aluExeUnits(i).io_alu_resp.bits.brInfo
+  }
+
+  // commit
+  io.getPC(0).ftqIdx := DontCare
+  for (i <- 0 until coreWidth) {
+    renameMapTable.io.comRemapReqs(i).valid := rob.io.commit(i).valid
+    renameMapTable.io.comRemapReqs(i).ldst  := rob.io.commit(i).bits.uop.ldst
+    renameMapTable.io.comRemapReqs(i).pdst  := rob.io.commit(i).bits.uop.pdst
+
+    renameFreeList.io.dealloc(i).valid := rob.io.commit(i).valid
+    renameFreeList.io.dealloc(i).bits  := rob.io.commit(i).bits.uop.stalePdst
+  }
 }

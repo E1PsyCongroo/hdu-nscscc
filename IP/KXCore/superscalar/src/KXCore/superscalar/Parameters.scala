@@ -36,12 +36,14 @@ case class FrontendParmaeters(
     fetchWidth: Int = 4, // Number of instructions fetched per request
     fbNum: Int = 16,     // Number of entries in the fetch buffer
     ftqNum: Int = 32,    // Number of entries in the fetch target queue
-    rasNum: Int = 16,    // Number of entries in the return address stack
+    rasNum: Int = 32,    // Number of entries in the return address stack
+    icacheParams: CacheParameters = CacheParameters(),
     faubtbParams: FAMicroBTBParameters = FAMicroBTBParameters(),
     bimParams: BIMParams = BIMParams(),
     btbParams: BTBParams = BTBParams(),
 ) {
   require(isPow2(fetchWidth))
+  require(fbNum > fetchWidth)
   val ftqIdxWidth = log2Ceil(ftqNum)
 }
 
@@ -66,19 +68,22 @@ case class IssueParams(
 case class BackendParameters(
     coreWidth: Int = 2, // Number of instructions decoded per cycle
     lregNum: Int = 32,
-    pregNum: Int = 64,
-    plWidth: Int = 1,    // Pipeline width
-    robRowNum: Int = 64, // Number of rows in the ROB
+    pregNum: Int = 80,
+    robNum: Int = 32, // Number of entries in the ROB
+    dcacheParams: CacheParameters = CacheParameters(id = 1),
     issueParams: Seq[IssueParams],
 ) {
   require(issueParams.length == 3)
+  require(robNum % coreWidth == 0)
   val lregWidth   = log2Ceil(lregNum)
   val pregWidth   = log2Ceil(pregNum)
-  val robIdxWidth = log2Ceil(robRowNum) + log2Ceil(coreWidth)
+  val robRowNum   = robNum / coreWidth
+  val robIdxWidth = log2Ceil(robNum)
   val retireWidth = coreWidth
   def memIQParams = issueParams(0)
   def unqIQParams = issueParams(1)
   def intIQParams = issueParams(2)
+  val wbPortNum   = issueParams.map(_.issueWidth).sum
 }
 
 case class CoreParameters(
@@ -86,10 +91,14 @@ case class CoreParameters(
 )(
     implicit val commonParams: CommonParameters = CommonParameters(),
     implicit val axiParams: AXIBundleParameters = AXIBundleParameters(),
-    implicit val icacheParams: CacheParameters = CacheParameters(),
     implicit val frontendParams: FrontendParmaeters = FrontendParmaeters(),
-    implicit val backendParams: BackendParameters =
-      BackendParameters(issueParams = Seq(IssueParams(2, 1, 12, IQType.IQT_MEM.asUInt), IssueParams(2, 2, 20, IQType.IQT_INT.asUInt))),
+    implicit val backendParams: BackendParameters = BackendParameters(issueParams =
+      Seq(
+        IssueParams(2, 1, 12, IQType.IQT_MEM.asUInt),
+        IssueParams(2, 1, 12, IQType.IQT_UNQ.asUInt),
+        IssueParams(2, 2, 20, IQType.IQT_INT.asUInt),
+      ),
+    ),
 ) {
   val fetchBytes = frontendParams.fetchWidth * commonParams.instBytes
   def fetchIdx(addr: UInt): UInt = {

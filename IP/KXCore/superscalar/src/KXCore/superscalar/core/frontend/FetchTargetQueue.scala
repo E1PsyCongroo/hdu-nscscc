@@ -31,16 +31,15 @@ class FetchTargetQueue(implicit params: CoreParameters) extends Module {
     }))
 
     // Give PC info to BranchUnit.
-    val getPC = new GetPCFromFtqIO()
+    val getPC = Vec(3, new GetPCFromFtqIO())
 
     val bpuUpdate = Output(Valid(new BranchPredictionUpdate))
 
   })
-  val deq_ptr    = RegInit(0.U(idxWidth.W))
-  val enq_ptr    = RegInit(0.U(idxWidth.W))
-  val maybe_full = RegInit(false.B)
+  val deq_ptr = RegInit(0.U(idxWidth.W))
+  val enq_ptr = RegInit(1.U(idxWidth.W))
 
-  val full = deq_ptr === enq_ptr && maybe_full
+  val full = deq_ptr === WrapInc(enq_ptr, ftqNum)
   io.enq.ready := !full
 
   val ram = Reg(Vec(ftqNum, new FTQBundle))
@@ -48,7 +47,6 @@ class FetchTargetQueue(implicit params: CoreParameters) extends Module {
   val do_enq = io.enq.fire
 
   when(do_enq) {
-    maybe_full := true.B
     val new_entry = Wire(new FTQBundle)
     new_entry.fetchPC  := io.enq.bits.pc
     new_entry.taken    := io.enq.bits.cfiIdx.valid
@@ -61,8 +59,7 @@ class FetchTargetQueue(implicit params: CoreParameters) extends Module {
   io.enqIdx := enq_ptr
 
   when(io.deq.valid) {
-    maybe_full := false.B
-    deq_ptr    := io.deq.bits.idx
+    deq_ptr := io.deq.bits.idx
     when(io.deq.bits.redirect) {
       enq_ptr := WrapInc(io.deq.bits.idx, ftqNum)
     }
@@ -70,7 +67,7 @@ class FetchTargetQueue(implicit params: CoreParameters) extends Module {
 
   val bpuUpdate = Wire(new BranchPredictionUpdate)
   bpuUpdate.fetchPC   := ram(io.deq.bits.idx).fetchPC
-  bpuUpdate.cfiIdx    := io.deq.bits.brUpdate.bits.pcLow(log2Ceil(params.fetchBytes) - 1, 2)
+  bpuUpdate.cfiIdx    := io.deq.bits.brUpdate.bits.cfiIdx
   bpuUpdate.cfiIsBr   := io.deq.bits.brUpdate.bits.cfiType === CFIType.CFI_BR.asUInt
   bpuUpdate.cfiIsB    := io.deq.bits.brUpdate.bits.cfiType === CFIType.CFI_B.asUInt
   bpuUpdate.cfiIsJirl := io.deq.bits.brUpdate.bits.cfiType === CFIType.CFI_JIRL.asUInt
@@ -85,8 +82,9 @@ class FetchTargetQueue(implicit params: CoreParameters) extends Module {
   // **** Core Read PC ****
   // -------------------------------------------------------------
 
-  io.getPC.entry := ram(io.getPC.ftqIdx)
-  val nextIdx = WrapInc(io.getPC.ftqIdx, ftqNum)
-  io.getPC.nextPC.valid := nextIdx =/= enq_ptr || io.enq.fire
-  io.getPC.nextPC.bits  := Mux(nextIdx =/= enq_ptr, ram(io.deq.bits.idx).fetchPC, io.enq.bits.pc)
+  for (i <- 0 until 3) {
+    val idx = io.getPC(i).ftqIdx
+    io.getPC(i).info.valid := idx =/= enq_ptr
+    io.getPC(i).info.entry := ram(idx)
+  }
 }

@@ -8,17 +8,15 @@ import KXCore.superscalar.core._
 
 /** IO bundle to interact with the issue unit
   */
-class IssueUnitIO(
-    numWakeupPorts: Int,
-    issueParams: IssueParams,
-)(implicit params: CoreParameters)
-    extends Bundle {
+class IssueUnitIO(issueParams: IssueParams)(implicit params: CoreParameters) extends Bundle {
+  import params.{backendParams}
+  import backendParams.{pregWidth, wbPortNum}
   import issueParams.{dispatchWidth, issueWidth, numEntries}
 
   val flush        = Input(Bool())
   val dis_uops     = Vec(dispatchWidth, Flipped(Decoupled(new MicroOp)))
   val iss_uops     = Vec(issueWidth, Decoupled(new MicroOp()))
-  val wakeup_ports = Flipped(Vec(numWakeupPorts, Valid(UInt(params.backendParams.pregWidth.W))))
+  val wakeup_ports = Flipped(Vec(wbPortNum, Valid(UInt(pregWidth.W))))
   // tell the issue unit what each execution pipeline has in terms of functional units
   val fu_types = Input(Vec(issueWidth, UInt(FUType.getWidth.W)))
 
@@ -27,10 +25,10 @@ class IssueUnitIO(
 
 /** Abstract top level issue unit
   */
-abstract class IssueUnit(numWakeupPorts: Int, issueParams: IssueParams)(implicit params: CoreParameters) extends Module {
+abstract class IssueUnit(issueParams: IssueParams)(implicit params: CoreParameters) extends Module {
   import issueParams.{dispatchWidth, issueWidth, numEntries, iqType}
 
-  val io = IO(new IssueUnitIO(numWakeupPorts, issueParams))
+  val io = IO(new IssueUnitIO(issueParams))
 
   // -------------------------------------------------------------
   // Set up the dispatch uops
@@ -44,7 +42,7 @@ abstract class IssueUnit(numWakeupPorts: Int, issueParams: IssueParams)(implicit
   // -------------------------------------------------------------
   // Issue Table
 
-  val slots       = Seq.fill(numEntries)(Module(new IssueSlot(numWakeupPorts)))
+  val slots       = Seq.fill(numEntries)(Module(new IssueSlot))
   val issue_slots = VecInit(slots.map(_.io))
 
   for (i <- 0 until numEntries) {

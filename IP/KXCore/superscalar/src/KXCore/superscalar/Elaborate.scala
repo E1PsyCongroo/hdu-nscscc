@@ -17,7 +17,7 @@ object Elaborate extends App {
 
   implicit val params: CoreParameters = CoreParameters()
   circt.stage.ChiselStage.emitSystemVerilogFile(
-    new IssueUnitCollapsing(2, IssueParams(1, 1, 8, IQType.IQT_INT.asUInt)),
+    new ReorderBuffer,
     args,
     firtoolOptions,
   )

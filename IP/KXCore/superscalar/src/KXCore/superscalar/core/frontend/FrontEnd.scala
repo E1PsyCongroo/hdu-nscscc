@@ -34,7 +34,7 @@ class FrontEnd(implicit params: CoreParameters) extends Module {
 
   val io = IO(new FrontEndIO)
 
-  val icache = Module(new ICache)
+  val icache = Module(new ICache()(commonParams, icacheParams, axiParams))
   val bpu    = Module(new SimpleBranchPredictor)
   val ras    = Module(new RAS)
   val fb     = Module(new FetchBuffer)

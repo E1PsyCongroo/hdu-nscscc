@@ -17,7 +17,7 @@ object IQTypeControlField extends DecodeField[Instruction, UInt] {
   def genTable(op: Instruction): BitPat = {
     op match {
       case LD_B | LD_H | LD_W | ST_B | ST_H | ST_W | LD_BU | LD_HU    => BitPat(IQType.IQT_MEM.asUInt)
-      case MUL_W | MULH_W | MULH_WU | DIV_W | MOD_W | DIV_WU | MOD_WU => BitPat(IQType.IQT_MUL_DIV.asUInt)
+      case MUL_W | MULH_W | MULH_WU | DIV_W | MOD_W | DIV_WU | MOD_WU => BitPat(IQType.IQT_UNQ.asUInt)
       case _                                                          => BitPat(IQType.IQT_INT.asUInt)
     }
   }

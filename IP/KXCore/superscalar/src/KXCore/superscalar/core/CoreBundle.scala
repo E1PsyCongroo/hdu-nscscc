@@ -8,8 +8,9 @@ import KXCore.superscalar._
 /** MicroOp passing through the pipeline
   */
 class MicroOp(implicit params: CoreParameters) extends Bundle {
-  import params.{commonParams, axiParams, icacheParams, frontendParams, backendParams}
-  val pcLow   = UInt(log2Ceil(params.fetchBytes).W)
+  import params.{commonParams, axiParams, frontendParams, backendParams}
+  import frontendParams.{icacheParams}
+  val idx     = UInt(log2Ceil(frontendParams.fetchWidth).W)
   val inst    = UInt(commonParams.instWidth.W)
   val iqType  = UInt(IQType.getWidth.W) // which issue unit do we use?
   val fuType  = UInt(FUType.getWidth.W) // which functional unit do we use?

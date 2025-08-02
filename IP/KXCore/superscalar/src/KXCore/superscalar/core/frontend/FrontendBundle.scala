@@ -88,10 +88,11 @@ class BranchPredictionUpdate(implicit params: CoreParameters) extends Bundle {
 
 class BrUpdateInfo(implicit params: CoreParameters) extends Bundle {
   import params.{commonParams, axiParams, frontendParams}
-  val pcLow   = UInt(log2Ceil(params.fetchBytes).W)
-  val cfiType = UInt(CFIType.getWidth.W)
-  val taken   = Bool()
-  val target  = UInt(commonParams.vaddrWidth.W)
+  val mispredict = Bool()
+  val cfiIdx     = UInt(log2Ceil(frontendParams.fetchWidth).W)
+  val cfiType    = UInt(CFIType.getWidth.W)
+  val taken      = Bool()
+  val target     = UInt(commonParams.vaddrWidth.W)
 }
 
 class FetchBufferResp(implicit params: CoreParameters) extends Bundle {
@@ -110,10 +111,15 @@ class FTQBundle(implicit params: CoreParameters) extends Bundle {
   }
 }
 
+class FTQInfo(implicit params: CoreParameters) extends Bundle {
+  import params.{commonParams, frontendParams}
+  val valid = Bool()
+  val entry = new FTQBundle
+}
+
 /** IO to provide a port for a FunctionalUnit to get the PC of an instruction. And for JIRL, the PC of the next instruction.
   */
 class GetPCFromFtqIO(implicit params: CoreParameters) extends Bundle {
   val ftqIdx = Flipped(UInt(log2Ceil(params.frontendParams.ftqNum).W))
-  val entry  = new FTQBundle
-  val nextPC = Valid(UInt(params.commonParams.vaddrWidth.W))
+  val info   = new FTQInfo
 }
