@@ -4,6 +4,7 @@ import chisel3._
 import chisel3.util._
 import KXCore.common.utils._
 import KXCore.superscalar._
+import KXCore.superscalar.core._
 
 /** Queue to store the fetch PC and other relevant branch predictor signals that are inflight in the processor.
   *

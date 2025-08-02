@@ -3,6 +3,7 @@ package KXCore.superscalar.core.backend
 import chisel3._
 import chisel3.util._
 import KXCore.superscalar._
+import KXCore.superscalar.core._
 
 class BusyResp extends Bundle {
   val prs1Busy = Bool()

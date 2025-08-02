@@ -7,6 +7,7 @@ import KXCore.common._
 import KXCore.common.peripheral._
 import KXCore.common.utils._
 import KXCore.superscalar._
+import KXCore.superscalar.core._
 
 import Instruction._
 
@@ -35,6 +36,19 @@ object FUTypeControlField extends DecodeField[Instruction, UInt] {
       case MUL_W | MULH_W | MULH_WU                                            => BitPat(FUType.FUT_MUL.asUInt)
       case DIV_W | MOD_W | DIV_WU | MOD_WU                                     => BitPat(FUType.FUT_DIV.asUInt)
       case _                                                                   => BitPat(FUType.FUT_ALU.asUInt)
+    }
+  }
+}
+
+object CFITypeControlField extends DecodeField[Instruction, UInt] {
+  def name             = "Control flow instruction type control field"
+  def chiselType: UInt = UInt(CFIType.getWidth.W)
+  def genTable(op: Instruction): BitPat = {
+    op match {
+      case B | BL                              => BitPat(CFIType.CFI_B.asUInt)
+      case JIRL                                => BitPat(CFIType.CFI_JIRL.asUInt)
+      case BNE | BEQ | BLT | BGE | BLTU | BGEU => BitPat(CFIType.CFI_BR.asUInt)
+      case _                                   => BitPat(CFIType.CFI_NONE.asUInt)
     }
   }
 }
@@ -306,8 +320,9 @@ class Decoder(implicit params: CoreParameters) extends Module {
   for (i <- 0 until coreWidth) {
     val decodeResult = decodeTable.decode(io.req(i).inst)
     val uop          = WireDefault(io.req(i))
-    uop.iqType := decodeResult(IQTypeControlField)
-    uop.fuType := decodeResult(FUTypeControlField)
+    uop.iqType  := decodeResult(IQTypeControlField)
+    uop.fuType  := decodeResult(FUTypeControlField)
+    uop.cfiType := decodeResult(CFITypeControlField)
     uop.imm := MuxCase(
       DontCare,
       Seq(

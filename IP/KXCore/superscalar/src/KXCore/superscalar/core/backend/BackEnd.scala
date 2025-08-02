@@ -7,6 +7,7 @@ import KXCore.common.Privilege._
 import KXCore.common.peripheral._
 import KXCore.common.utils._
 import KXCore.superscalar._
+import KXCore.superscalar.core._
 import KXCore.superscalar.core.frontend._
 
 class BackEndIO(implicit params: CoreParameters) extends Bundle {
@@ -20,17 +21,23 @@ class BackEndIO(implicit params: CoreParameters) extends Bundle {
 
 class BackEnd(implicit params: CoreParameters) extends Module {
   import params.{commonParams, backendParams}
-  import backendParams.{coreWidth}
+  import backendParams.{coreWidth, issueParams}
 
   val io = IO(new BackEndIO)
 
   val decoder         = Module(new Decoder)
   val renameMapTable  = Module(new RenameMapTable(true))
-  val renameFreeList  = Module(new RenameFreeList(coreWidth, 1))
+  val renameFreeList  = Module(new RenameFreeList(coreWidth, coreWidth))
   val renameBusyTable = Module(new RenameBusyTable(1, true))
-  val rob             = Module(new ReorderBuffer)
+  val rob             = Module(new ReorderBuffer(2))
+  val dispatcher      = Module(new Dispatcher)
+  val memIq           = Module(new IssueUnitCollapsing(3, issueParams(0)))
+  val intIq           = Module(new IssueUnitCollapsing(3, issueParams(1)))
 
   val flush = Wire(Bool())
+
+  memIq.io.flush := flush
+  intIq.io.flush := flush
 
   // decode & rename
   val decUopFire    = Wire(UInt(coreWidth.W))
@@ -55,7 +62,7 @@ class BackEnd(implicit params: CoreParameters) extends Module {
   val decToRen = Wire(Decoupled(Vec(coreWidth, Valid(new MicroOp))))
   PipeConnect(Some(flush), decData, decToRen)
 
-  decUopFire := decUopFireReg | (Fill(coreWidth, decData.fire) & VecInit(decData.bits.map(_.valid)).asUInt)
+  decUopFire := decUopFireReg | (Fill(coreWidth, decData.ready) & VecInit(decData.bits.map(_.valid)).asUInt)
 
   // rename & dispatch
   val disUopReady   = Wire(UInt(coreWidth.W))
@@ -66,7 +73,7 @@ class BackEnd(implicit params: CoreParameters) extends Module {
 
   val disData = Wire(Decoupled(Vec(coreWidth, Valid(new MicroOp))))
   for (i <- 0 until coreWidth) {
-    renameFreeList.io.allocPregs(i).valid := disData.bits(i).valid && disData.bits(i).bits.ldst =/= 0.U &&
+    renameFreeList.io.allocPregs(i).ready := disData.bits(i).valid && disData.bits(i).bits.ldst =/= 0.U &&
       disUopReady(i)
 
     renameMapTable.io.renRemapReqs(i).valid := disData.bits(i).valid && disUopReady(i)
@@ -76,12 +83,12 @@ class BackEnd(implicit params: CoreParameters) extends Module {
     renameBusyTable.io.uopReqs(i)    := disData.bits(i).bits
     renameBusyTable.io.rebusyReqs(i) := disData.bits(i).valid
 
-    rob.io.alloc(i).valid := disData.bits(i).valid && disUopReady(i)
+    rob.io.alloc(i).ready := disData.bits(i).valid && disUopReady(i)
     rob.io.alloc(i).uop   := disData.bits(i).bits
 
-    disData.bits(i).valid := decToRen.bits(i).valid &&
-      (renameFreeList.io.allocPregs(i).ready || disData.bits(i).bits.ldst === 0.U) &&
-      rob.io.alloc(i).ready
+    disData.bits(i).valid := decToRen.bits(i).valid && !disUopFireReg(i)
+    (renameFreeList.io.allocPregs(i).valid || disData.bits(i).bits.ldst === 0.U) &&
+    rob.io.alloc(i).valid
     disData.bits(i).bits        := decToRen.bits(i).bits
     disData.bits(i).bits.pdst   := renameFreeList.io.allocPregs(i).bits
     disData.bits(i).bits.robIdx := rob.io.alloc(i).idx
@@ -100,7 +107,15 @@ class BackEnd(implicit params: CoreParameters) extends Module {
     }
     disData.bits(i).bits.prs1Busy := renameBusyTable.io.busyResps(i).prs1Busy
     disData.bits(i).bits.prs2Busy := renameBusyTable.io.busyResps(i).prs2Busy
+
+    dispatcher.io.ren_uops(i).valid := disData.bits(i).valid
+    dispatcher.io.ren_uops(i).bits  := disData.bits(i).bits
+
   }
+  disUopReady := VecInit(dispatcher.io.ren_uops.map(_.ready)).asUInt
+  disUopFire  := disUopFireReg | (disUopReady & VecInit(disData.bits.map(_.valid)).asUInt)
 
   // issue
+  memIq.io.dis_uops := dispatcher.io.dis_uops(0)
+  intIq.io.dis_uops := dispatcher.io.dis_uops(1)
 }

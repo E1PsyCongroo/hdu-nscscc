@@ -2,6 +2,7 @@ package KXCore.superscalar.core.backend
 
 import chisel3._
 import KXCore.superscalar._
+import KXCore.superscalar.core._
 
 class StableCounter(implicit params: CoreParameters) extends Module {
   val io = IO(new Bundle {

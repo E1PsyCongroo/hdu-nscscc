@@ -1,8 +1,6 @@
 package KXCore.superscalar
 
 import KXCore.common._
-import KXCore.common.peripheral.CacheParameters
-import KXCore.common.peripheral.AXIBundleParameters
 import KXCore.superscalar.core._
 import KXCore.superscalar.core.frontend._
 import KXCore.superscalar.core.backend._
@@ -19,7 +17,7 @@ object Elaborate extends App {
 
   implicit val params: CoreParameters = CoreParameters()
   circt.stage.ChiselStage.emitSystemVerilogFile(
-    new Decoder(),
+    new IssueUnitCollapsing(2, IssueParams(1, 1, 8, IQType.IQT_INT.asUInt)),
     args,
     firtoolOptions,
   )

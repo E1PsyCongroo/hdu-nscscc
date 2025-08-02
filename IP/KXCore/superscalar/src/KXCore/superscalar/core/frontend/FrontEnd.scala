@@ -7,6 +7,7 @@ import KXCore.common.Privilege._
 import KXCore.common.peripheral._
 import KXCore.common.utils._
 import KXCore.superscalar._
+import KXCore.superscalar.core._
 
 class FrontEndIO(implicit params: CoreParameters) extends Bundle {
   import params.{commonParams, axiParams, frontendParams}

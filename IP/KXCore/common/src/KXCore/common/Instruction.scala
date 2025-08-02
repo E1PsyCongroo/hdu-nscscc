@@ -144,4 +144,24 @@ object Privilege {
     val CACOP_HIT_INV  = Value(2.U(2.W)) // invalidate cache line if hit
     val CACOP_HIT_READ = Value(3.U(2.W)) // read cache line if hit
   }
+
+  object ECODE extends ChiselEnum {
+    def getEcode(e: UInt)    = e(5, 0)
+    def getEsubCode(e: UInt) = e(6)
+    val INT                  = Value(Cat(0.B, 0x0.U(6.W)))
+    val PIL                  = Value(Cat(0.B, 0x1.U(6.W)))
+    val PIS                  = Value(Cat(0.B, 0x2.U(6.W)))
+    val PIF                  = Value(Cat(0.B, 0x3.U(6.W)))
+    val PME                  = Value(Cat(0.B, 0x4.U(6.W)))
+    val PPI                  = Value(Cat(0.B, 0x7.U(6.W)))
+    val ADEF                 = Value(Cat(0.B, 0x8.U(6.W)))
+    val ALE                  = Value(Cat(1.B, 0x8.U(6.W)))
+    val SYS                  = Value(Cat(0.B, 0xb.U(6.W)))
+    val BRK                  = Value(Cat(0.B, 0xc.U(6.W)))
+    val INE                  = Value(Cat(0.B, 0xd.U(6.W)))
+    val IPE                  = Value(Cat(0.B, 0xe.U(6.W)))
+    val FPD                  = Value(Cat(0.B, 0xf.U(6.W)))
+    val FPE                  = Value(Cat(0.B, 0x12.U(6.W)))
+    val TLBR                 = Value(Cat(0.B, 0x3f.U(6.W)))
+  }
 }

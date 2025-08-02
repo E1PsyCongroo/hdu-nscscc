@@ -4,6 +4,7 @@ import chisel3._
 import chisel3.util._
 import chisel3.util.random._
 import KXCore.superscalar._
+import KXCore.superscalar.core._
 
 class BTB(implicit params: CoreParameters) extends Module {
   import params._

@@ -4,6 +4,7 @@ import chisel3._
 import chisel3.util._
 import KXCore.common.utils._
 import KXCore.superscalar._
+import KXCore.superscalar.core._
 
 /** Buffer to hold fetched packets and convert them into a vector of MicroOps to give the Decode stage
   *

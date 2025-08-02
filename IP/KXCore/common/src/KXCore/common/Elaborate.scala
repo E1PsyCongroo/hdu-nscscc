@@ -1,6 +1,8 @@
 package KXCore.common
 
+import chisel3._
 import KXCore.common._
+import KXCore.common.utils._
 import KXCore.common.peripheral._
 
 object Elaborate extends App {
@@ -17,7 +19,7 @@ object Elaborate extends App {
   implicit val cacheParams: CacheParameters   = CacheParameters()
   implicit val axiParams: AXIBundleParameters = AXIBundleParameters()
   circt.stage.ChiselStage.emitSystemVerilogFile(
-    new ICache,
+    new Compactor(3, 2, UInt(1.W)),
     args,
     firtoolOptions,
   )

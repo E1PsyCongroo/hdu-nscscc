@@ -4,10 +4,11 @@ import chisel3._
 import chisel3.util._
 import KXCore.superscalar._
 import KXCore.common.utils._
+import KXCore.superscalar.core._
 
 class RenameFreeList(
-    allocWidth: Int,
-    deallocWidth: Int,
+    val allocWidth: Int,
+    val deallocWidth: Int,
 )(implicit params: CoreParameters)
     extends Module {
   import params.{commonParams, backendParams}
@@ -17,7 +18,7 @@ class RenameFreeList(
   val io = IO(new Bundle {
     val initial = Input(UInt(pregNum.W))
     // Physical register requests.
-    val allocPregs = Vec(allocWidth, Flipped(Decoupled(UInt(pregWidth.W))))
+    val allocPregs = Vec(allocWidth, Decoupled(UInt(pregWidth.W)))
 
     // Pregs returned by the ROB.
     val dealloc = Input(Vec(deallocWidth, Valid(UInt(pregWidth.W))))

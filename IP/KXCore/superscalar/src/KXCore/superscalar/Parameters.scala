@@ -45,17 +45,40 @@ case class FrontendParmaeters(
   val ftqIdxWidth = log2Ceil(ftqNum)
 }
 
+/** Class used for configurations
+  *
+  * @param issueWidth
+  *   amount of things that can be issued
+  * @param numEntries
+  *   size of issue queue
+  * @param iqType
+  *   type of issue queue
+  */
+case class IssueParams(
+    dispatchWidth: Int = 1,
+    issueWidth: Int = 1,
+    numEntries: Int = 8,
+    iqType: UInt,
+) {
+  require(dispatchWidth >= issueWidth)
+}
+
 case class BackendParameters(
     coreWidth: Int = 2, // Number of instructions decoded per cycle
     lregNum: Int = 32,
     pregNum: Int = 64,
-    plWidth: Int = 1,   // Pipeline width
-    robRowNum: Int = 64,// Number of rows in the ROB
+    plWidth: Int = 1,    // Pipeline width
+    robRowNum: Int = 64, // Number of rows in the ROB
+    issueParams: Seq[IssueParams],
 ) {
+  require(issueParams.length == 3)
   val lregWidth   = log2Ceil(lregNum)
   val pregWidth   = log2Ceil(pregNum)
   val robIdxWidth = log2Ceil(robRowNum) + log2Ceil(coreWidth)
   val retireWidth = coreWidth
+  def memIQParams = issueParams(0)
+  def unqIQParams = issueParams(1)
+  def intIQParams = issueParams(2)
 }
 
 case class CoreParameters(
@@ -65,7 +88,8 @@ case class CoreParameters(
     implicit val axiParams: AXIBundleParameters = AXIBundleParameters(),
     implicit val icacheParams: CacheParameters = CacheParameters(),
     implicit val frontendParams: FrontendParmaeters = FrontendParmaeters(),
-    implicit val backendParams: BackendParameters = BackendParameters(),
+    implicit val backendParams: BackendParameters =
+      BackendParameters(issueParams = Seq(IssueParams(2, 1, 12, IQType.IQT_MEM.asUInt), IssueParams(2, 2, 20, IQType.IQT_INT.asUInt))),
 ) {
   val fetchBytes = frontendParams.fetchWidth * commonParams.instBytes
   def fetchIdx(addr: UInt): UInt = {

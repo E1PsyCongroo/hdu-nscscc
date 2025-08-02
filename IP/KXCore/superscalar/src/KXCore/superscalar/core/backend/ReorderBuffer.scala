@@ -5,12 +5,13 @@ import chisel3.util._
 import KXCore.common._
 import KXCore.common.utils._
 import KXCore.superscalar._
+import KXCore.superscalar.core._
 import KXCore.superscalar.core.frontend._
 
 class RoBWrite(implicit params: CoreParameters) extends Bundle {}
 class RoBEntry(implicit params: CoreParameters) extends Bundle {}
 
-class ReorderBuffer(implicit params: CoreParameters) extends Module {
+class ReorderBuffer(val numWakeupPorts: Int)(implicit params: CoreParameters) extends Module {
   import params.{commonParams, frontendParams, backendParams}
   import frontendParams.{ftqIdxWidth}
   import backendParams.{coreWidth, robRowNum, robIdxWidth, retireWidth, lregWidth, pregWidth}
@@ -18,10 +19,10 @@ class ReorderBuffer(implicit params: CoreParameters) extends Module {
     val alloc = Vec(
       coreWidth,
       new Bundle {
-        val valid = Input(Bool())
+        val ready = Input(Bool())
         val uop   = Input(new MicroOp)
         val idx   = Output(UInt(robIdxWidth.W))
-        val ready = Output(Bool())
+        val valid = Output(Bool())
       },
     )
     // val write  = Valid(new RoBWrite)
@@ -85,7 +86,6 @@ class ReorderBuffer(implicit params: CoreParameters) extends Module {
   rob_compact_uop_mem.write(rob_tail, rob_compact_uop_wdata, rob_alloc_fires)
   val rob_compact_uop_rdata = rob_compact_uop_mem.read(next_rob_head)
 
-  val will_not_empty = WireInit(false.B)
   for (w <- 0 until coreWidth) {
     def MatchBank(bank_idx: UInt): Bool = (bank_idx === w.U)
 
@@ -99,14 +99,15 @@ class ReorderBuffer(implicit params: CoreParameters) extends Module {
 
     rob_alloc_fires(w) := io.alloc(w).valid && io.alloc(w).ready
     when(rob_alloc_fires(w)) {
-      will_not_empty          := true.B
       rob_val(rob_tail)       := true.B
       rob_bsy(rob_tail)       := io.alloc(w).uop.busy
       rob_exception(rob_tail) := io.alloc(w).uop.exception
       assert(rob_val(rob_tail) === false.B, "[rob] overwriting a valid entry.")
     }
 
-    io.alloc(w).ready := !full && (!io.alloc(w).uop.isUnique || (empty && !will_not_empty))
+    val isFirst = if (w == 0) true.B else !VecInit((0 until w).map(i => io.alloc(i).valid)).reduce(_ || _)
+    io.alloc(w).idx   := Mux((coreWidth == 1).B, rob_tail, Cat(rob_tail, w.U(log2Ceil(coreWidth).W)))
+    io.alloc(w).valid := !full && (!io.alloc(w).uop.isUnique || (empty && isFirst))
 
     // // -----------------------------------------------
     // // Writeback

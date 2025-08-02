@@ -3,6 +3,7 @@ package KXCore.superscalar.core.backend
 import chisel3._
 import chisel3.util._
 import KXCore.superscalar._
+import KXCore.superscalar.core._
 
 class MapReq(implicit val params: CoreParameters) extends Bundle {
   val lrs1 = UInt(params.backendParams.lregWidth.W)
