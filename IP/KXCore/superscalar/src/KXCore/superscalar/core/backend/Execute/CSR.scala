@@ -3,6 +3,7 @@ package KXCore.superscalar.core.backend
 import chisel3._
 import chisel3.util._
 import KXCore.common._
+import KXCore.common.peripheral._
 import KXCore.superscalar._
 
 class CRMD extends Bundle {
@@ -163,18 +164,19 @@ class Timer extends Module {
 }
 
 object CSRAddr {
-  val CRMD   = 0x00
-  val PRMD   = 0x01
-  val ECFG   = 0x04
-  val ESTAT  = 0x05
-  val ERA    = 0x06
-  val BADV   = 0x07
-  val EENTRY = 0x0c
-  val SAVED0 = 0x30
-  val TID    = 0x40
-  val TCFG   = 0x41
-  val TVAL   = 0x42
-  val TICLR  = 0x44
+  val CRMD   = 0x000
+  val PRMD   = 0x001
+  val ECFG   = 0x004
+  val ESTAT  = 0x005
+  val ERA    = 0x006
+  val BADV   = 0x007
+  val EENTRY = 0x00c
+  val SAVED0 = 0x030
+  val TID    = 0x040
+  val TCFG   = 0x041
+  val TVAL   = 0x042
+  val TICLR  = 0x044
+  val DMW0   = 0x180
 }
 
 object CSRCmd {
@@ -196,7 +198,17 @@ class CSRIO(implicit params: CoreParameters) extends Bundle {
   val we    = Input(Bool())     // Write enable
   /* ------ CSR RW ------- */
 
+  /* ------ Global State ------ */
   val priv = Output(UInt(2.W)) // Current privilege level
+  val tlb = new Bundle {
+    val da = Output(Bool())
+    val pg = Output(Bool())
+    val matf = Output(UInt(2.W)) // Memory access type for fetch
+    val matd = Output(UInt(2.W)) // Memory access type for data
+    val asid = Output(UInt(10.W)) // Address space ID
+    val dwm  = Output(Vec(2, new DMW)) // DMW0 register
+  }
+  /* ------ Global State ------ */
 
   /* ------ Exception Enter ------ */
   val pc      = Input(UInt(32.W))  // Program counter for exception handling
@@ -234,8 +246,18 @@ class CSR(implicit params: CoreParameters) extends Module {
   val eentry = Reg(new EENTRY)
   val saved  = Vec(4, Reg(UInt(32.W)))
   val tid    = Reg(UInt(32.W))
+  val dwm    = Vec(2, RegInit(0.U.asTypeOf(new DMW)))
 
+  /* ------ Global State ------ */
   io.priv := crmd.plv()
+  io.tlb.da := crmd.da()
+  io.tlb.pg := crmd.pg()
+  io.tlb.matf := crmd.datf() // Memory access type for fetch
+  io.tlb.matd := crmd.datm() // Memory access type for data
+  io.tlb.asid := 0.U // Dont care for now, can be set by TLB
+  io.tlb.dwm := dwm // DMW0 register
+  // io.tlb.asid := prmd.value(31, 22) // Address space ID
+  /* ------ Global State ------ */
 
   /* ------ Timer ------ */
   val timer = Module(new Timer)
@@ -282,18 +304,24 @@ class CSR(implicit params: CoreParameters) extends Module {
     crmd := eret_crmd
     prmd := eret_prmd
   }.elsewhen(io.we) {
+    val wdata = io.wdata & io.wmask
+    
     for (i <- 0 until 4) {
-      saved(i) := Mux(io.waddr === (CSRAddr.SAVED0 + i).U, (io.wdata & io.wmask) | (saved(i) & ~io.wmask), saved(i))
+      saved(i) := Mux(io.waddr === (CSRAddr.SAVED0 + i).U, wdata | (saved(i) & ~io.wmask), saved(i))
     }
 
-    crmd.value := Mux(io.waddr === CSRAddr.CRMD.U, crmd.write((io.wdata & io.wmask) | (crmd.value & ~io.wmask)), crmd.value)
-    prmd.value := Mux(io.waddr === CSRAddr.PRMD.U, prmd.write((io.wdata & io.wmask) | (prmd.value & ~io.wmask)), prmd.value)
+    for (i <- 0 until 2) {
+      dwm(i) := Mux(io.waddr === (CSRAddr.DMW0 + i).U, dwm(i).write(wdata  | (dwm(i).value & ~io.wmask)), dwm(i))
+    }
 
-    estat.value := Mux(io.waddr === CSRAddr.ESTAT.U, estat.write((io.wdata & io.wmask) | (estat.value & !io.wmask)), estat.value)
-    era := Mux(io.waddr === CSRAddr.ERA.U, (io.wdata & io.wmask) | (era & !io.wmask), era)
-    eentry.value := Mux(io.waddr === CSRAddr.EENTRY.U, eentry.write((io.wdata & io.wmask) | (eentry.value & !io.wmask)), eentry.value)
+    crmd.value := Mux(io.waddr === CSRAddr.CRMD.U, crmd.write(wdata  | (crmd.value & ~io.wmask)), crmd.value)
+    prmd.value := Mux(io.waddr === CSRAddr.PRMD.U, prmd.write(wdata  | (prmd.value & ~io.wmask)), prmd.value)
 
-    tid := Mux(io.waddr === CSRAddr.TID.U, (io.wdata & io.wmask) | (tid & ~io.wmask), tid)
+    estat.value := Mux(io.waddr === CSRAddr.ESTAT.U, estat.write(wdata | (estat.value & !io.wmask)), estat.value)
+    era := Mux(io.waddr === CSRAddr.ERA.U, wdata | (era & !io.wmask), era)
+    eentry.value := Mux(io.waddr === CSRAddr.EENTRY.U, eentry.write(wdata | (eentry.value & !io.wmask)), eentry.value)
+
+    tid := Mux(io.waddr === CSRAddr.TID.U, wdata | (tid & ~io.wmask), tid)
   }.otherwise{
     estat := estat.set_sample(io.interrupt.externel_sample).set_tis(timer_interrupt_pending)
   }
