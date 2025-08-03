@@ -28,6 +28,8 @@ abstract class RegisterFile(
         val data = UInt(dataWidth.W)
       })),
     )
+
+    val debug = Vec(pregNum, Output(UInt(dataWidth.W)))
   })
 
   // ensure there is only 1 writer per register (unless to preg0)
@@ -59,6 +61,9 @@ class FullyPortedRF(
   (0 until numReadPorts) map { p => io.read_resps(p) := regfile(io.read_reqs(p).bits) }
 
   io.write_ports map { p => when(p.valid) { regfile(p.bits.addr) := p.bits.data } }
+
+  regfile(0) := 0.U
+  io.debug   := VecInit((0 until numRegisters).map(regfile(_)))
 }
 
 class PartiallyPortedRF(

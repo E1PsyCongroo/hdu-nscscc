@@ -38,6 +38,8 @@ class RenameMapTable(val bypass: Boolean)(implicit params: CoreParameters) exten
 
     // Signals for restoring state
     val rollback = Input(Bool())
+
+    val debug = Output(Vec(lregNum, UInt(pregWidth.W)))
   })
 
   // The map table register array
@@ -89,5 +91,7 @@ class RenameMapTable(val bypass: Boolean)(implicit params: CoreParameters) exten
   io.renRemapReqs.map(req => (req.pdst, req.valid)).foreach { case (p, r) =>
     assert(!r || !renMapTable.contains(p), "[maptable] Trying to write a duplicate mapping.")
   }
+
+  io.debug := comMapTable
 
 }

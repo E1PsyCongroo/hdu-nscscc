@@ -145,13 +145,13 @@ class TLB(implicit params: CommonParameters) extends Module {
         (dmw.vseg() === req.vaddr(31, 29))
     }
     val dmw_hit = dmw_hits.asUInt.orR
-    val dmw_paddr = MuxLookup(dmw_hits.asUInt, DontCare.asUInt)(
+    val dmw_paddr = MuxLookup(dmw_hits.asUInt, 0.U)(
       Seq(
         1.U -> Cat(io.mode.dmw(0).pseg(), vaddr(28, 0)), // DMW0
         3.U -> Cat(io.mode.dmw(1).pseg(), vaddr(28, 0)), // DMW1
       ),
     )
-    val dmw_mat = MuxLookup(dmw_hits.asUInt, DontCare.asUInt)(
+    val dmw_mat = MuxLookup(dmw_hits.asUInt, 0.U)(
       Seq(
         1.U -> io.mode.dmw(0).mat(), // DMW0
         3.U -> io.mode.dmw(1).mat(), // DMW1
@@ -282,6 +282,7 @@ class TLB(implicit params: CommonParameters) extends Module {
   val cmd_wr   = io.cmd_in.cmd === TLBCmd.CMD_WR.U
 
   val fill_entry = Wire(new TLBEntry)
+  fill_entry.e             := true.B
   fill_entry.vppn          := io.cmd_in.tlb_ehi(31, 13)
   fill_entry.ps            := io.cmd_in.tlb_idx(29, 24) === 21.U // 2M page
   fill_entry.global        := io.cmd_in.tlb_elo0(6) && io.cmd_in.tlb_elo1(6)

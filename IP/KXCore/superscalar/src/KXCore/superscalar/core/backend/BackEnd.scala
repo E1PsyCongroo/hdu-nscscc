@@ -21,10 +21,13 @@ class BackEndIO(implicit params: CoreParameters) extends Bundle {
     val ftqIdx   = UInt(log2Ceil(frontendParams.ftqNum).W)
     val brUpdate = Valid(new BrUpdateInfo)
   })
+  val debug = Output(new Bundle {
+    val regs = Vec(backendParams.lregNum, UInt(commonParams.dataWidth.W))
+  })
 }
 
 class BackEnd(implicit params: CoreParameters) extends Module {
-  import params.{commonParams, backendParams}
+  import params.{commonParams, frontendParams, backendParams}
   import backendParams.{coreWidth, issueParams, pregNum, memIQParams, unqIQParams, intIQParams}
 
   val io = IO(new BackEndIO)
@@ -55,7 +58,8 @@ class BackEnd(implicit params: CoreParameters) extends Module {
 
   // decode & rename
   val decData = Wire(Decoupled(Vec(coreWidth, Valid(new MicroOp))))
-  decData.valid := io.fetchPacket.valid
+  decData.valid        := io.fetchPacket.valid
+  io.fetchPacket.ready := decData.ready
   for (i <- 0 until coreWidth) {
     decoder.io.req(i)                 := io.fetchPacket.bits.uops(i).bits
     renameMapTable.io.mapReqs(i).ldst := io.fetchPacket.bits.uops(i).bits.ldst
@@ -76,10 +80,12 @@ class BackEnd(implicit params: CoreParameters) extends Module {
   val disUopReady   = Wire(UInt(coreWidth.W))
   val disUopFire    = Wire(UInt(coreWidth.W))
   val disUopFireReg = RegInit(0.U(coreWidth.W))
-  disUopFireReg  := Mux(decToRen.ready, 0.U, disUopFire)
-  decToRen.ready := VecInit(decToRen.bits.map(_.valid)).asUInt === disUopFire || flush
+  disUopFireReg := Mux(decToRen.ready, 0.U, disUopFire)
 
   val disData = Wire(Decoupled(Vec(coreWidth, Valid(new MicroOp))))
+  disData.valid  := decToRen.valid
+  decToRen.ready := disData.ready
+  disData.ready  := VecInit(disData.bits.map(_.valid)).asUInt === disUopFire || flush
   for (i <- 0 until coreWidth) {
     renameFreeList.io.allocPregs(i).ready := disData.bits(i).valid && disData.bits(i).bits.ldst =/= 0.U &&
       disUopReady(i)
@@ -132,13 +138,37 @@ class BackEnd(implicit params: CoreParameters) extends Module {
 
   // execute
   intIssUnit.io.iss_uops zip aluExeUnits map { case (iss_uop, exu) => iss_uop <> exu.io_iss_uop }
-  (0 until aluExeUnits.length).foreach { i =>
-    aluExeUnits(i).io_read_reqs(0) <> regFile.io.read_reqs(2 * i)
-    aluExeUnits(i).io_read_reqs(1) <> regFile.io.read_reqs(2 * i + 1)
-    io.getPC(i + 1).ftqIdx         := aluExeUnits(i).io_ftq_req(0).bits
-    io.getPC(i + 2).ftqIdx         := aluExeUnits(i).io_ftq_req(1).bits
-    aluExeUnits(i).io_ftq_resp(0)  := io.getPC(i + 1).info
-    aluExeUnits(i).io_ftq_resp(1)  := io.getPC(i + 2).info
+
+  val ftq_port_issued = Array.fill(2) { false.B }
+  val ftq_port_addrs  = Array.fill(2) { 0.U(frontendParams.ftqIdxWidth.W) }
+  for (i <- 0 until aluExeUnits.length) {
+    aluExeUnits(i).io_read_reqs(0)  <> regFile.io.read_reqs(2 * i)
+    aluExeUnits(i).io_read_reqs(1)  <> regFile.io.read_reqs(2 * i + 1)
+    aluExeUnits(i).io_read_resps(0) <> regFile.io.read_resps(2 * i)
+    aluExeUnits(i).io_read_resps(1) <> regFile.io.read_resps(2 * i + 1)
+    for (w <- 0 until 2) {
+      val req         = aluExeUnits(i).io_ftq_req(w)
+      var read_issued = false.B
+      val data_sel    = WireInit(0.U(2.W))
+      for (j <- 0 until 2) {
+        val issue_read = WireInit(false.B)
+        val use_port   = WireInit(false.B)
+        when(!read_issued && !ftq_port_issued(j) && req.valid) {
+          issue_read := true.B
+          use_port   := true.B
+          data_sel   := UIntToOH(j.U)
+        }
+        val was_port_issued_yet = ftq_port_issued(j)
+        ftq_port_issued(j) = use_port || ftq_port_issued(j)
+        ftq_port_addrs(j) = ftq_port_addrs(j) | Mux(was_port_issued_yet || !use_port, 0.U, req.bits)
+        read_issued = issue_read || read_issued
+      }
+      req.ready                     := read_issued
+      aluExeUnits(i).io_ftq_resp(w) := Mux(data_sel(0), io.getPC(1).info, io.getPC(2).info)
+    }
+  }
+  for (j <- 0 until 2) {
+    io.getPC(j + 1).ftqIdx := ftq_port_addrs(j)
   }
 
   // write back
@@ -156,15 +186,33 @@ class BackEnd(implicit params: CoreParameters) extends Module {
   }
 
   // commit
+  io.getPC(0).ftqIdx := 0.U
   for (i <- 0 until coreWidth) {
-    renameMapTable.io.comRemapReqs(i).valid := rob.io.commit.valids(i)
+    renameMapTable.io.comRemapReqs(i).valid := rob.io.commit.valids(i) && rob.io.commit.uop(i).ldst =/= 0.U
     renameMapTable.io.comRemapReqs(i).ldst  := rob.io.commit.uop(i).ldst
     renameMapTable.io.comRemapReqs(i).pdst  := rob.io.commit.uop(i).pdst
 
-    renameFreeList.io.dealloc(i).valid := rob.io.commit.valids(i)
+    renameFreeList.io.dealloc(i).valid := rob.io.commit.valids(i) && rob.io.commit.uop(i).ldst =/= 0.U
     renameFreeList.io.dealloc(i).bits  := rob.io.commit.uop(i).stalePdst
   }
   io.commit.valid         := rob.io.commit.valids.reduce(_ || _)
   io.commit.bits.ftqIdx   := rob.io.commit.ftqIdx
   io.commit.bits.brUpdate := rob.io.commit.brInfo
+
+  flush := io.commit.bits.brUpdate.valid && rob.io.commit.brInfo.bits.mispredict
+
+  for (i <- 0 until backendParams.lregNum) {
+    io.debug.regs(i) := regFile.io.debug(renameMapTable.io.debug(i))
+  }
+
+  io.axi          := DontCare
+  io.axi.ar.valid := false.B
+  io.axi.r.ready  := false.B
+  io.axi.aw.valid := false.B
+  io.axi.w.valid  := false.B
+  io.axi.b.ready  := false.B
+
+  io.dtlbReq         := DontCare
+  io.dtlbReq.isWrite := false.B
+  io.dtlbReq.vaddr   := 0.U
 }

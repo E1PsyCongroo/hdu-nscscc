@@ -12,11 +12,10 @@ class RenameFreeList(
 )(implicit params: CoreParameters)
     extends Module {
   import params.{commonParams, backendParams}
-  import backendParams.{pregNum, pregWidth}
-  protected val n = pregNum
+  import backendParams.{lregNum, pregNum, pregWidth}
+  private val n = pregNum
 
   val io = IO(new Bundle {
-    val initial = Input(UInt(pregNum.W))
     // Physical register requests.
     val allocPregs = Vec(allocWidth, Decoupled(UInt(pregWidth.W)))
 
@@ -25,11 +24,11 @@ class RenameFreeList(
 
     val rollback = Input(Bool())
 
-    val debug_freeList = Output(UInt(pregNum.W))
+    val debug = Output(UInt(pregNum.W))
   })
 
   // The free list register array and its allocation lists.
-  val freeList      = RegInit(UInt(pregNum.W), io.initial)
+  val freeList      = RegInit(UInt(pregNum.W), Cat(~(0.U((pregNum - lregNum).W)), 0.U(lregNum.W)))
   val specAllocList = RegInit(0.U(pregNum.W))
 
   // Select pregs from the free list.
@@ -58,7 +57,7 @@ class RenameFreeList(
     io.allocPregs(w).valid := valid
   }
 
-  io.debug_freeList := freeList | io.allocPregs.map(p => UIntToOH(p.bits)(n - 1, 0) & Fill(n, p.valid)).reduce(_ | _)
+  io.debug := freeList | io.allocPregs.map(p => UIntToOH(p.bits)(n - 1, 0) & Fill(n, p.valid)).reduce(_ | _)
 
-  assert(!(io.debug_freeList & deallocMask).orR, "[freelist] Returning a free physical register.")
+  assert(!(io.debug & deallocMask).orR, "[freelist] Returning a free physical register.")
 }

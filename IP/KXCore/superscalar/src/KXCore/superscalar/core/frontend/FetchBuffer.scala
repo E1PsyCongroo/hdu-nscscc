@@ -55,7 +55,7 @@ class FetchBuffer(implicit params: CoreParameters) extends Module {
     in_uops(i)          := DontCare
     in_mask(i)          := io.enq.valid && io.enq.bits.mask(i)
     in_uops(i).debug.pc := pc
-    in_uops(i).idx      := pc(log2Ceil(params.fetchBytes) - 1, log2Ceil(commonParams.instBytes))
+    in_uops(i).idx      := i.U
     in_uops(i).ftqIdx   := io.enq.bits.ftqIdx
     in_uops(i).inst     := io.enq.bits.insts(i)
   }

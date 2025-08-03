@@ -31,9 +31,9 @@ abstract class ExecutionUnit(implicit params: CoreParameters) extends Module {
 
   val stage0Regs = Wire(Decoupled(Vec(nReaders, UInt(params.commonParams.dataWidth.W))))
   stage0Regs.valid   := io_read_reqs.map(_.fire).reduce(_ && _)
-  stage0Regs.bits(0) := Mux(iss_uop_ext.bits.lrs1 === 0.U, 0.U, io_read_resps(0))
+  stage0Regs.bits(0) := io_read_resps(0)
   if (nReaders == 2) {
-    stage0Regs.bits(1) := Mux(iss_uop_ext.bits.lrs2 === 0.U, 0.U, io_read_resps(1))
+    stage0Regs.bits(1) := io_read_resps(1)
   }
   iss_uop_ext.ready(0) := stage0Regs.ready
 

@@ -291,7 +291,7 @@ class ICacheStage1to2(implicit
 
   val holdReqReg = RegEnable(io.req.bits, io.req.ready)
   val readSet    = Mux(io.req.ready, io.req.bits.set, holdReqReg.set)
-  val readWay    = Mux(io.req.ready, io.req.bits.way, holdReqReg.way)
+  val readWay    = holdReqReg.way
 
   if (!singlePorted) {
     val dataWrite = io.dataWrite.bits
