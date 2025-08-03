@@ -5,6 +5,8 @@ import chisel3.util._
 import KXCore.superscalar._
 import KXCore.superscalar.core._
 import KXCore.superscalar.core.frontend._
+import KXCore.common.utils.WallaceMultiplier
+import KXCore.common.utils.BoothDivider
 
 /** Abstract top level functional unit class that wraps a lower level hand made functional unit
   */
@@ -85,78 +87,64 @@ class ALUUnit(implicit params: CoreParameters) extends FunctionalUnit(isAluUnit 
   assert(io.resp.ready)
 }
 
-// /** Divide functional unit.
-//   *
-//   * @param dataWidth
-//   *   data to be passed into the functional unit
-//   */
-// class DivUnit(dataWidth: Int)(implicit p: Parameters) extends FunctionalUnit(dataWidth = dataWidth) {
+class MultiplyUnit(implicit params: CoreParameters) extends FunctionalUnit {
+  import params.{commonParams, frontendParams}
+  import commonParams.{dataWidth}
 
-//   // We don't use the iterative multiply functionality here.
-//   // Instead we use the PipelinedMultiplier
-//   val div = Module(new freechips.rocketchip.rocket.MulDiv(mulDivParams, width = dataWidth))
+  val uop = io.req.bits.uop
+  val multiplier = Module(new WallaceMultiplier(params.commonParams.dataWidth, params.backendParams.multiplierPipelineDepth))
 
-//   val req = Reg(Valid(new MicroOp()))
+  /* ------ State Machine ------ */
+  val sIdle :: sRunning :: sKilled :: sDone :: Nil = Enum(4)
+  val state = RegInit(sIdle)
+  state := MuxLookup(state, sIdle)(Seq(
+    sIdle    -> Mux(io.req.valid && multiplier.io.out.ready, sRunning, sIdle),
+    sRunning -> Mux(io.kill, sKilled, sRunning),
+    sKilled  -> Mux(multiplier.io.out.valid, sIdle, sKilled),
+    sDone    -> Mux(io.resp.ready, sDone, sIdle),
+  ))
 
-//   when(io.req.fire) {
-//     req.valid := !IsKilledByBranch(io.brupdate, io.kill, io.req.bits)
-//     req.bits  := UpdateBrMask(io.brupdate, io.req.bits.uop)
-//   }.otherwise {
-//     req.valid := !IsKilledByBranch(io.brupdate, io.kill, req.bits) && req.valid
-//     req.bits  := UpdateBrMask(io.brupdate, req.bits)
-//   }
-//   when(reset.asBool) {
-//     req.valid := false.B
-//   }
+  io.req.ready := state === sIdle
+  io.resp.valid := state === sDone && !io.kill
+  multiplier.io.in.valid := io.req.valid && state === sIdle
+  /* ------ State Machine ------ */
+  
+  multiplier.io.in.bits.signed := (uop.aluCmd === ALUType.ALU_MUL.asUInt || uop.aluCmd === ALUType.ALU_MULH.asUInt)
+  multiplier.io.in.bits.multiplier := io.req.bits.rs1_data
+  multiplier.io.in.bits.multiplicand := io.req.bits.rs2_data
+  
+  io.resp.bits.uop := io.req.bits.uop
+  io.resp.bits.data := Mux(uop.aluCmd === ALUType.ALU_MUL.asUInt, multiplier.io.out.bits.result_hi, multiplier.io.out.bits.result_lo)
+}
 
-//   // request
-//   div.io.req.valid    := io.req.valid && !IsKilledByBranch(io.brupdate, io.kill, io.req.bits)
-//   div.io.req.bits.dw  := io.req.bits.uop.fcn_dw
-//   div.io.req.bits.fn  := io.req.bits.uop.fcn_op
-//   div.io.req.bits.in1 := io.req.bits.rs1_data
-//   div.io.req.bits.in2 := io.req.bits.rs2_data
-//   div.io.req.bits.tag := DontCare
-//   io.req.ready        := div.io.req.ready && !req.valid
+class DivUnit(dataWidth: Int)(implicit params: CoreParameters) extends FunctionalUnit {
+  val divider = Module(new BoothDivider(params.commonParams.dataWidth))
 
-//   // handle pipeline kills and branch misspeculations
-//   div.io.kill := (req.valid && IsKilledByBranch(io.brupdate, io.kill, req.bits))
+  val uop = io.req.bits.uop
 
-//   // response
-//   io.resp.valid     := div.io.resp.valid && req.valid
-//   div.io.resp.ready := io.resp.ready
-//   io.resp.valid     := div.io.resp.valid && req.valid
-//   io.resp.bits.data := div.io.resp.bits.data
-//   io.resp.bits.uop  := req.bits
-//   when(io.resp.fire) {
-//     req.valid := false.B
-//   }
-// }
+  /* ------ State Machine ------ */
+  val sIdle :: sRunning :: sKilled :: sDone :: Nil = Enum(4)
+  val state = RegInit(sIdle)
+  state := MuxLookup(state, sIdle)(Seq(
+    sIdle    -> Mux(io.req.valid && divider.io.out.ready, sRunning, sIdle),
+    sRunning -> Mux(io.kill, sKilled, sRunning),
+    sKilled  -> Mux(divider.io.out.valid, sIdle, sKilled),
+    sDone    -> Mux(io.resp.ready, sDone, sIdle),
+  ))
 
-// /** Pipelined multiplier functional unit that wraps around the RocketChip pipelined multiplier
-//   *
-//   * @param numStages
-//   *   number of pipeline stages
-//   * @param dataWidth
-//   *   size of the data being passed into the functional unit
-//   */
-// class PipelinedMulUnit(numStages: Int, dataWidth: Int)(implicit p: Parameters) extends FunctionalUnit(dataWidth = dataWidth) {
-//   io.req.ready := true.B
-//   val imul = Module(new PipelinedMultiplier(xLen, numStages))
-//   val pipe = Module(new BranchKillablePipeline(new FuncUnitReq(dataWidth), numStages))
-//   // request
-//   imul.io.req.valid    := io.req.valid
-//   imul.io.req.bits.fn  := io.req.bits.uop.fcn_op
-//   imul.io.req.bits.dw  := io.req.bits.uop.fcn_dw
-//   imul.io.req.bits.in1 := io.req.bits.rs1_data
-//   imul.io.req.bits.in2 := io.req.bits.rs2_data
-//   imul.io.req.bits.tag := DontCare
+  io.req.ready := state === sIdle
+  io.resp.valid := state === sDone && !io.kill
+  divider.io.in.valid := io.req.valid && state === sIdle
+  /* ------ State Machine ------ */
 
-//   pipe.io.req      := io.req
-//   pipe.io.flush    := io.kill
-//   pipe.io.brupdate := io.brupdate
-//   // response
-//   io.resp.valid           := pipe.io.resp(numStages - 1).valid
-//   io.resp.bits.uop        := pipe.io.resp(numStages - 1).bits.uop
-//   io.resp.bits.data       := imul.io.resp.bits.data
-//   io.resp.bits.predicated := false.B
-// }
+  divider.io.in.bits.dividend := io.req.bits.rs1_data
+  divider.io.in.bits.divisor := io.req.bits.rs2_data
+  divider.io.in.bits.signed := uop.aluCmd === ALUType.ALU_DIV.asUInt || uop.aluCmd === ALUType.ALU_MOD.asUInt
+
+  io.resp.bits.uop := io.req.bits.uop
+  io.resp.bits.data := Mux(
+    uop.aluCmd === ALUType.ALU_DIV.asUInt || uop.aluCmd === ALUType.ALU_DIVU.asUInt,
+    divider.io.out.bits.quotient,
+    divider.io.out.bits.remainder,
+  )
+}

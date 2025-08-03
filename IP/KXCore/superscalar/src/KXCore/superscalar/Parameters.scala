@@ -71,6 +71,7 @@ case class BackendParameters(
     lregNum: Int = 32,
     pregNum: Int = 80,
     robNum: Int = 32, // Number of entries in the ROB
+    multiplierPipelineDepth: Int = 3,
     dcacheParams: CacheParameters = CacheParameters(id = 1),
     issueParams: Seq[IssueParams],
 ) {
