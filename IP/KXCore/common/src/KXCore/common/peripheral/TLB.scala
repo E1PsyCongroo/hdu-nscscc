@@ -3,6 +3,7 @@ package KXCore.common.peripheral
 import chisel3._
 import chisel3.util._
 import KXCore.common._
+import KXCore.common.Privilege.ECODE
 
 class TLBReq(implicit params: CommonParameters) extends Bundle {
 
@@ -19,31 +20,14 @@ class TLBReq(implicit params: CommonParameters) extends Bundle {
   val isWrite = Bool()
 }
 
-class TLBException(implicit params: CommonParameters) extends Bundle {
-  val ecode   = UInt(6.W) // exception code
-  val subcode = UInt(9.W) // sub-code for the exception
-}
-
 class TLBResp(implicit params: CommonParameters) extends Bundle {
-  // /* page invalid? */
-  // val pageInv = Bool()
-
-  // /* page privilege invalid? */
-  // val ppi = Bool()
-
-  // /* page memory access type invalid? */
-  // val pme = Bool()
-
   /* memory access type */
   val mat = UInt(2.W)
 
   /** physical address */
   val paddr = UInt(params.paddrWidth.W)
 
-  /** tlb refill? */
-  val refill = Bool()
-
-  val exception = Valid(new TLBException)
+  val exception = Valid(UInt(6.W))
 }
 
 class TLBTranslateItem(implicit params: CommonParameters) extends Bundle {
@@ -129,8 +113,6 @@ class TLB(implicit params: CommonParameters) extends Module {
     val transReq1  = Input(new TLBReq) // MUST BE USED FOR LOAD/STORE
     val transResp0 = Output(new TLBResp)
     val transResp1 = Output(new TLBResp)
-    // val transReq = Input(new TLBReq)
-    // val transResp = Output(new TLBResp)
   })
 
   val tlbEntry = Reg(Vec(params.tlbCount, new TLBEntry))
@@ -182,28 +164,25 @@ class TLB(implicit params: CommonParameters) extends Module {
     val tlb_exception_valid = !isHit || !found.valid || req.plv > found.plv || (req.isWrite && found.dirty === 0.U)
     val tlb_exception_ecode = Mux(
       !isHit,
-      0x3f.U,
+      ECODE.TLBR,
       Mux(
         !found.valid,
-        if (is_fetch) 0x03.U else Mux(req.isWrite, 0x02.U, 0x01.U),
-        Mux(req.plv > found.plv, 0x07.U, Mux(req.isWrite && found.dirty === 0.U, 0x04.U, DontCare)),
+        if (is_fetch) ECODE.PIF else Mux(req.isWrite, ECODE.PIS, ECODE.PIL),
+        Mux(req.plv > found.plv, ECODE.PPI, Mux(req.isWrite && found.dirty === 0.U, ECODE.PME, DontCare)),
       ),
     )
 
     val resp = Wire(new TLBResp)
-    resp.refill                 := Mux(dmw_hit, false.B, !isHit)
-    resp.exception.valid        := Mux(dmw_hit, false.B, !isHit)
-    resp.exception.bits.ecode   := Mux(dmw_hit, 0.U, tlb_exception_ecode)
-    resp.exception.bits.subcode := 0.U
-    resp.mat                    := Mux(dmw_hit, dmw_mat, found.mat)
-    resp.paddr                  := Mux(dmw_hit, dmw_paddr, tlb_paddr)
+    resp.exception.valid := Mux(dmw_hit, false.B, !isHit)
+    resp.exception.bits  := Mux(dmw_hit, 0.U, tlb_exception_ecode)
+    resp.mat             := Mux(dmw_hit, dmw_mat, found.mat)
+    resp.paddr           := Mux(dmw_hit, dmw_paddr, tlb_paddr)
 
     resp
   }
 
   def tlb_translate_direct(req: TLBReq, mat: UInt): TLBResp = {
     val resp = Wire(new TLBResp)
-    resp.refill          := false.B
     resp.exception.valid := false.B
     resp.exception.bits  := DontCare
     resp.mat             := mat

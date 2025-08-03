@@ -5,6 +5,7 @@ import chisel3.util._
 import KXCore.common._
 import KXCore.common.peripheral._
 import KXCore.superscalar._
+import KXCore.common.Privilege.ECODE
 
 class CRMD extends Bundle {
   val value = UInt(32.W)
@@ -290,8 +291,7 @@ class CSR(implicit params: CoreParameters) extends Module {
   val excp_prmd = prmd.set_pie(crmd.ie()).set_pplv(crmd.plv())
   val excp_estat = estat.set_ecode(io.ecode).set_sub_ecode(io.ecode_sub)
 
-  io.eentry := eentry.value
-  io.tlbrentry := tlbrentry.value
+  io.eentry := Mux(io.ecode === ECODE.TLBR.asUInt, tlbrentry, eentry)
   /* ------ Exception Enter ------ */
 
   /* ------ Exception Return ------ */
