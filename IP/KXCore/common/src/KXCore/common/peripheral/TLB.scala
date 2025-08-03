@@ -170,7 +170,7 @@ class TLB(implicit params: CommonParameters) extends Module {
         if (is_fetch) ECODE.PIF else Mux(req.isWrite, ECODE.PIS, ECODE.PIL),
         Mux(req.plv > found.plv, ECODE.PPI, Mux(req.isWrite && found.dirty === 0.U, ECODE.PME, DontCare)),
       ),
-    )
+    ).asUInt
 
     val resp = Wire(new TLBResp)
     resp.exception.valid := Mux(dmw_hit, false.B, !isHit)
