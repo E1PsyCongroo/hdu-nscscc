@@ -307,6 +307,7 @@ class Decoder(implicit params: CoreParameters) extends Module {
     Seq(
       IQTypeControlField,
       FUTypeControlField,
+      CFITypeControlField,
       IMMTypeControlField,
       OP1SelControlField,
       OP2SelControlField,

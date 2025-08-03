@@ -22,7 +22,7 @@ class RenameBusyTable(val bypass: Boolean)(implicit params: CoreParameters) exte
     val wbPdsts  = Input(Vec(wbPortNum, UInt(coreWidth.W)))
     val wbValids = Input(Vec(wbPortNum, Bool()))
 
-    val debug = new Bundle { val busyTable = Output(Bits(pregNum.W)) }
+    val debug = new Bundle { val busyTable = Output(UInt(pregNum.W)) }
   })
 
   val busyTable = RegInit(0.U(pregNum.W))

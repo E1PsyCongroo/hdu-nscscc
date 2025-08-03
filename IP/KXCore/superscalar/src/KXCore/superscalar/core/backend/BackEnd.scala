@@ -39,7 +39,7 @@ class BackEnd(implicit params: CoreParameters) extends Module {
   // val unqIssUnit = Module(new IssueUnitCollapsing(unqIQParams))
   // val intIssUnit = Module(new IssueUnitCollapsing(intIQParams))
   val intIssUnit  = Module(new IssueUnitCollapsing(intIQParams))
-  val aluExeUnits = Seq.fill(1)(Module(new ALUExeUnit))
+  val aluExeUnits = Seq.fill(intIQParams.issueWidth)(Module(new ALUExeUnit))
   val regFile     = Module(new FullyPortedRF(pregNum, aluExeUnits.map(_.nReaders).sum, aluExeUnits.length))
 
   val flush = Wire(Bool())
@@ -135,8 +135,8 @@ class BackEnd(implicit params: CoreParameters) extends Module {
   (0 until aluExeUnits.length).foreach { i =>
     aluExeUnits(i).io_read_reqs(0) <> regFile.io.read_reqs(2 * i)
     aluExeUnits(i).io_read_reqs(1) <> regFile.io.read_reqs(2 * i + 1)
-    io.getPC(i + 1).ftqIdx         := aluExeUnits(i).io_ftq_req(0)
-    io.getPC(i + 2).ftqIdx         := aluExeUnits(i).io_ftq_req(1)
+    io.getPC(i + 1).ftqIdx         := aluExeUnits(i).io_ftq_req(0).bits
+    io.getPC(i + 2).ftqIdx         := aluExeUnits(i).io_ftq_req(1).bits
     aluExeUnits(i).io_ftq_resp(0)  := io.getPC(i + 1).info
     aluExeUnits(i).io_ftq_resp(1)  := io.getPC(i + 2).info
   }
@@ -156,7 +156,6 @@ class BackEnd(implicit params: CoreParameters) extends Module {
   }
 
   // commit
-  io.getPC(0).ftqIdx := DontCare
   for (i <- 0 until coreWidth) {
     renameMapTable.io.comRemapReqs(i).valid := rob.io.commit.valids(i)
     renameMapTable.io.comRemapReqs(i).ldst  := rob.io.commit.uop(i).ldst

@@ -26,14 +26,14 @@ class MicroOp(implicit params: CoreParameters) extends Bundle {
   val op2Sel = UInt(OP2Type.getWidth.W)
   val aluCmd = UInt(ALUType.getWidth.W)
 
-  val ldst = UInt(log2Ceil(backendParams.lregWidth).W) // logical destination register
-  val lrs1 = UInt(log2Ceil(backendParams.lregWidth).W) // logical source register 1
-  val lrs2 = UInt(log2Ceil(backendParams.lregWidth).W) // logical source register 2
+  val ldst = UInt(backendParams.lregWidth.W) // logical destination register
+  val lrs1 = UInt(backendParams.lregWidth.W) // logical source register 1
+  val lrs2 = UInt(backendParams.lregWidth.W) // logical source register 2
 
-  val stalePdst = UInt(log2Ceil(backendParams.pregWidth).W) // stale physical destination register
-  val pdst      = UInt(log2Ceil(backendParams.pregWidth).W) // physical destination register
-  val prs1      = UInt(log2Ceil(backendParams.pregWidth).W) // physical source register 1
-  val prs2      = UInt(log2Ceil(backendParams.pregWidth).W) // physical source register 2
+  val stalePdst = UInt(backendParams.pregWidth.W) // stale physical destination register
+  val pdst      = UInt(backendParams.pregWidth.W) // physical destination register
+  val prs1      = UInt(backendParams.pregWidth.W) // physical source register 1
+  val prs2      = UInt(backendParams.pregWidth.W) // physical source register 2
   val prs1Busy  = Bool()
   val prs2Busy  = Bool()
   val busy      = Bool()

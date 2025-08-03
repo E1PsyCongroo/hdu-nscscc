@@ -18,23 +18,6 @@ object ICache {
   def getTag(paddr: UInt)(implicit commonParams: CommonParameters, cacheParams: CacheParameters): UInt = {
     paddr.head(commonParams.paddrWidth - cacheParams.setWidth - cacheParams.blockWidth)
   }
-  class ICacheStageReq(implicit commonParams: CommonParameters, cacheParams: CacheParameters) extends Bundle {
-    import commonParams.{paddrWidth, vaddrWidth}
-    import cacheParams.{blockBits, blockWidth, setWidth, nSets, nWays}
-    private val tagWidth = paddrWidth - setWidth - blockWidth
-    val vaddr            = UInt(vaddrWidth.W)
-    val paddr            = UInt(paddrWidth.W)
-    val cacop            = UInt(CACOP.getWidth.W)
-    val wayValid         = Vec(nWays, Bool())
-    val wayTag           = Vec(nWays, UInt(tagWidth.W))
-    val wayData          = Vec(nWays, UInt(blockBits.W))
-  }
-
-  class ICacheStageResp(implicit commonParams: CommonParameters, cacheParams: CacheParameters) extends Bundle {
-    val data      = UInt(cacheParams.blockBits.W)
-    val exception = Bool() // Indicates whether an exception occurred
-  }
-
   class ICacheValidWrite(implicit commonParams: CommonParameters, cacheParams: CacheParameters) extends Bundle {
     import cacheParams.{setWidth, wayWidth}
     val all  = Bool()
@@ -63,7 +46,11 @@ object ICache {
 
 import ICache._
 
-class ICacheStage0to1(implicit commonParams: CommonParameters, cacheParams: CacheParameters) extends Module {
+class ICacheStage0to1(implicit
+    commonParams: CommonParameters,
+    cacheParams: CacheParameters,
+    axiParams: AXIBundleParameters,
+) extends Module {
   import commonParams.{vaddrWidth, paddrWidth}
   import cacheParams._
   private val tagWidth = paddrWidth - setWidth - blockWidth
@@ -75,7 +62,6 @@ class ICacheStage0to1(implicit commonParams: CommonParameters, cacheParams: Cach
       val cacheValid = Vec(nSets, Vec(nWays, Bool()))
       val wayTag     = Vec(nWays, UInt(tagWidth.W))
     })
-    val keepRead   = Input(UInt(vaddrWidth.W))
     val validWrite = Flipped(Valid(new ICacheValidWrite))
     val tagWrite   = Flipped(Valid(new ICacheTagWrite))
   })
@@ -88,8 +74,8 @@ class ICacheStage0to1(implicit commonParams: CommonParameters, cacheParams: Cach
   io.req.ready  := (nextEn === 0.U) || io.flush
   io.resp.valid := en && !io.flush
 
-  val readEn  = io.req.fire || nextEn
-  val readSet = getSet(Mux(en, io.keepRead, io.req.bits))
+  val holdReqReg = RegEnable(io.req.bits, io.req.ready)
+  val readSet    = getSet(Mux(io.req.ready, io.req.bits, holdReqReg))
 
   val validWriteEn = io.validWrite.valid
   val validWrite   = io.validWrite.bits
@@ -116,20 +102,25 @@ class ICacheStage0to1(implicit commonParams: CommonParameters, cacheParams: Cach
       Mux(tagWriteEn, tagWrite.set, readSet),
       tagWriteData,
       (UIntToOH(tagWrite.way) & Fill(wayWidth, tagWriteEn)).asBools,
-      readEn || tagWriteEn,
+      true.B,
       tagWriteEn,
     )
   } else {
-    cacheTag.read(readSet, io.req.fire)
+    cacheTag.read(readSet)
   }
 
   io.resp.bits.cacheValid := cacheValid
   io.resp.bits.wayTag     := wayTag
 }
 
-class ICacheStage1(implicit commonParams: CommonParameters, cacheParams: CacheParameters, axiParams: AXIBundleParameters) extends Module {
+class ICacheStage1(implicit
+    commonParams: CommonParameters,
+    cacheParams: CacheParameters,
+    axiParams: AXIBundleParameters,
+) extends Module {
   import commonParams.{vaddrWidth, paddrWidth}
   import cacheParams._
+  import axiParams.{dataBits}
   private val tagWidth = paddrWidth - setWidth - blockWidth
   private val burstLen = blockBits / axiParams.dataBits
 
@@ -141,20 +132,23 @@ class ICacheStage1(implicit commonParams: CommonParameters, cacheParams: CachePa
     val req = Flipped(Decoupled(new Bundle {
       val vaddr      = UInt(vaddrWidth.W)
       val paddr      = UInt(paddrWidth.W)
+      val cached     = Bool()
       val cacop      = UInt(CACOP.getWidth.W)
       val cacheValid = Vec(nSets, Vec(nWays, Bool()))
       val wayTag     = Vec(nWays, UInt(tagWidth.W))
     }))
     val resp = Decoupled(new Bundle {
-      val set       = UInt(setWidth.W)
-      val way       = UInt(wayWidth.W)
-      val exception = Bool()
+      val cached       = Bool()
+      val set          = UInt(setWidth.W)
+      val way          = UInt(wayWidth.W)
+      val uncachedRead = UInt(dataBits.W)
     })
   })
 
   val bits     = io.req.bits
   val vaddr    = bits.vaddr
   val paddr    = bits.paddr
+  val cached   = bits.cached
   val set      = getSet(paddr)
   val tag      = getTag(paddr)
   val cacop    = bits.cacop
@@ -165,7 +159,7 @@ class ICacheStage1(implicit commonParams: CommonParameters, cacheParams: CachePa
   val isIdxInv = cacop === CACOP_IDX_INV.asUInt
   val isHitInv = cacop === CACOP_HIT_INV.asUInt
 
-  val sHandleReq :: sSendBusReq :: sReadBusResp :: sFlushBusReq :: sFlushBusResp :: sWriteBack :: sSendReadResp :: Nil = Enum(7)
+  val sHandleReq :: sSendBusReq :: sReadBusResp :: sWriteBack :: sSendReadResp :: Nil = Enum(5)
 
   val state     = RegInit(sHandleReq)
   val nextState = WireDefault(sHandleReq)
@@ -173,21 +167,15 @@ class ICacheStage1(implicit commonParams: CommonParameters, cacheParams: CachePa
 
   nextState := MuxLookup(state, sHandleReq)(
     Seq(
-      sHandleReq -> Mux(io.req.valid && isRead && !hit, sSendBusReq, sHandleReq),
-      sSendBusReq -> Mux(
-        io.req.valid,
-        Mux(io.axi.ar.ready, sReadBusResp, sSendBusReq),
-        Mux(io.axi.ar.ready, sFlushBusResp, sFlushBusReq),
-      ),
+      sHandleReq  -> Mux(io.req.valid && isRead && (!hit || !cached), sSendBusReq, sHandleReq),
+      sSendBusReq -> Mux(io.axi.ar.ready, sReadBusResp, sSendBusReq),
       sReadBusResp -> Mux(
-        io.req.valid,
-        Mux(io.axi.r.valid && io.axi.r.bits.last.asBool, sWriteBack, sReadBusResp),
-        Mux(io.axi.r.valid && io.axi.r.bits.last.asBool, sHandleReq, sFlushBusResp),
+        io.axi.r.valid && io.axi.r.bits.last.asBool,
+        Mux(io.req.valid, Mux(cached, sWriteBack, sSendReadResp), sHandleReq),
+        sReadBusResp,
       ),
-      sFlushBusReq  -> Mux(io.axi.ar.ready, sFlushBusResp, sFlushBusReq),
-      sFlushBusResp -> Mux(io.axi.r.valid && io.axi.r.bits.last.asBool, sHandleReq, sFlushBusResp),
       sWriteBack    -> Mux(io.req.valid, sSendReadResp, sHandleReq),
-      sSendReadResp -> Mux(io.req.valid, Mux(io.resp.ready, sHandleReq, sSendBusReq), sHandleReq),
+      sSendReadResp -> Mux(!io.req.valid || io.resp.ready, sHandleReq, sSendBusReq),
     ),
   )
   state := nextState
@@ -211,16 +199,16 @@ class ICacheStage1(implicit commonParams: CommonParameters, cacheParams: CachePa
 
   io.resp.valid := MuxLookup(state, false.B)(
     Seq(
-      sHandleReq    -> (io.req.valid && isRead && hit),
+      sHandleReq    -> (io.req.valid && isRead && hit && cached),
       sSendReadResp -> io.req.valid,
     ),
   )
-  io.resp.bits.set       := set
-  io.resp.bits.way       := Mux(state === sSendReadResp, replacedSel, matched)
-  io.resp.bits.exception := false.B
+  io.resp.bits.set          := set
+  io.resp.bits.way          := Mux(state === sSendReadResp, replacedSel, matched)
+  io.resp.bits.uncachedRead := lineData(0)
 
   val idxSet = vaddr(blockWidth + setWidth - 1, blockWidth)
-  val idxWay = vaddr.tail(wayWidth)
+  val idxWay = vaddr(wayWidth - 1, 0)
   io.validWrite.valid := MuxLookup(state, false.B)(
     Seq(
       sHandleReq -> (io.req.valid && ((isHitInv && hit) || isFlush || isIdxInv)),
@@ -229,7 +217,7 @@ class ICacheStage1(implicit commonParams: CommonParameters, cacheParams: CachePa
   )
   io.validWrite.bits.all  := isFlush
   io.validWrite.bits.set  := Mux(isIdxInv, idxSet, set)
-  io.validWrite.bits.way  := Mux(isIdxInv, idxWay, Mux(isHitInv, matched, replacedSel))
+  io.validWrite.bits.way  := Mux(isIdxInv, idxWay, replacedSel)
   io.validWrite.bits.data := isRead
 
   io.tagWrite.valid     := io.req.valid && (state === sWriteBack)
@@ -242,10 +230,10 @@ class ICacheStage1(implicit commonParams: CommonParameters, cacheParams: CachePa
   io.dataWrite.bits.way  := replacedSel
   io.dataWrite.bits.data := lineData.asUInt
 
-  io.axi.ar.valid     := (state === sSendBusReq) || (state === sFlushBusReq)
+  io.axi.ar.valid     := state === sSendBusReq
   io.axi.ar.bits.addr := paddr
   io.axi.ar.bits.id   := id.U
-  io.axi.ar.bits.len  := (burstLen - 1).U
+  io.axi.ar.bits.len  := Mux(cached, (burstLen - 1).U, 0.U)
 
   io.axi.ar.bits.size  := log2Ceil(axiParams.dataBits / 8).U
   io.axi.ar.bits.burst := AXIParameters.BURST_INCR
@@ -253,7 +241,7 @@ class ICacheStage1(implicit commonParams: CommonParameters, cacheParams: CachePa
   io.axi.ar.bits.cache := 0.U
   io.axi.ar.bits.prot  := 0.U
 
-  io.axi.r.ready := (state === sReadBusResp) || (state === sFlushBusResp)
+  io.axi.r.ready := state === sReadBusResp
 
   io.axi.aw.valid := false.B
   io.axi.aw.bits  := DontCare
@@ -264,7 +252,11 @@ class ICacheStage1(implicit commonParams: CommonParameters, cacheParams: CachePa
   io.axi.b.ready := false.B
 }
 
-class ICacheStage1to2(implicit commonParams: CommonParameters, cacheParams: CacheParameters) extends Module {
+class ICacheStage1to2(implicit
+    commonParams: CommonParameters,
+    cacheParams: CacheParameters,
+    axiParams: AXIBundleParameters,
+) extends Module {
   import commonParams.{vaddrWidth, paddrWidth}
   import cacheParams._
   private val tagWidth = paddrWidth - setWidth - blockWidth
@@ -272,18 +264,16 @@ class ICacheStage1to2(implicit commonParams: CommonParameters, cacheParams: Cach
   val io = IO(new Bundle {
     val flush = Input(Bool())
     val req = Flipped(Decoupled(new Bundle {
-      val set       = UInt(setWidth.W)
-      val way       = UInt(wayWidth.W)
-      val exception = Bool()
+      val cached       = Bool()
+      val set          = UInt(setWidth.W)
+      val way          = UInt(wayWidth.W)
+      val uncachedRead = UInt(axiParams.dataBits.W)
     }))
     val resp = Decoupled(new Bundle {
-      val data      = UInt(blockBits.W)
-      val exception = Bool()
+      val cached = Bool()
+      val data   = UInt(blockBits.W)
     })
-    val keepRead = Input(new Bundle {
-      val set = UInt(setWidth.W)
-      val way = UInt(wayWidth.W)
-    })
+
     val dataWrite = Flipped(Valid(new ICacheDataWrite))
   })
 
@@ -298,9 +288,9 @@ class ICacheStage1to2(implicit commonParams: CommonParameters, cacheParams: Cach
   io.req.ready  := (nextEn === 0.U) || io.flush
   io.resp.valid := en && !io.flush
 
-  val readEn  = io.req.fire || nextEn
-  val readSet = Mux(io.req.ready, io.req.bits.set, io.keepRead.set)
-  val readWay = Mux(io.req.ready, io.req.bits.way, io.keepRead.way)
+  val holdReqReg = RegEnable(io.req.bits, io.req.ready)
+  val readSet    = Mux(io.req.ready, io.req.bits.set, holdReqReg.set)
+  val readWay    = Mux(io.req.ready, io.req.bits.way, holdReqReg.way)
 
   if (!singlePorted) {
     val dataWrite = io.dataWrite.bits
@@ -325,7 +315,7 @@ class ICacheStage1to2(implicit commonParams: CommonParameters, cacheParams: Cach
           cacheData.readWrite(
             Mux(dataWriteEn, dataWrite.set, readSet),
             dataWriteData,
-            readEn || dataWriteEn,
+            true.B,
             dataWriteEn,
           )
         })(readWay)
@@ -334,13 +324,13 @@ class ICacheStage1to2(implicit commonParams: CommonParameters, cacheParams: Cach
   } else {
     VecInit(
       cacheData.map { cacheDataBanks =>
-        VecInit(cacheDataBanks.map(_.read(readSet, readEn)))(readWay)
+        VecInit(cacheDataBanks.map(_.read(readSet)))(readWay)
       },
     ).asUInt
   }
 
-  io.resp.bits.exception := RegEnable(io.req.bits.exception, io.req.fire)
-  io.resp.bits.data      := data
+  io.resp.bits.cached := holdReqReg.cached
+  io.resp.bits.data   := Mux(holdReqReg.cached, data, holdReqReg.uncachedRead)
 }
 
 class ICache(implicit commonParams: CommonParameters, cacheParams: CacheParameters, axiParams: AXIBundleParameters) extends Module {
@@ -359,15 +349,16 @@ class ICache(implicit commonParams: CommonParameters, cacheParams: CacheParamete
         val vaddr = UInt(vaddrWidth.W)
       }))
       val stage1 = Flipped(Decoupled(new Bundle {
-        val vaddr = UInt(vaddrWidth.W)
-        val paddr = UInt(paddrWidth.W)
-        val cacop = UInt(CACOP.getWidth.W)
+        val vaddr  = UInt(vaddrWidth.W)
+        val paddr  = UInt(paddrWidth.W)
+        val cached = Bool()
+        val cacop  = UInt(CACOP.getWidth.W)
       }))
     }
     val resp = new Bundle {
       val stage2 = Decoupled(new Bundle {
-        val data      = UInt(blockBits.W)
-        val exception = Bool()
+        val cached = Bool()
+        val data   = UInt(blockBits.W)
       })
     }
   })
@@ -379,28 +370,28 @@ class ICache(implicit commonParams: CommonParameters, cacheParams: CacheParamete
   stage0to1.io.flush := io.flush.stage1
   stage1to2.io.flush := io.flush.stage2
 
+  // stage0to1
   stage0to1.io.req.valid := io.req.stage0.valid
   stage0to1.io.req.bits  := io.req.stage0.bits.vaddr
   io.req.stage0.ready    := stage0to1.io.req.ready
-  stage0to1.io.keepRead  := io.req.stage1.bits.vaddr
 
+  // stage1
   io.axi                        <> stage1.io.axi
   stage1.io.req.valid           := stage0to1.io.resp.valid && io.req.stage1.valid
   stage0to1.io.resp.ready       := stage1.io.req.ready
   io.req.stage1.ready           := stage1.io.req.ready
   stage1.io.req.bits.vaddr      := io.req.stage1.bits.vaddr
   stage1.io.req.bits.paddr      := io.req.stage1.bits.paddr
+  stage1.io.req.bits.cached     := io.req.stage1.bits.cached
   stage1.io.req.bits.cacop      := io.req.stage1.bits.cacop
   stage1.io.req.bits.cacheValid := stage0to1.io.resp.bits.cacheValid
   stage1.io.req.bits.wayTag     := stage0to1.io.resp.bits.wayTag
   stage0to1.io.validWrite       := stage1.io.validWrite
   stage0to1.io.tagWrite         := stage1.io.tagWrite
-  stage1to2.io.dataWrite        := stage1.io.dataWrite
 
-  val stage1to2Keep = RegEnable(stage1.io.resp.bits, stage1.io.resp.fire)
-  stage1to2.io.req          <> stage1.io.resp
-  stage1to2.io.keepRead.set := stage1to2Keep.set
-  stage1to2.io.keepRead.way := stage1to2Keep.way
+  // stage1to2
+  stage1to2.io.dataWrite := stage1.io.dataWrite
+  stage1to2.io.req       <> stage1.io.resp.valid
 
   io.resp.stage2 <> stage1to2.io.resp
 }
