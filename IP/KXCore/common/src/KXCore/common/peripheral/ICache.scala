@@ -391,7 +391,7 @@ class ICache(implicit commonParams: CommonParameters, cacheParams: CacheParamete
 
   // stage1to2
   stage1to2.io.dataWrite := stage1.io.dataWrite
-  stage1to2.io.req       <> stage1.io.resp.valid
+  stage1to2.io.req       <> stage1.io.resp
 
   io.resp.stage2 <> stage1to2.io.resp
 }

@@ -118,14 +118,17 @@ class FrontEnd(implicit params: CoreParameters) extends Module {
   icacheFetchReq.bits.cacop := CACOP.CACOP_HIT_READ.asUInt
 
   val icacheArb = Module(new Arbiter(io.icacheReq.bits.cloneType, 2))
-  icacheArb.io.in(0)              <> icacheCacopReq
-  icacheArb.io.in(1)              <> icacheFetchReq
-  icache.io.req.stage1.valid      := icacheArb.io.out.valid
-  icacheArb.io.out.ready          := icache.io.req.stage1.ready
-  icache.io.req.stage1.bits.vaddr := icacheArb.io.out.bits.vaddr
-  io.itlbReq.vaddr                := stage0to1Ext.bits.fetchPC
-  icache.io.req.stage1.bits.paddr := io.itlbResp.paddr
-  icache.io.req.stage1.bits.cacop := icacheArb.io.out.bits.cacop
+  icacheArb.io.in(0)               <> icacheCacopReq
+  icacheArb.io.in(1)               <> icacheFetchReq
+  icache.io.req.stage1.valid       := icacheArb.io.out.valid
+  icacheArb.io.out.ready           := icache.io.req.stage1.ready
+  icache.io.req.stage1.bits.vaddr  := icacheArb.io.out.bits.vaddr
+  io.itlbReq                       := DontCare
+  io.itlbReq.vaddr                 := stage0to1Ext.bits.fetchPC
+  io.itlbReq.isWrite               := false.B
+  icache.io.req.stage1.bits.paddr  := io.itlbResp.paddr
+  icache.io.req.stage1.bits.cacop  := icacheArb.io.out.bits.cacop
+  icache.io.req.stage1.bits.cached := io.itlbResp.mat(0)
 
   bpu.io.req.stage1.valid := stage0to1Ext.valid(1)
   stage0to1Ext.ready(1)   := bpu.io.req.stage1.ready
