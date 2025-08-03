@@ -90,5 +90,6 @@ class Core(implicit params: CoreParameters) extends Module {
     // difftestInstrCommit.io.clock  := clock.asBool
     // difftestInstrCommit.io.coreid := 0.U
     // difftestInstrCommit.io.index :=
+    dontTouch(backend.io.debug)
   }
 }

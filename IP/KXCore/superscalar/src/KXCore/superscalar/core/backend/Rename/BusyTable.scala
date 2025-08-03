@@ -12,14 +12,14 @@ class BusyResp extends Bundle {
 
 class RenameBusyTable(val bypass: Boolean)(implicit params: CoreParameters) extends Module {
   import params.{commonParams, backendParams}
-  import backendParams.{coreWidth, pregNum, wbPortNum}
+  import backendParams.{coreWidth, pregNum, pregWidth, wbPortNum}
 
   val io = IO(new Bundle {
     val uopReqs    = Input(Vec(coreWidth, new MicroOp))
     val busyResps  = Output(Vec(coreWidth, new BusyResp))
     val rebusyReqs = Input(Vec(coreWidth, Bool()))
 
-    val wbPdsts  = Input(Vec(wbPortNum, UInt(coreWidth.W)))
+    val wbPdsts  = Input(Vec(wbPortNum, UInt(pregWidth.W)))
     val wbValids = Input(Vec(wbPortNum, Bool()))
 
     val debug = Output(UInt(pregNum.W))

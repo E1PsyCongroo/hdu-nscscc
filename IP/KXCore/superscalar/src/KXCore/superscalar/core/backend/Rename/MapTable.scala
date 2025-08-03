@@ -77,13 +77,13 @@ class RenameMapTable(val bypass: Boolean)(implicit params: CoreParameters) exten
 
   // Read out mappings.
   for (i <- 0 until coreWidth) {
-    io.mapResps(i).prs1 := (0 until i).foldLeft(renMapTable(io.mapReqs(i).lrs1))((p, k) =>
+    io.mapResps(i).prs1 := (0 until coreWidth).foldLeft(renMapTable(io.mapReqs(i).lrs1))((p, k) =>
       Mux(bypass.B && io.renRemapReqs(k).valid && io.renRemapReqs(k).ldst === io.mapReqs(i).lrs1, io.renRemapReqs(k).pdst, p),
     )
-    io.mapResps(i).prs2 := (0 until i).foldLeft(renMapTable(io.mapReqs(i).lrs2))((p, k) =>
+    io.mapResps(i).prs2 := (0 until coreWidth).foldLeft(renMapTable(io.mapReqs(i).lrs2))((p, k) =>
       Mux(bypass.B && io.renRemapReqs(k).valid && io.renRemapReqs(k).ldst === io.mapReqs(i).lrs2, io.renRemapReqs(k).pdst, p),
     )
-    io.mapResps(i).stalePdst := (0 until i).foldLeft(renMapTable(io.mapReqs(i).ldst))((p, k) =>
+    io.mapResps(i).stalePdst := (0 until coreWidth).foldLeft(renMapTable(io.mapReqs(i).ldst))((p, k) =>
       Mux(bypass.B && io.renRemapReqs(k).valid && io.renRemapReqs(k).ldst === io.mapReqs(i).ldst, io.renRemapReqs(k).pdst, p),
     )
   }

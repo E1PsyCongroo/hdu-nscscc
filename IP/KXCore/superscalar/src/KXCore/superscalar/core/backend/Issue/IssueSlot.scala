@@ -42,7 +42,7 @@ class IssueSlot(implicit params: CoreParameters) extends Module {
   val slot_uop = Reg(new MicroOp)
   val next_uop = Mux(io.in_uop.valid, io.in_uop.bits, slot_uop)
 
-  valid := Mux(io.in_uop.valid, true.B, Mux(io.grant, false.B, valid))
+  valid := Mux(io.in_uop.valid, true.B, Mux(io.grant || io.kill || io.clear, false.B, valid))
 
   when(io.in_uop.valid) {
     slot_uop := io.in_uop.bits

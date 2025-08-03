@@ -26,8 +26,7 @@ class ALU(implicit params: CoreParameters) extends AbstractALU {
 
   // ADD, SUB
   val in2_inv     = Mux(isSub(io.cmd), ~io.in2, io.in2)
-  val in1_xor_in2 = io.in1 ^ in2_inv
-  val in1_and_in2 = io.in1 & in2_inv
+  val in1_xor_in2 = io.in1 ^ io.in2
   io.adder_out := io.in1 + in2_inv + isSub(io.cmd)
 
   // SLT, SLTU
@@ -46,10 +45,15 @@ class ALU(implicit params: CoreParameters) extends AbstractALU {
   val shout = Mux(io.cmd === ALU_SRL.asUInt || io.cmd === ALU_SRA.asUInt, shout_r, 0.U) |
     Mux(io.cmd === ALU_SLL.asUInt, shout_l, 0.U)
 
-  // AND, OR, XOR
-  val logic =
-    Mux(io.cmd === ALU_XOR.asUInt || io.cmd === ALU_OR.asUInt || io.cmd === ALU_NOR.asUInt, in1_xor_in2, 0.U) |
-      Mux(io.cmd === ALU_OR.asUInt || io.cmd === ALU_ADD.asUInt || io.cmd === ALU_NOR.asUInt, in1_and_in2, 0.U)
+  // AND, OR, XOR, NOR
+  val logic = MuxLookup(io.cmd, 0.U)(
+    Seq(
+      ALU_XOR.asUInt -> in1_xor_in2,
+      ALU_OR.asUInt  -> (io.in1 | io.in2),
+      ALU_NOR.asUInt -> ~(io.in1 | io.in2),
+      ALU_AND.asUInt -> (io.in1 & io.in2),
+    ),
+  )
 
   val shift_logic = (isCmp(io.cmd) && slt) | logic | shout
 

@@ -10,14 +10,14 @@ object ALUType extends ChiselEnum {
   val ALU_SRA = Value("b0011".U)
   val ALU_NEQ = Value("b0100".U)
   val ALU_ADD = Value("b0101".U)
-  val ALU_NOR = Value("b0110".U)
+  val ALU_XOR = Value("b0110".U)
   val ALU_AND = Value("b0111".U)
 
   val ALU_SUB  = Value("b1000".U)
   val ALU_SLT  = Value("b1001".U)
   val ALU_SLTU = Value("b1010".U)
   val ALU_OR   = Value("b1011".U)
-  val ALU_XOR  = Value("b1100".U)
+  val ALU_NOR  = Value("b1100".U)
   val ALU_SGE  = Value("b1101".U)
   val ALU_SGEU = Value("b1110".U)
 

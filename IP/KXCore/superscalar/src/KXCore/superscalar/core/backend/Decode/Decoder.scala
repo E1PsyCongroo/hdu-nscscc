@@ -16,9 +16,13 @@ object IQTypeControlField extends DecodeField[Instruction, UInt] {
   def chiselType: UInt = UInt(IQType.getWidth.W)
   def genTable(op: Instruction): BitPat = {
     op match {
-      case LD_B | LD_H | LD_W | ST_B | ST_H | ST_W | LD_BU | LD_HU    => BitPat(IQType.IQT_MEM.asUInt)
-      case MUL_W | MULH_W | MULH_WU | DIV_W | MOD_W | DIV_WU | MOD_WU => BitPat(IQType.IQT_UNQ.asUInt)
-      case _                                                          => BitPat(IQType.IQT_INT.asUInt)
+      case LD_B | LD_H | LD_W | ST_B | ST_H | ST_W | LD_BU | LD_HU             => BitPat(IQType.IQT_MEM.asUInt)
+      case MUL_W | MULH_W | MULH_WU | DIV_W | MOD_W | DIV_WU | MOD_WU          => BitPat(IQType.IQT_UNQ.asUInt)
+      case CSRRD | CSRWR | CSRXCHG_0 | CSRXCHG_1 | CSRXCHG_2 | CSRXCHG_3       => BitPat(IQType.IQT_UNQ.asUInt)
+      case BREAK | SYSCALL | ERTN                                              => BitPat(IQType.IQT_UNQ.asUInt)
+      case RDCNTID_W_0 | RDCNTID_W_1 | RDCNTID_W_2 | RDCNTID_W_3 | RDCNTID_W_4 => BitPat(IQType.IQT_UNQ.asUInt)
+      case RDCNTVH_W | RDCNTVL_W                                               => BitPat(IQType.IQT_UNQ.asUInt)
+      case _                                                                   => BitPat(IQType.IQT_INT.asUInt)
     }
   }
 }
@@ -28,8 +32,8 @@ object FUTypeControlField extends DecodeField[Instruction, UInt] {
   def chiselType: UInt = UInt(FUType.getWidth.W)
   def genTable(op: Instruction): BitPat = {
     op match {
-      case PCADDU12I | JIRL | B | BL | BEQ | BNE | BLT | BGE | BLTU | BGEU     => BitPat(FUType.FUT_CFI.asUInt)
-      case BREAK | SYSCALL | ERTN | IDLE | RDCNTVH_W | RDCNTVL_W               => BitPat(FUType.FUT_CSR.asUInt)
+      case JIRL | B | BL | BEQ | BNE | BLT | BGE | BLTU | BGEU                 => BitPat(FUType.FUT_CFI.asUInt)
+      case BREAK | SYSCALL | ERTN | RDCNTVH_W | RDCNTVL_W                      => BitPat(FUType.FUT_CSR.asUInt)
       case RDCNTID_W_0 | RDCNTID_W_1 | RDCNTID_W_2 | RDCNTID_W_3 | RDCNTID_W_4 => BitPat(FUType.FUT_CSR.asUInt)
       case CSRRD | CSRWR | CSRXCHG_0 | CSRXCHG_1 | CSRXCHG_2 | CSRXCHG_3       => BitPat(FUType.FUT_CSR.asUInt)
       case LD_B | LD_H | LD_W | ST_B | ST_H | ST_W | LD_BU | LD_HU             => BitPat(FUType.FUT_MEM.asUInt)
@@ -59,7 +63,7 @@ object IMMTypeControlField extends DecodeField[Instruction, UInt] {
   def genTable(op: Instruction): BitPat = {
     op match {
       case SLLI_W | SRLI_W | SRAI_W                                      => BitPat(IMMType.IMM_5U.asUInt)
-      case SLTI | SLTUI | ADDI_W | CACOP                                 => BitPat(IMMType.IMM_12.asUInt)
+      case SLTI | SLTUI | ADDI_W                                         => BitPat(IMMType.IMM_12.asUInt)
       case LD_B | LD_H | LD_W | ST_B | ST_H | ST_W | LD_BU | LD_HU       => BitPat(IMMType.IMM_12.asUInt)
       case ANDI | ORI | XORI                                             => BitPat(IMMType.IMM_12U.asUInt)
       case CSRRD | CSRWR | CSRXCHG_0 | CSRXCHG_1 | CSRXCHG_2 | CSRXCHG_3 => BitPat(IMMType.IMM_14U.asUInt)
@@ -152,7 +156,7 @@ object RS1ControlField extends DecodeField[Instruction, UInt] {
   def genTable(op: Instruction): BitPat = {
     op match {
       case LU12I_W | PCADDU12I | B | BL                                        => BitPat(RS1From.rs1None.asUInt)
-      case SYSCALL | BREAK | ERTN | IDLE                                       => BitPat(RS1From.rs1None.asUInt)
+      case SYSCALL | BREAK | ERTN                                              => BitPat(RS1From.rs1None.asUInt)
       case RDCNTVL_W | RDCNTVH_W                                               => BitPat(RS1From.rs1FromRd.asUInt)
       case RDCNTID_W_0 | RDCNTID_W_1 | RDCNTID_W_2 | RDCNTID_W_3 | RDCNTID_W_4 => BitPat(RS1From.rs1FromRd.asUInt)
       case _                                                                   => BitPat(RS1From.rs1FromRj.asUInt)
@@ -214,6 +218,19 @@ object WBControlField extends DecodeField[Instruction, UInt] {
   }
 }
 
+object UniqControlField extends DecodeField[Instruction, Bool] {
+  def name             = "Unique Instruction control field"
+  def chiselType: Bool = Bool()
+  def genTable(op: Instruction): BitPat = {
+    op match {
+      case ST_B | ST_H | ST_W                                            => BitPat.Y(1)
+      case RDCNTVL_W | RDCNTVH_W                                         => BitPat.Y(1)
+      case CSRRD | CSRWR | CSRXCHG_0 | CSRXCHG_1 | CSRXCHG_2 | CSRXCHG_3 => BitPat.Y(1)
+      case _                                                             => BitPat.N(1)
+    }
+  }
+}
+
 class DecoderIO(implicit params: CoreParameters) extends Bundle {
   val req  = Input(Vec(params.backendParams.coreWidth, new MicroOp))
   val resp = Output(Vec(params.backendParams.coreWidth, new MicroOp))
@@ -221,7 +238,7 @@ class DecoderIO(implicit params: CoreParameters) extends Bundle {
 
 class Decoder(implicit params: CoreParameters) extends Module {
   import params.{commonParams, backendParams}
-  import commonParams.{dataWidth}
+  import commonParams.{instWidth, dataWidth}
   import backendParams.{coreWidth}
   val io = IO(new DecoderIO)
 
@@ -299,7 +316,7 @@ class Decoder(implicit params: CoreParameters) extends Module {
     // TLBFILL,
     // INVTLB,
     ERTN,
-    IDLE,
+    // IDLE,
   )
 
   val decodeTable = new DecodeTable(
@@ -315,11 +332,16 @@ class Decoder(implicit params: CoreParameters) extends Module {
       RS1ControlField,
       RS2ControlField,
       WBControlField,
+      UniqControlField,
     ),
   )
 
+  val NOP     = "b0000_001010_000000000000_00000_00000".U(instWidth.W)
+  val unImpls = Seq(PRELD, LL_W, SC_W, DBAR, IBAR, CACOP, TLBSRCH, TLBRD, TLBWR, TLBFILL, INVTLB, IDLE)
+
   for (i <- 0 until coreWidth) {
-    val decodeResult = decodeTable.decode(io.req(i).inst)
+    val inst         = Mux(unImpls.map(_.bitPat === io.req(i).inst).reduce(_ || _), NOP, io.req(i).inst)
+    val decodeResult = decodeTable.decode(inst)
     val uop          = WireDefault(io.req(i))
     uop.iqType  := decodeResult(IQTypeControlField)
     uop.fuType  := decodeResult(FUTypeControlField)
@@ -327,14 +349,14 @@ class Decoder(implicit params: CoreParameters) extends Module {
     uop.imm := MuxCase(
       DontCare,
       Seq(
-        IMMType.IMM_5U  -> uop.inst(14, 10),
-        IMMType.IMM_12  -> Sext(uop.inst(21, 10), dataWidth),
-        IMMType.IMM_12U -> uop.inst(21, 10),
-        IMMType.IMM_14U -> uop.inst(23, 10),
-        IMMType.IMM_15U -> uop.inst(14, 0),
-        IMMType.IMM_16  -> Sext((uop.inst(25, 10) << 2.U), dataWidth),
-        IMMType.IMM_20  -> (uop.inst(24, 5) << 12.U),
-        IMMType.IMM_26  -> Sext(Cat(uop.inst(9, 0), uop.inst(25, 10)) << 2.U, dataWidth),
+        IMMType.IMM_5U  -> inst(14, 10),
+        IMMType.IMM_12  -> Sext(inst(21, 10), dataWidth),
+        IMMType.IMM_12U -> inst(21, 10),
+        IMMType.IMM_14U -> inst(23, 10),
+        IMMType.IMM_15U -> inst(14, 0),
+        IMMType.IMM_16  -> Sext((inst(25, 10) << 2.U), dataWidth),
+        IMMType.IMM_20  -> (inst(24, 5) << 12.U),
+        IMMType.IMM_26  -> Sext(Cat(inst(9, 0), inst(25, 10)) << 2.U, dataWidth),
       ).map { case (key, value) => (decodeResult(IMMTypeControlField) === key.asUInt, value) },
     )
     uop.op1Sel := decodeResult(OP1SelControlField)
@@ -344,28 +366,31 @@ class Decoder(implicit params: CoreParameters) extends Module {
       0.U,
       Seq(
         RS1From.rs1None   -> 0.U,
-        RS1From.rs1FromRj -> uop.inst(9, 5),
-        RS1From.rs1FromRd -> uop.inst(4, 0),
+        RS1From.rs1FromRj -> inst(9, 5),
+        RS1From.rs1FromRd -> inst(4, 0),
       ).map { case (key, value) => (decodeResult(RS1ControlField) === key.asUInt, value) },
     )
     uop.lrs2 := MuxCase(
       0.U,
       Seq(
         RS2From.rs2None   -> 0.U,
-        RS2From.rs2FromRk -> uop.inst(14, 10),
-        RS2From.rs2FromRj -> uop.inst(9, 5),
+        RS2From.rs2FromRk -> inst(14, 10),
+        RS2From.rs2FromRj -> inst(9, 5),
       ).map { case (key, value) => (decodeResult(RS2ControlField) === key.asUInt, value) },
     )
     uop.ldst := MuxCase(
       0.U,
       Seq(
         WBDest.destNone -> 0.U,
-        WBDest.destRd   -> uop.inst(4, 0),
+        WBDest.destRd   -> inst(4, 0),
         WBDest.destR1   -> 1.U,
-        WBDest.destRj   -> uop.inst(9, 4),
+        WBDest.destRj   -> inst(9, 4),
       ).map { case (key, value) => (decodeResult(WBControlField) === key.asUInt, value) },
     )
+    uop.isUnique := decodeResult(UniqControlField)
+    uop.busy     := !uop.exception
 
     io.resp(i) := uop
   }
+
 }

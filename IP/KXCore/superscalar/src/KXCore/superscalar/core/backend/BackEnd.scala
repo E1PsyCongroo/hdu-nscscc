@@ -37,10 +37,9 @@ class BackEnd(implicit params: CoreParameters) extends Module {
   val renameFreeList  = Module(new RenameFreeList(coreWidth, coreWidth))
   val renameBusyTable = Module(new RenameBusyTable(true))
   val rob             = Module(new ReorderBuffer)
-  val dispatcher      = Module(new Dispatcher)
+  val dispatcher      = Module(new BasicDispatcher)
   // val memIssUnit      = Module(new IssueUnitCollapsing(memIQParams))
   // val unqIssUnit = Module(new IssueUnitCollapsing(unqIQParams))
-  // val intIssUnit = Module(new IssueUnitCollapsing(intIQParams))
   val intIssUnit  = Module(new IssueUnitCollapsing(intIQParams))
   val aluExeUnits = Seq.fill(intIQParams.issueWidth)(Module(new ALUExeUnit))
   val regFile     = Module(new FullyPortedRF(pregNum, aluExeUnits.map(_.nReaders).sum, aluExeUnits.length))
@@ -61,12 +60,13 @@ class BackEnd(implicit params: CoreParameters) extends Module {
   decData.valid        := io.fetchPacket.valid
   io.fetchPacket.ready := decData.ready
   for (i <- 0 until coreWidth) {
-    decoder.io.req(i)                 := io.fetchPacket.bits.uops(i).bits
-    renameMapTable.io.mapReqs(i).ldst := io.fetchPacket.bits.uops(i).bits.ldst
-    renameMapTable.io.mapReqs(i).lrs1 := io.fetchPacket.bits.uops(i).bits.lrs1
-    renameMapTable.io.mapReqs(i).lrs2 := io.fetchPacket.bits.uops(i).bits.lrs2
-    decData.bits(i).valid             := io.fetchPacket.bits.uops(i).valid
-    decData.bits(i).bits              := decoder.io.resp(i)
+    decoder.io.req(i)     := io.fetchPacket.bits.uops(i).bits
+    decData.bits(i).valid := io.fetchPacket.bits.uops(i).valid
+    decData.bits(i).bits  := decoder.io.resp(i)
+
+    renameMapTable.io.mapReqs(i).ldst := decData.bits(i).bits.ldst
+    renameMapTable.io.mapReqs(i).lrs1 := decData.bits(i).bits.lrs1
+    renameMapTable.io.mapReqs(i).lrs2 := decData.bits(i).bits.lrs2
     decData.bits(i).bits.stalePdst    := renameMapTable.io.mapResps(i).stalePdst
     decData.bits(i).bits.prs1         := renameMapTable.io.mapResps(i).prs1
     decData.bits(i).bits.prs2         := renameMapTable.io.mapResps(i).prs2
@@ -86,13 +86,15 @@ class BackEnd(implicit params: CoreParameters) extends Module {
   disData.valid  := decToRen.valid
   decToRen.ready := disData.ready
   disData.ready  := VecInit(disData.bits.map(_.valid)).asUInt === disUopFire || flush
+  var dis_valid_not_ready = false.B
   for (i <- 0 until coreWidth) {
     renameFreeList.io.allocPregs(i).ready := disData.bits(i).valid && disData.bits(i).bits.ldst =/= 0.U &&
       disUopReady(i)
 
-    renameMapTable.io.renRemapReqs(i).valid := disData.bits(i).valid && disUopReady(i)
-    renameMapTable.io.renRemapReqs(i).ldst  := disData.bits(i).bits.ldst
-    renameMapTable.io.renRemapReqs(i).pdst  := disData.bits(i).bits.pdst
+    renameMapTable.io.renRemapReqs(i).valid := disData.bits(i).valid && disUopReady(i) &&
+      disData.bits(i).bits.ldst =/= 0.U && renameFreeList.io.allocPregs(i).valid
+    renameMapTable.io.renRemapReqs(i).ldst := disData.bits(i).bits.ldst
+    renameMapTable.io.renRemapReqs(i).pdst := disData.bits(i).bits.pdst
 
     renameBusyTable.io.uopReqs(i)    := disData.bits(i).bits
     renameBusyTable.io.rebusyReqs(i) := disData.bits(i).valid
@@ -100,40 +102,52 @@ class BackEnd(implicit params: CoreParameters) extends Module {
     rob.io.alloc(i).ready := disData.bits(i).valid && disUopReady(i)
     rob.io.alloc(i).uop   := disData.bits(i).bits
 
-    disData.bits(i).valid := decToRen.bits(i).valid && !disUopFireReg(i)
-    (renameFreeList.io.allocPregs(i).valid || disData.bits(i).bits.ldst === 0.U) &&
-    rob.io.alloc(i).valid
+    disData.bits(i).valid := decToRen.valid && decToRen.bits(i).valid && !disUopFireReg(i) &&
+      (renameFreeList.io.allocPregs(i).valid || disData.bits(i).bits.ldst === 0.U) &&
+      rob.io.alloc(i).valid
     disData.bits(i).bits        := decToRen.bits(i).bits
     disData.bits(i).bits.pdst   := renameFreeList.io.allocPregs(i).bits
     disData.bits(i).bits.robIdx := rob.io.alloc(i).idx
     for (j <- 0 until i) {
-      when(decToRen.bits(j).valid) {
-        when(decToRen.bits(j).bits.ldst === disData.bits(i).bits.ldst) {
-          disData.bits(i).bits.stalePdst := decToRen.bits(j).bits.pdst
+      when(disData.bits(j).valid) {
+        when(disData.bits(j).bits.ldst === disData.bits(i).bits.ldst) {
+          disData.bits(i).bits.stalePdst := disData.bits(j).bits.pdst
         }
-        when(decToRen.bits(j).bits.ldst === disData.bits(i).bits.lrs1) {
-          disData.bits(i).bits.prs1 := decToRen.bits(j).bits.pdst
+        when(disData.bits(j).bits.ldst === disData.bits(i).bits.lrs1) {
+          disData.bits(i).bits.prs1 := disData.bits(j).bits.pdst
         }
-        when(decToRen.bits(j).bits.ldst === disData.bits(i).bits.lrs2) {
-          disData.bits(i).bits.prs2 := decToRen.bits(j).bits.pdst
+        when(disData.bits(j).bits.ldst === disData.bits(i).bits.lrs2) {
+          disData.bits(i).bits.prs2 := disData.bits(j).bits.pdst
         }
       }
     }
     disData.bits(i).bits.prs1Busy := renameBusyTable.io.busyResps(i).prs1Busy
     disData.bits(i).bits.prs2Busy := renameBusyTable.io.busyResps(i).prs2Busy
 
-    dispatcher.io.ren_uops(i).valid := disData.bits(i).valid
+    val dis_valid_not_ready_yet = dis_valid_not_ready
+
+    dis_valid_not_ready = disData.bits(i).valid && !disUopReady(i)
+    dispatcher.io.ren_uops(i).valid := disData.bits(i).valid && !dis_valid_not_ready_yet
     dispatcher.io.ren_uops(i).bits  := disData.bits(i).bits
 
+    when(dispatcher.io.ren_uops(i).fire) {
+      printf("alloc preg (lreg: %d -> %d)", dispatcher.io.ren_uops(i).bits.ldst, dispatcher.io.ren_uops(i).bits.pdst)
+    }
+
+    when(renameFreeList.io.dealloc(i).valid) {
+      printf("free preg %d", renameFreeList.io.dealloc(i).bits)
+    }
   }
   disUopReady := VecInit(dispatcher.io.ren_uops.map(_.ready)).asUInt
   disUopFire  := disUopFireReg | (disUopReady & VecInit(disData.bits.map(_.valid)).asUInt)
 
   // issue
-  // dispatcher.io.dis_uops(0) <> memIssUnit.io.dis_uops
-  // dispatcher.io.dis_uops(1) <>unqIssUnit.io.dis_uops
-  dispatcher.io.dis_uops(0) := DontCare
-  dispatcher.io.dis_uops(1) := DontCare
+  dispatcher.io.dis_uops(0).foreach { dis =>
+    dis.ready := true.B
+  }
+  dispatcher.io.dis_uops(1).foreach { dis =>
+    dis.ready := true.B
+  }
   dispatcher.io.dis_uops(2) <> intIssUnit.io.dis_uops
 
   // execute
@@ -173,16 +187,19 @@ class BackEnd(implicit params: CoreParameters) extends Module {
 
   // write back
   (0 until aluExeUnits.length).foreach { i =>
-    renameBusyTable.io.wbValids(i)      := aluExeUnits(i).io_alu_resp.valid
-    renameBusyTable.io.wbPdsts(i)       := aluExeUnits(i).io_alu_resp.bits.uop.pdst
+    renameBusyTable.io.wbValids(i) := aluExeUnits(i).io_alu_resp.valid
+    renameBusyTable.io.wbPdsts(i)  := aluExeUnits(i).io_alu_resp.bits.uop.pdst
+
     intIssUnit.io.wakeup_ports(i).valid := aluExeUnits(i).io_alu_resp.valid
     intIssUnit.io.wakeup_ports(i).bits  := aluExeUnits(i).io_alu_resp.bits.uop.pdst
+
     regFile.io.write_ports(i).valid     := aluExeUnits(i).io_alu_resp.valid
     regFile.io.write_ports(i).bits.addr := aluExeUnits(i).io_alu_resp.bits.uop.pdst
     regFile.io.write_ports(i).bits.data := aluExeUnits(i).io_alu_resp.bits.data
-    rob.io.write(i).valid               := aluExeUnits(i).io_alu_resp.valid
-    rob.io.write(i).bits.uop            := aluExeUnits(i).io_alu_resp.bits.uop
-    rob.io.write(i).bits.brInfo         := aluExeUnits(i).io_alu_resp.bits.brInfo
+
+    rob.io.write(i).valid       := aluExeUnits(i).io_alu_resp.valid
+    rob.io.write(i).bits.uop    := aluExeUnits(i).io_alu_resp.bits.uop
+    rob.io.write(i).bits.brInfo := aluExeUnits(i).io_alu_resp.bits.brInfo
   }
 
   // commit
@@ -215,4 +232,11 @@ class BackEnd(implicit params: CoreParameters) extends Module {
   io.dtlbReq         := DontCare
   io.dtlbReq.isWrite := false.B
   io.dtlbReq.vaddr   := 0.U
+
+  dontTouch(decData)
+  dontTouch(disData)
+  dontTouch(rob.io)
+  dontTouch(dispatcher.io)
+  dontTouch(intIssUnit.io)
+  aluExeUnits.foreach(unit => dontTouch(unit.io_alu_resp))
 }

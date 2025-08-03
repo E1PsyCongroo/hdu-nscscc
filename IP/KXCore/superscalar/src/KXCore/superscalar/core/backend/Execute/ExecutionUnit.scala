@@ -30,7 +30,7 @@ abstract class ExecutionUnit(implicit params: CoreParameters) extends Module {
   }
 
   val stage0Regs = Wire(Decoupled(Vec(nReaders, UInt(params.commonParams.dataWidth.W))))
-  stage0Regs.valid   := io_read_reqs.map(_.fire).reduce(_ && _)
+  stage0Regs.valid   := io_read_reqs.map(req => (!req.valid || req.ready)).reduce(_ && _)
   stage0Regs.bits(0) := io_read_resps(0)
   if (nReaders == 2) {
     stage0Regs.bits(1) := io_read_resps(1)
@@ -122,4 +122,9 @@ class ALUExeUnit(implicit params: CoreParameters) extends ExecutionUnit {
   io_alu_resp.valid := alu.io.resp.valid
   alu.io.resp.ready := true.B
   io_alu_resp.bits  := alu.io.resp.bits
+
+  dontTouch(stage0Uop)
+  dontTouch(stage0Ftq)
+  dontTouch(stage0Regs)
+  dontTouch(io_read_reqs)
 }

@@ -41,9 +41,9 @@ class ALUUnit(implicit params: CoreParameters) extends FunctionalUnit(isAluUnit 
   )
 
   // operand 2 select
-  val op2_data = MuxLookup(uop.op2Sel, io.req.bits.rs1_data)(
+  val op2_data = MuxLookup(uop.op2Sel, io.req.bits.rs2_data)(
     Seq(
-      OP2Type.OP2_RS2.asUInt  -> io.req.bits.rs1_data,
+      OP2Type.OP2_RS2.asUInt  -> io.req.bits.rs2_data,
       OP2Type.OP2_IMM.asUInt  -> io.req.bits.uop.imm,
       OP2Type.OP2_NEXT.asUInt -> 4.U,
     ),

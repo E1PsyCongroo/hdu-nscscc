@@ -56,7 +56,7 @@ class FullyPortedRF(
 
   io.read_reqs.map(p => p.ready := true.B)
 
-  val regfile = Mem(numRegisters, UInt(params.commonParams.dataBytes.W))
+  val regfile = Mem(numRegisters, UInt(params.commonParams.dataWidth.W))
 
   (0 until numReadPorts) map { p => io.read_resps(p) := regfile(io.read_reqs(p).bits) }
 
