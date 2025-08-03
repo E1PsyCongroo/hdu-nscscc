@@ -41,9 +41,9 @@ class ALUUnit(implicit params: CoreParameters) extends FunctionalUnit(isAluUnit 
   )
 
   // operand 2 select
-  val op2_data = MuxLookup(uop.op2Sel, io.req.bits.rs1_data)(
+  val op2_data = MuxLookup(uop.op2Sel, io.req.bits.rs2_data)(
     Seq(
-      OP2Type.OP2_RS2.asUInt  -> io.req.bits.rs1_data,
+      OP2Type.OP2_RS2.asUInt  -> io.req.bits.rs2_data,
       OP2Type.OP2_IMM.asUInt  -> io.req.bits.uop.imm,
       OP2Type.OP2_NEXT.asUInt -> 4.U,
     ),
@@ -77,10 +77,11 @@ class ALUUnit(implicit params: CoreParameters) extends FunctionalUnit(isAluUnit 
     uop_pc,
   ) + io.req.bits.uop.imm
 
-  io.resp.valid       := io.req.valid
-  io.resp.bits.uop    := io.req.bits.uop
-  io.resp.bits.data   := alu.io.out
-  io.resp.bits.brInfo := brInfo
+  io.resp.valid             := io.req.valid
+  io.resp.bits.uop          := io.req.bits.uop
+  io.resp.bits.data         := alu.io.out
+  io.resp.bits.brInfo.valid := true.B
+  io.resp.bits.brInfo.bits  := brInfo
   assert(io.resp.ready)
 }
 

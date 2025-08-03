@@ -61,9 +61,8 @@ class IssueUnitCollapsing(issueParams: IssueParams)(implicit params: CoreParamet
   val will_be_available = (issue_slots zip issue_slots_will_be_valid)
     .map { case (slot, will_be_valid) => !will_be_valid || slot.clear || !slot.valid }
   val num_available = PopCount(will_be_available)
-  val avaliables    = (Fill(dispatchWidth, 1.B) << num_available)(2 * dispatchWidth - 1, dispatchWidth)
   for (w <- 0 until dispatchWidth) {
-    io.dis_uops(w).ready := avaliables(w)
+    io.dis_uops(w).ready := num_available > w.U
   }
 
   // -------------------------------------------------------------
@@ -76,21 +75,21 @@ class IssueUnitCollapsing(issueParams: IssueParams)(implicit params: CoreParamet
   }
 
   val requests    = issue_slots.map(s => s.request)
-  val port_issued = WireDefault(VecInit(Seq.fill(numEntries + 1)(VecInit(Seq.fill(issueWidth)(false.B)))))
-
+  val port_issued = Array.fill(issueWidth) { false.B }
   for (i <- 0 until numEntries) {
     issue_slots(i).grant := false.B
-    val uop_issued = WireDefault(VecInit(Seq.fill(issueWidth + 1)(false.B)))
+    var uop_issued = false.B
 
     for (w <- 0 until issueWidth) {
       val can_allocate = (issue_slots(i).uop.fuType & io.fu_types(w)) =/= 0.U
-      when(!uop_issued(w) && can_allocate && !port_issued(i)(w)) {
-        issue_slots(i).grant  := io.iss_uops(w).ready
-        io.iss_uops(w).valid  := requests(i)
-        io.iss_uops(w).bits   := issue_slots(i).uop
-        port_issued(i + 1)(w) := port_issued(i)(w) | requests(i)
-        uop_issued(w + 1)     := uop_issued(w) | io.iss_uops(w).ready
+      when(requests(i) && !uop_issued && can_allocate && !port_issued(w)) {
+        issue_slots(i).grant := io.iss_uops(w).ready
+        io.iss_uops(w).valid := requests(i)
+        io.iss_uops(w).bits  := issue_slots(i).uop
       }
+      val was_port_issued_yet = port_issued(w)
+      port_issued(w) = (requests(i) && !uop_issued && can_allocate) | port_issued(w)
+      uop_issued = (requests(i) && can_allocate && !was_port_issued_yet) | uop_issued
     }
   }
 }

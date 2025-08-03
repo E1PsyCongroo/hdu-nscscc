@@ -52,12 +52,13 @@ class FetchBuffer(implicit params: CoreParameters) extends Module {
 
   for (i <- 0 until fetchWidth) {
     val pc = io.enq.bits.pcs(i)
-    in_uops(i)          := DontCare
-    in_mask(i)          := io.enq.valid && io.enq.bits.mask(i)
-    in_uops(i).debug.pc := pc
-    in_uops(i).idx      := pc(log2Ceil(params.fetchBytes) - 1, log2Ceil(commonParams.instBytes))
-    in_uops(i).ftqIdx   := io.enq.bits.ftqIdx
-    in_uops(i).inst     := io.enq.bits.insts(i)
+    in_uops(i)            := DontCare
+    in_mask(i)            := io.enq.valid && io.enq.bits.mask(i)
+    in_uops(i).debug.pc   := pc
+    in_uops(i).debug.inst := io.enq.bits.insts(i)
+    in_uops(i).idx        := i.U
+    in_uops(i).ftqIdx     := io.enq.bits.ftqIdx
+    in_uops(i).inst       := io.enq.bits.insts(i)
   }
 
   when(do_enq) {
@@ -92,7 +93,7 @@ class FetchBuffer(implicit params: CoreParameters) extends Module {
   tail_ptr := Mux(do_enq, WrapInc(tail_ptr, fbNum), tail_ptr)
 
   val next_bank_ptr  = bank_ptr + 1.U
-  val read_next_bank = (!empty && !io.deq.valid) || io.deq.ready
+  val read_next_bank = (!empty && !io.deq.valid) || io.deq.fire
   bank_ptr := Mux(read_next_bank, next_bank_ptr, bank_ptr)
   head_ptr := Mux(next_bank_ptr === 0.U && read_next_bank, WrapInc(head_ptr, fbNum), head_ptr)
 

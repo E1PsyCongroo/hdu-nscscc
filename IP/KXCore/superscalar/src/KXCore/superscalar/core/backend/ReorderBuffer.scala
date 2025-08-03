@@ -195,9 +195,13 @@ class ReorderBuffer(implicit params: CoreParameters) extends Module {
   // Commit Logic
 
   var block_commit = false.B
+  var commit_count = 0.U
   for (w <- 0 until coreWidth) {
     will_commit(w) := can_commit(w) && !block_commit
-    block_commit = (io.commit.brInfo.valid && io.commit.brInfo.bits.mispredict) || block_commit
+    commit_count = Mux(will_commit(w), commit_count + 1.U, commit_count)
+    block_commit = (io.commit.brInfo.valid && io.commit.brInfo.bits.mispredict) ||
+      (if (retireWidth != coreWidth) { commit_count === retireWidth.U }
+       else false.B) || block_commit
   }
 
   // -----------------------------------------------

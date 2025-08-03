@@ -66,7 +66,8 @@ case class IssueParams(
 }
 
 case class BackendParameters(
-    coreWidth: Int = 2, // Number of instructions decoded per cycle
+    coreWidth: Int = 2,   // Number of instructions piped per cycle
+    retireWidth: Int = 2, // Number of instructions retired per cycle
     lregNum: Int = 32,
     pregNum: Int = 80,
     robNum: Int = 32, // Number of entries in the ROB
@@ -75,11 +76,11 @@ case class BackendParameters(
 ) {
   require(issueParams.length == 3)
   require(robNum % coreWidth == 0)
+  require(retireWidth <= coreWidth)
   val lregWidth   = log2Ceil(lregNum)
   val pregWidth   = log2Ceil(pregNum)
   val robRowNum   = robNum / coreWidth
   val robIdxWidth = log2Ceil(robNum)
-  val retireWidth = coreWidth
   def memIQParams = issueParams(0)
   def unqIQParams = issueParams(1)
   def intIQParams = issueParams(2)
@@ -94,8 +95,10 @@ case class CoreParameters(
     implicit val frontendParams: FrontendParmaeters = FrontendParmaeters(),
     implicit val backendParams: BackendParameters = BackendParameters(issueParams =
       Seq(
-        IssueParams(2, 1, 12, IQType.IQT_MEM.asUInt),
-        IssueParams(2, 1, 12, IQType.IQT_UNQ.asUInt),
+        // IssueParams(2, 1, 12, IQType.IQT_MEM.asUInt),
+        // IssueParams(2, 1, 12, IQType.IQT_UNQ.asUInt),
+        IssueParams(2, 0, 0, IQType.IQT_MEM.asUInt),
+        IssueParams(2, 0, 0, IQType.IQT_UNQ.asUInt),
         IssueParams(2, 2, 20, IQType.IQT_INT.asUInt),
       ),
     ),

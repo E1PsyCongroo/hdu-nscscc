@@ -51,6 +51,7 @@ class MicroOp(implicit params: CoreParameters) extends Bundle {
   // val csr_cmd          = UInt(freechips.rocketchip.rocket.CSR.SZ.W)
 
   val debug = new Bundle {
-    val pc = UInt(commonParams.vaddrWidth.W)
+    val pc   = UInt(commonParams.vaddrWidth.W)
+    val inst = UInt(commonParams.instWidth.W)
   }
 }

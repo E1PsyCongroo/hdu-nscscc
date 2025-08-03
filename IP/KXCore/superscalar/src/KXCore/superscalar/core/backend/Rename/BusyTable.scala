@@ -12,17 +12,17 @@ class BusyResp extends Bundle {
 
 class RenameBusyTable(val bypass: Boolean)(implicit params: CoreParameters) extends Module {
   import params.{commonParams, backendParams}
-  import backendParams.{coreWidth, pregNum, wbPortNum}
+  import backendParams.{coreWidth, pregNum, pregWidth, wbPortNum}
 
   val io = IO(new Bundle {
     val uopReqs    = Input(Vec(coreWidth, new MicroOp))
     val busyResps  = Output(Vec(coreWidth, new BusyResp))
     val rebusyReqs = Input(Vec(coreWidth, Bool()))
 
-    val wbPdsts  = Input(Vec(wbPortNum, UInt(coreWidth.W)))
+    val wbPdsts  = Input(Vec(wbPortNum, UInt(pregWidth.W)))
     val wbValids = Input(Vec(wbPortNum, Bool()))
 
-    val debug = new Bundle { val busyTable = Output(UInt(pregNum.W)) }
+    val debug = Output(UInt(pregNum.W))
   })
 
   val busyTable = RegInit(0.U(pregNum.W))
@@ -46,5 +46,5 @@ class RenameBusyTable(val bypass: Boolean)(implicit params: CoreParameters) exte
     io.busyResps(i).prs2Busy := busyTable(io.uopReqs(i).prs2) || (prs2Bypassed && bypass.B)
   }
 
-  io.debug.busyTable := busyTable
+  io.debug := busyTable
 }
