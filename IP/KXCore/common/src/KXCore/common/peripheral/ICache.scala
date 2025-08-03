@@ -203,6 +203,7 @@ class ICacheStage1(implicit
       sSendReadResp -> io.req.valid,
     ),
   )
+  io.resp.bits.cached       := cached
   io.resp.bits.set          := set
   io.resp.bits.way          := Mux(state === sSendReadResp, replacedSel, matched)
   io.resp.bits.uncachedRead := lineData(0)
@@ -391,7 +392,7 @@ class ICache(implicit commonParams: CommonParameters, cacheParams: CacheParamete
 
   // stage1to2
   stage1to2.io.dataWrite := stage1.io.dataWrite
-  stage1to2.io.req       <> stage1.io.resp.valid
+  stage1to2.io.req       <> stage1.io.resp
 
   io.resp.stage2 <> stage1to2.io.resp
 }

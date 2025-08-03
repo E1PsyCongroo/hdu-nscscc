@@ -43,7 +43,7 @@ class Core(implicit params: CoreParameters) extends Module {
   // tlb.io.transReq               := frontend.io.itlbReq
   // frontend.io.itlbResp          := tlb.io.transResp
   frontend.io.fetchPacket.ready := false.B
-  frontend.io.getPC.ftqIdx      := 0.U
+  frontend.io.getPC             := DontCare
   frontend.io.commit.valid      := false.B
   frontend.io.commit.bits       := DontCare
   dontTouch(frontend.io.fetchPacket)

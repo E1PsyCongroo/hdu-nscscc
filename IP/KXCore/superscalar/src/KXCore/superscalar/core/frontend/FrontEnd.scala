@@ -19,7 +19,7 @@ class FrontEndIO(implicit params: CoreParameters) extends Bundle {
   val itlbReq     = Output(new TLBReq)
   val itlbResp    = Input(new TLBResp)
   val fetchPacket = Decoupled(new FetchBufferResp())
-  val getPC       = new GetPCFromFtqIO
+  val getPC       = Vec(3, new GetPCFromFtqIO)
   val commit = Flipped(Valid(new Bundle {
     val ftqIdx   = UInt(log2Ceil(frontendParams.ftqNum).W)
     val brUpdate = Valid(new BrUpdateInfo)
@@ -62,7 +62,9 @@ class FrontEnd(implicit params: CoreParameters) extends Module {
   io.fetchPacket <> fb.io.deq
   fb.io.flush    := flush.stage2
 
-  io.getPC                 <> ftq.io.getPC
+  io.getPC(0)              <> ftq.io.getPC(0)
+  io.getPC(1)              <> ftq.io.getPC(1)
+  io.getPC(2)              <> ftq.io.getPC(2)
   ftq.io.deq.valid         := io.commit.valid
   ftq.io.deq.bits.idx      := io.commit.bits.ftqIdx
   ftq.io.deq.bits.redirect := backendRedirect.valid
@@ -118,14 +120,17 @@ class FrontEnd(implicit params: CoreParameters) extends Module {
   icacheFetchReq.bits.cacop := CACOP.CACOP_HIT_READ.asUInt
 
   val icacheArb = Module(new Arbiter(io.icacheReq.bits.cloneType, 2))
-  icacheArb.io.in(0)              <> icacheCacopReq
-  icacheArb.io.in(1)              <> icacheFetchReq
-  icache.io.req.stage1.valid      := icacheArb.io.out.valid
-  icacheArb.io.out.ready          := icache.io.req.stage1.ready
-  icache.io.req.stage1.bits.vaddr := icacheArb.io.out.bits.vaddr
-  io.itlbReq.vaddr                := stage0to1Ext.bits.fetchPC
-  icache.io.req.stage1.bits.paddr := io.itlbResp.paddr
-  icache.io.req.stage1.bits.cacop := icacheArb.io.out.bits.cacop
+  icacheArb.io.in(0)               <> icacheCacopReq
+  icacheArb.io.in(1)               <> icacheFetchReq
+  icache.io.req.stage1.valid       := icacheArb.io.out.valid
+  icacheArb.io.out.ready           := icache.io.req.stage1.ready
+  icache.io.req.stage1.bits.vaddr  := icacheArb.io.out.bits.vaddr
+  io.itlbReq                       := DontCare
+  io.itlbReq.vaddr                 := stage0to1Ext.bits.fetchPC
+  io.itlbReq.isWrite               := false.B
+  icache.io.req.stage1.bits.paddr  := io.itlbResp.paddr
+  icache.io.req.stage1.bits.cacop  := icacheArb.io.out.bits.cacop
+  icache.io.req.stage1.bits.cached := io.itlbResp.mat(0)
 
   bpu.io.req.stage1.valid := stage0to1Ext.valid(1)
   stage0to1Ext.ready(1)   := bpu.io.req.stage1.ready
