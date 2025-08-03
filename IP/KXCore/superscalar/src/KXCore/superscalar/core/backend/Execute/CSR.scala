@@ -112,6 +112,14 @@ class ECFG extends Bundle {
   }
 }
 
+class TLBRENTRY extends Bundle {
+  val value = UInt(32.W)
+
+  def write(value: UInt): UInt = {
+    value & ~0x1f.U(32.W)
+  }
+}
+
 class Timer extends Module {
   val io = IO(new Bundle {
     val waddr = Input(UInt(12.W))
@@ -176,6 +184,7 @@ object CSRAddr {
   val TCFG   = 0x041
   val TVAL   = 0x042
   val TICLR  = 0x044
+  val TLBRE  = 0x088
   val DMW0   = 0x180
 }
 
@@ -217,6 +226,7 @@ class CSRIO(implicit params: CoreParameters) extends Bundle {
   val badv    = Input(UInt(32.W)) // Bad virtual address for exception
   val excp_en = Input(Bool())      // Exception enable
   val eentry  = Output(UInt(32.W)) // Exception entry address
+  val tlbrentry = Output(UInt(32.W)) // TLB exception entry address
   /* ------ Exception Enter ------ */
 
   /* ------ Exception Return ------ */
@@ -246,6 +256,7 @@ class CSR(implicit params: CoreParameters) extends Module {
   val eentry = Reg(new EENTRY)
   val saved  = Vec(4, Reg(UInt(32.W)))
   val tid    = Reg(UInt(32.W))
+  val tlbrentry = RegInit(0.U.asTypeOf(new TLBRENTRY))
   val dwm    = Vec(2, RegInit(0.U.asTypeOf(new DMW)))
 
   /* ------ Global State ------ */
@@ -280,6 +291,7 @@ class CSR(implicit params: CoreParameters) extends Module {
   val excp_estat = estat.set_ecode(io.ecode).set_sub_ecode(io.ecode_sub)
 
   io.eentry := eentry.value
+  io.tlbrentry := tlbrentry.value
   /* ------ Exception Enter ------ */
 
   /* ------ Exception Return ------ */
@@ -320,6 +332,7 @@ class CSR(implicit params: CoreParameters) extends Module {
     estat.value := Mux(io.waddr === CSRAddr.ESTAT.U, estat.write(wdata | (estat.value & !io.wmask)), estat.value)
     era := Mux(io.waddr === CSRAddr.ERA.U, wdata | (era & !io.wmask), era)
     eentry.value := Mux(io.waddr === CSRAddr.EENTRY.U, eentry.write(wdata | (eentry.value & !io.wmask)), eentry.value)
+    tlbrentry.value := Mux(io.waddr === CSRAddr.TLBRE.U, tlbrentry.write(wdata | (tlbrentry.value & !io.wmask)), tlbrentry.value)
 
     tid := Mux(io.waddr === CSRAddr.TID.U, wdata | (tid & ~io.wmask), tid)
   }.otherwise{

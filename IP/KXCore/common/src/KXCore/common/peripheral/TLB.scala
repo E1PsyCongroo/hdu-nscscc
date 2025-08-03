@@ -19,26 +19,31 @@ class TLBReq(implicit params: CommonParameters) extends Bundle {
   val isWrite = Bool()
 }
 
+class TLBException(implicit params: CommonParameters) extends Bundle {
+  val ecode   = UInt(6.W) // exception code
+  val subcode = UInt(9.W) // sub-code for the exception
+}
+
 class TLBResp(implicit params: CommonParameters) extends Bundle {
-  /** tlb refill? */
-  val refill = Bool()
+  // /* page invalid? */
+  // val pageInv = Bool()
 
-  /* page invalid? */
-  val pageInv = Bool()
+  // /* page privilege invalid? */
+  // val ppi = Bool()
 
-  /* page privilege invalid? */
-  val ppi = Bool()
-
-  /* page memory access type invalid? */
-  val pme = Bool()
+  // /* page memory access type invalid? */
+  // val pme = Bool()
 
   /* memory access type */
   val mat = UInt(2.W)
 
   /** physical address */
-  val paddr = UInt(params.paddrWidth.W)
+  val paddr = UInt(params.paddrWidth.W)  
+  
+  /** tlb refill? */
+  val refill = Bool()
 
-  val miss = Bool() // TLB miss, always false for now
+  val exception = Valid(new TLBException)
 }
 
 class TLBTranslateItem(implicit params: CommonParameters) extends Bundle {
@@ -130,7 +135,7 @@ class TLB(implicit params: CommonParameters) extends Module {
 
   val tlbEntry = Reg(Vec(params.tlbCount, new TLBEntry))
   
-  def tlb_translate(req: TLBReq): TLBResp = {
+  def tlb_translate(req: TLBReq, is_fetch: Boolean): TLBResp = {
     val vaddr = req.vaddr
 
     val dmw_hits = Wire(Vec(2, Bool()))
@@ -170,11 +175,24 @@ class TLB(implicit params: CommonParameters) extends Module {
       Cat(found.ppn(params.paddrWidth - 13, 0), vaddr(11, 0)) // 4K page
     )
 
+    val tlb_exception_valid = !isHit || !found.valid || req.plv > found.plv || (req.isWrite && found.dirty === 0.U)
+    val tlb_exception_ecode = Mux(
+      !isHit,
+      0x3f.U,
+      Mux(
+        !found.valid,
+        if (is_fetch) 0x03.U else Mux(req.isWrite, 0x02.U, 0x01.U),
+        Mux(req.plv > found.plv, 0x07.U,
+          Mux(req.isWrite && found.dirty === 0.U, 0x04.U, DontCare)
+        )
+      )
+    )
+
     val resp = Wire(new TLBResp)
     resp.refill := Mux(dmw_hit, false.B, !isHit)
-    resp.pageInv := Mux(dmw_hit, false.B, !found.valid)
-    resp.ppi := Mux(dmw_hit, false.B, req.plv > found.plv)
-    resp.pme := Mux(dmw_hit, false.B, req.isWrite && found.dirty === 0.U)
+    resp.exception.valid := Mux(dmw_hit, false.B, !isHit)
+    resp.exception.bits.ecode := Mux(dmw_hit, 0.U, tlb_exception_ecode)
+    resp.exception.bits.subcode := 0.U
     resp.mat := Mux(dmw_hit, dmw_mat, found.mat)
     resp.paddr := Mux(dmw_hit, dmw_paddr, tlb_paddr)
 
@@ -184,16 +202,15 @@ class TLB(implicit params: CommonParameters) extends Module {
   def tlb_translate_direct(req: TLBReq, mat: UInt): TLBResp = {
     val resp = Wire(new TLBResp)
     resp.refill := false.B
-    resp.pageInv := false.B
-    resp.ppi := false.B
-    resp.pme := false.B
+    resp.exception.valid := false.B
+    resp.exception.bits := DontCare
     resp.mat := mat
     resp.paddr := req.vaddr // passthrough vaddr as paddr for now
     resp
   }
 
-  io.transResp0 := Mux(io.mode.da && !io.mode.pg, tlb_translate_direct(io.transReq0, io.mode.matf), tlb_translate(io.transReq0))
-  io.transResp1 := Mux(io.mode.da && !io.mode.pg, tlb_translate_direct(io.transReq1, io.mode.matd), tlb_translate(io.transReq1))
+  io.transResp0 := Mux(io.mode.da && !io.mode.pg, tlb_translate_direct(io.transReq0, io.mode.matf), tlb_translate(io.transReq0, true))
+  io.transResp1 := Mux(io.mode.da && !io.mode.pg, tlb_translate_direct(io.transReq1, io.mode.matd), tlb_translate(io.transReq1, false))
 
   /* ------ TLBSRCH ------ */
   val srch_vppn = io.cmd_in.tlb_ehi(31, 13)
