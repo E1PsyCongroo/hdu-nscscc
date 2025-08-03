@@ -12,8 +12,9 @@ import os.read
 /** Buffer to hold fetched packets and convert them into a vector of MicroOps to give the Decode stage
   */
 class FetchBuffer(implicit params: CoreParameters) extends Module {
-  import params.frontendParams.{fetchWidth, fbNum}
-  import params.backendParams.{coreWidth}
+  import params.{commonParams, frontendParams, backendParams}
+  import frontendParams.{fetchWidth, fbNum}
+  import backendParams.{coreWidth}
 
   require(fetchWidth % coreWidth == 0)
 
@@ -60,8 +61,8 @@ class FetchBuffer(implicit params: CoreParameters) extends Module {
   }
 
   when(do_enq) {
-    valids         := in_mask
-    uops(tail_ptr) := in_uops
+    valids(tail_ptr) := in_mask.asUInt
+    uops(tail_ptr)   := in_uops
   }
 
   // -------------------------------------------------------------

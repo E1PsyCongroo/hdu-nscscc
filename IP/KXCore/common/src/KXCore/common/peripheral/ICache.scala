@@ -203,6 +203,7 @@ class ICacheStage1(implicit
       sSendReadResp -> io.req.valid,
     ),
   )
+  io.resp.bits.cached       := cached
   io.resp.bits.set          := set
   io.resp.bits.way          := Mux(state === sSendReadResp, replacedSel, matched)
   io.resp.bits.uncachedRead := lineData(0)

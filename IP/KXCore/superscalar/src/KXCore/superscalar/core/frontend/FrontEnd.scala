@@ -19,7 +19,7 @@ class FrontEndIO(implicit params: CoreParameters) extends Bundle {
   val itlbReq     = Output(new TLBReq)
   val itlbResp    = Input(new TLBResp)
   val fetchPacket = Decoupled(new FetchBufferResp())
-  val getPC       = new GetPCFromFtqIO
+  val getPC       = Vec(3, new GetPCFromFtqIO)
   val commit = Flipped(Valid(new Bundle {
     val ftqIdx   = UInt(log2Ceil(frontendParams.ftqNum).W)
     val brUpdate = Valid(new BrUpdateInfo)
@@ -62,7 +62,9 @@ class FrontEnd(implicit params: CoreParameters) extends Module {
   io.fetchPacket <> fb.io.deq
   fb.io.flush    := flush.stage2
 
-  io.getPC                 <> ftq.io.getPC
+  io.getPC(0)              <> ftq.io.getPC(0)
+  io.getPC(1)              <> ftq.io.getPC(1)
+  io.getPC(2)              <> ftq.io.getPC(2)
   ftq.io.deq.valid         := io.commit.valid
   ftq.io.deq.bits.idx      := io.commit.bits.ftqIdx
   ftq.io.deq.bits.redirect := backendRedirect.valid
