@@ -96,9 +96,15 @@ class BackEnd(implicit params: CoreParameters) extends Module {
   disData.ready  := VecInit(decToRen.bits.map(_.valid)).asUInt === disUopFire || flush
   var dis_not_fire    = false.B
   var dis_first_valid = true.B
+  val dis_alloc_regs  = Reg(Vec(coreWidth, UInt(backendParams.pregWidth.W)))
   for (i <- 0 until coreWidth) {
     renameFreeList.io.allocPregs(i).ready := disData.bits(i).valid && disData.bits(i).bits.ldst =/= 0.U &&
       disUopReady(i)
+    dis_alloc_regs(i) := Mux(
+      renameFreeList.io.allocPregs(i).ready,
+      renameFreeList.io.allocPregs(i).bits,
+      dis_alloc_regs(i),
+    )
 
     renameMapTable.io.renRemapReqs(i).valid := disData.bits(i).valid && disUopReady(i) &&
       disData.bits(i).bits.ldst =/= 0.U && renameFreeList.io.allocPregs(i).valid
@@ -120,17 +126,17 @@ class BackEnd(implicit params: CoreParameters) extends Module {
     disData.bits(i).bits        := decToRen.bits(i).bits
     disData.bits(i).bits.pdst   := Mux(disData.bits(i).bits.ldst =/= 0.U, renameFreeList.io.allocPregs(i).bits, 0.U)
     disData.bits(i).bits.robIdx := rob.io.alloc(i).idx
-    // bug here
+    // TODO: do better here
     for (j <- 0 until i) {
-      when(disData.bits(j).valid) {
+      when(decToRen.bits(j).valid) {
         when(disData.bits(j).bits.ldst === disData.bits(i).bits.ldst) {
-          disData.bits(i).bits.stalePdst := disData.bits(j).bits.pdst
+          disData.bits(i).bits.stalePdst := Mux(disUopFireReg(j), dis_alloc_regs(j), disData.bits(j).bits.pdst)
         }
         when(disData.bits(j).bits.ldst === disData.bits(i).bits.lrs1) {
-          disData.bits(i).bits.prs1 := disData.bits(j).bits.pdst
+          disData.bits(i).bits.prs1 := Mux(disUopFireReg(j), dis_alloc_regs(j), disData.bits(j).bits.pdst)
         }
         when(disData.bits(j).bits.ldst === disData.bits(i).bits.lrs2) {
-          disData.bits(i).bits.prs2 := disData.bits(j).bits.pdst
+          disData.bits(i).bits.prs2 := Mux(disUopFireReg(j), dis_alloc_regs(j), disData.bits(j).bits.pdst)
         }
       }
     }
