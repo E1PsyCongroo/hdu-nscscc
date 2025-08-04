@@ -7,62 +7,50 @@ Disassembly of section .init:
 
 1c000000 <_start>:
 _start():
-1c000000:	157f5f19 	lu12i.w	$r25,-263432(0xbfaf8)
-1c000004:	03bff339 	ori	$r25,$r25,0xffc
-1c000008:	29800320 	st.w	$r0,$r25,0
-1c00000c:	157f5ff9 	lu12i.w	$r25,-263425(0xbfaff)
-1c000010:	03bcc339 	ori	$r25,$r25,0xf30
-1c000014:	29800320 	st.w	$r0,$r25,0
-1c000018:	157f5f19 	lu12i.w	$r25,-263432(0xbfaf8)
-1c00001c:	03bff339 	ori	$r25,$r25,0xffc
-1c000020:	29800320 	st.w	$r0,$r25,0
-1c000024:	157f5f19 	lu12i.w	$r25,-263432(0xbfaf8)
-1c000028:	03bff339 	ori	$r25,$r25,0xffc
-1c00002c:	29800320 	st.w	$r0,$r25,0
-1c000030:	157f5ff9 	lu12i.w	$r25,-263425(0xbfaff)
-1c000034:	03bd0339 	ori	$r25,$r25,0xf40
-1c000038:	29800320 	st.w	$r0,$r25,0
-1c00003c:	157f5f19 	lu12i.w	$r25,-263432(0xbfaf8)
-1c000040:	03bff339 	ori	$r25,$r25,0xffc
+1c000000:	0380040c 	ori	$r12,$r0,0x1
+1c000004:	0404042c 	csrwr	$r12,0x101
+1c000008:	04060020 	csrwr	$r0,0x180
+1c00000c:	04060420 	csrwr	$r0,0x181
+1c000010:	0380640c 	ori	$r12,$r0,0x19
+1c000014:	0406002c 	csrwr	$r12,0x180
+1c000018:	1540000c 	lu12i.w	$r12,-393216(0xa0000)
+1c00001c:	0380258c 	ori	$r12,$r12,0x9
+1c000020:	0406042c 	csrwr	$r12,0x181
+1c000024:	0380400c 	ori	$r12,$r0,0x10
+1c000028:	0380600d 	ori	$r13,$r0,0x18
+1c00002c:	040001ac 	csrxchg	$r12,$r13,0x0
+1c000030:	1438000c 	lu12i.w	$r12,114688(0x1c000)
+1c000034:	038e018c 	ori	$r12,$r12,0x380
+1c000038:	0400302c 	csrwr	$r12,0xc
+1c00003c:	157f5ff9 	lu12i.w	$r25,-263425(0xbfaff)
+1c000040:	03bcc339 	ori	$r25,$r25,0xf30
 1c000044:	29800320 	st.w	$r0,$r25,0
-1c000048:	0380040c 	ori	$r12,$r0,0x1
-1c00004c:	0404042c 	csrwr	$r12,0x101
-1c000050:	1c0001ac 	pcaddu12i	$r12,13(0xd)
-1c000054:	029ec18c 	addi.w	$r12,$r12,1968(0x7b0)
-1c000058:	1c00100d 	pcaddu12i	$r13,128(0x80)
-1c00005c:	02bea1ad 	addi.w	$r13,$r13,-88(0xfa8)
-1c000060:	1c00100e 	pcaddu12i	$r14,128(0x80)
-1c000064:	029591ce 	addi.w	$r14,$r14,1380(0x564)
-1c000068:	6c0019ae 	bgeu	$r13,$r14,24(0x18) # 1c000080 <_start+0x80>
-1c00006c:	2880018f 	ld.w	$r15,$r12,0
-1c000070:	298001af 	st.w	$r15,$r13,0
-1c000074:	0280118c 	addi.w	$r12,$r12,4(0x4)
-1c000078:	028011ad 	addi.w	$r13,$r13,4(0x4)
-1c00007c:	6bfff1ae 	bltu	$r13,$r14,-16(0x3fff0) # 1c00006c <_start+0x6c>
-1c000080:	1c00100c 	pcaddu12i	$r12,128(0x80)
-1c000084:	0295118c 	addi.w	$r12,$r12,1348(0x544)
-1c000088:	1c00100d 	pcaddu12i	$r13,128(0x80)
-1c00008c:	029561ad 	addi.w	$r13,$r13,1368(0x558)
-1c000090:	6c00118d 	bgeu	$r12,$r13,16(0x10) # 1c0000a0 <_start+0xa0>
-1c000094:	29800180 	st.w	$r0,$r12,0
-1c000098:	0280118c 	addi.w	$r12,$r12,4(0x4)
-1c00009c:	6bfff98d 	bltu	$r12,$r13,-8(0x3fff8) # 1c000094 <_start+0x94>
-1c0000a0:	04060020 	csrwr	$r0,0x180
-1c0000a4:	04060420 	csrwr	$r0,0x181
-1c0000a8:	0380640c 	ori	$r12,$r0,0x19
-1c0000ac:	0406002c 	csrwr	$r12,0x180
-1c0000b0:	1540000c 	lu12i.w	$r12,-393216(0xa0000)
-1c0000b4:	0380258c 	ori	$r12,$r12,0x9
-1c0000b8:	0406042c 	csrwr	$r12,0x181
-1c0000bc:	0380400c 	ori	$r12,$r0,0x10
-1c0000c0:	0380600d 	ori	$r13,$r0,0x18
-1c0000c4:	040001ac 	csrxchg	$r12,$r13,0x0
-1c0000c8:	1438000c 	lu12i.w	$r12,114688(0x1c000)
-1c0000cc:	038e018c 	ori	$r12,$r12,0x380
-1c0000d0:	0400302c 	csrwr	$r12,0xc
-1c0000d4:	1c002003 	pcaddu12i	$r3,256(0x100)
-1c0000d8:	02bca063 	addi.w	$r3,$r3,-216(0xf28)
-1c0000dc:	5002b000 	b	688(0x2b0) # 1c00038c <run_test>
+1c000048:	157f5ff9 	lu12i.w	$r25,-263425(0xbfaff)
+1c00004c:	03bd0339 	ori	$r25,$r25,0xf40
+1c000050:	29800320 	st.w	$r0,$r25,0
+1c000054:	1c0001ac 	pcaddu12i	$r12,13(0xd)
+1c000058:	029f318c 	addi.w	$r12,$r12,1996(0x7cc)
+1c00005c:	1c00100d 	pcaddu12i	$r13,128(0x80)
+1c000060:	02be91ad 	addi.w	$r13,$r13,-92(0xfa4)
+1c000064:	1c00100e 	pcaddu12i	$r14,128(0x80)
+1c000068:	029581ce 	addi.w	$r14,$r14,1376(0x560)
+1c00006c:	6c0019ae 	bgeu	$r13,$r14,24(0x18) # 1c000084 <_start+0x84>
+1c000070:	2880018f 	ld.w	$r15,$r12,0
+1c000074:	298001af 	st.w	$r15,$r13,0
+1c000078:	0280118c 	addi.w	$r12,$r12,4(0x4)
+1c00007c:	028011ad 	addi.w	$r13,$r13,4(0x4)
+1c000080:	6bfff1ae 	bltu	$r13,$r14,-16(0x3fff0) # 1c000070 <_start+0x70>
+1c000084:	1c00100c 	pcaddu12i	$r12,128(0x80)
+1c000088:	0295018c 	addi.w	$r12,$r12,1344(0x540)
+1c00008c:	1c00100d 	pcaddu12i	$r13,128(0x80)
+1c000090:	029551ad 	addi.w	$r13,$r13,1364(0x554)
+1c000094:	6c00118d 	bgeu	$r12,$r13,16(0x10) # 1c0000a4 <_start+0xa4>
+1c000098:	29800180 	st.w	$r0,$r12,0
+1c00009c:	0280118c 	addi.w	$r12,$r12,4(0x4)
+1c0000a0:	6bfff98d 	bltu	$r12,$r13,-8(0x3fff8) # 1c000098 <_start+0x98>
+1c0000a4:	1c002003 	pcaddu12i	$r3,256(0x100)
+1c0000a8:	02bd6063 	addi.w	$r3,$r3,-168(0xf58)
+1c0000ac:	5002e000 	b	736(0x2e0) # 1c00038c <run_test>
 	...
 
 1c000100 <test_finish>:
@@ -3127,7 +3115,7 @@ test_min_value2_8():
 1c003178:	0015009e 	move	$r30,$r4
 1c00317c:	001500b7 	move	$r23,$r5
 1c003180:	001500d8 	move	$r24,$r6
-1c003184:	54a5bc00 	bl	42428(0xa5bc) # 1c00d740 <get_clock>
+1c003184:	54a5dc00 	bl	42460(0xa5dc) # 1c00d760 <get_clock>
 1c003188:	28800330 	ld.w	$r16,$r25,0
 1c00318c:	1c000fac 	pcaddu12i	$r12,125(0x7d)
 1c003190:	2890d18c 	ld.w	$r12,$r12,1076(0x434)
@@ -3239,7 +3227,7 @@ test_min_value2_8():
 1c003338:	63fe8f90 	blt	$r28,$r16,-372(0x3fe8c) # 1c0031c4 <test_min_value2_8+0x84>
 1c00333c:	1c000fb9 	pcaddu12i	$r25,125(0x7d)
 1c003340:	288a1339 	ld.w	$r25,$r25,644(0x284)
-1c003344:	54a3fc00 	bl	41980(0xa3fc) # 1c00d740 <get_clock>
+1c003344:	54a41c00 	bl	42012(0xa41c) # 1c00d760 <get_clock>
 1c003348:	2880033e 	ld.w	$r30,$r25,0
 1c00334c:	00150091 	move	$r17,$r4
 1c003350:	14001e9b 	lu12i.w	$r27,244(0xf4)
@@ -3294,7 +3282,7 @@ test_min_value2_u8():
 1c003408:	0015009e 	move	$r30,$r4
 1c00340c:	001500b7 	move	$r23,$r5
 1c003410:	001500d8 	move	$r24,$r6
-1c003414:	54a32c00 	bl	41772(0xa32c) # 1c00d740 <get_clock>
+1c003414:	54a34c00 	bl	41804(0xa34c) # 1c00d760 <get_clock>
 1c003418:	28800330 	ld.w	$r16,$r25,0
 1c00341c:	1c000fac 	pcaddu12i	$r12,125(0x7d)
 1c003420:	2886918c 	ld.w	$r12,$r12,420(0x1a4)
@@ -3406,7 +3394,7 @@ test_min_value2_u8():
 1c0035c8:	63fe8f90 	blt	$r28,$r16,-372(0x3fe8c) # 1c003454 <test_min_value2_u8+0x84>
 1c0035cc:	1c000fb9 	pcaddu12i	$r25,125(0x7d)
 1c0035d0:	28bfd339 	ld.w	$r25,$r25,-12(0xff4)
-1c0035d4:	54a16c00 	bl	41324(0xa16c) # 1c00d740 <get_clock>
+1c0035d4:	54a18c00 	bl	41356(0xa18c) # 1c00d760 <get_clock>
 1c0035d8:	2880033e 	ld.w	$r30,$r25,0
 1c0035dc:	00150091 	move	$r17,$r4
 1c0035e0:	14001e9b 	lu12i.w	$r27,244(0xf4)
@@ -3461,7 +3449,7 @@ test_min_value2_16():
 1c003698:	0015009e 	move	$r30,$r4
 1c00369c:	001500b7 	move	$r23,$r5
 1c0036a0:	001500d8 	move	$r24,$r6
-1c0036a4:	54a09c00 	bl	41116(0xa09c) # 1c00d740 <get_clock>
+1c0036a4:	54a0bc00 	bl	41148(0xa0bc) # 1c00d760 <get_clock>
 1c0036a8:	28800330 	ld.w	$r16,$r25,0
 1c0036ac:	1c000fac 	pcaddu12i	$r12,125(0x7d)
 1c0036b0:	28bc518c 	ld.w	$r12,$r12,-236(0xf14)
@@ -3577,7 +3565,7 @@ test_min_value2_16():
 1c003868:	63fe83b0 	blt	$r29,$r16,-384(0x3fe80) # 1c0036e8 <test_min_value2_16+0x88>
 1c00386c:	1c000fb9 	pcaddu12i	$r25,125(0x7d)
 1c003870:	28b55339 	ld.w	$r25,$r25,-684(0xd54)
-1c003874:	549ecc00 	bl	40652(0x9ecc) # 1c00d740 <get_clock>
+1c003874:	549eec00 	bl	40684(0x9eec) # 1c00d760 <get_clock>
 1c003878:	2880033e 	ld.w	$r30,$r25,0
 1c00387c:	00150091 	move	$r17,$r4
 1c003880:	14001e9c 	lu12i.w	$r28,244(0xf4)
@@ -3632,7 +3620,7 @@ test_min_value2_u16():
 1c003938:	0015009e 	move	$r30,$r4
 1c00393c:	001500b7 	move	$r23,$r5
 1c003940:	001500d8 	move	$r24,$r6
-1c003944:	549dfc00 	bl	40444(0x9dfc) # 1c00d740 <get_clock>
+1c003944:	549e1c00 	bl	40476(0x9e1c) # 1c00d760 <get_clock>
 1c003948:	28800330 	ld.w	$r16,$r25,0
 1c00394c:	1c000fac 	pcaddu12i	$r12,125(0x7d)
 1c003950:	28b1d18c 	ld.w	$r12,$r12,-908(0xc74)
@@ -3748,7 +3736,7 @@ test_min_value2_u16():
 1c003b08:	63fe83b0 	blt	$r29,$r16,-384(0x3fe80) # 1c003988 <test_min_value2_u16+0x88>
 1c003b0c:	1c000fb9 	pcaddu12i	$r25,125(0x7d)
 1c003b10:	28aad339 	ld.w	$r25,$r25,-1356(0xab4)
-1c003b14:	549c2c00 	bl	39980(0x9c2c) # 1c00d740 <get_clock>
+1c003b14:	549c4c00 	bl	40012(0x9c4c) # 1c00d760 <get_clock>
 1c003b18:	2880033e 	ld.w	$r30,$r25,0
 1c003b1c:	00150091 	move	$r17,$r4
 1c003b20:	14001e9c 	lu12i.w	$r28,244(0xf4)
@@ -3803,7 +3791,7 @@ test_min_value2_32():
 1c003bd8:	0015009e 	move	$r30,$r4
 1c003bdc:	001500b7 	move	$r23,$r5
 1c003be0:	001500d8 	move	$r24,$r6
-1c003be4:	549b5c00 	bl	39772(0x9b5c) # 1c00d740 <get_clock>
+1c003be4:	549b7c00 	bl	39804(0x9b7c) # 1c00d760 <get_clock>
 1c003be8:	2880032f 	ld.w	$r15,$r25,0
 1c003bec:	1c000fac 	pcaddu12i	$r12,125(0x7d)
 1c003bf0:	28a7518c 	ld.w	$r12,$r12,-1580(0x9d4)
@@ -3909,7 +3897,7 @@ test_min_value2_32():
 1c003d80:	53feabff 	b	-344(0xffffea8) # 1c003c28 <test_min_value2_32+0x88>
 1c003d84:	028007bd 	addi.w	$r29,$r29,1(0x1)
 1c003d88:	63fea3af 	blt	$r29,$r15,-352(0x3fea0) # 1c003c28 <test_min_value2_32+0x88>
-1c003d8c:	5499b400 	bl	39348(0x99b4) # 1c00d740 <get_clock>
+1c003d8c:	5499d400 	bl	39380(0x99d4) # 1c00d760 <get_clock>
 1c003d90:	1c000fa6 	pcaddu12i	$r6,125(0x7d)
 1c003d94:	28a0c0c6 	ld.w	$r6,$r6,-2000(0x830)
 1c003d98:	288000d9 	ld.w	$r25,$r6,0
@@ -3966,7 +3954,7 @@ test_min_value2_u32():
 1c003e58:	0015009e 	move	$r30,$r4
 1c003e5c:	001500b7 	move	$r23,$r5
 1c003e60:	001500d8 	move	$r24,$r6
-1c003e64:	5498dc00 	bl	39132(0x98dc) # 1c00d740 <get_clock>
+1c003e64:	5498fc00 	bl	39164(0x98fc) # 1c00d760 <get_clock>
 1c003e68:	2880032f 	ld.w	$r15,$r25,0
 1c003e6c:	1c000f8c 	pcaddu12i	$r12,124(0x7c)
 1c003e70:	289d518c 	ld.w	$r12,$r12,1876(0x754)
@@ -4072,7 +4060,7 @@ test_min_value2_u32():
 1c004000:	53feabff 	b	-344(0xffffea8) # 1c003ea8 <test_min_value2_u32+0x88>
 1c004004:	028007bd 	addi.w	$r29,$r29,1(0x1)
 1c004008:	63fea3af 	blt	$r29,$r15,-352(0x3fea0) # 1c003ea8 <test_min_value2_u32+0x88>
-1c00400c:	54973400 	bl	38708(0x9734) # 1c00d740 <get_clock>
+1c00400c:	54975400 	bl	38740(0x9754) # 1c00d760 <get_clock>
 1c004010:	1c000f86 	pcaddu12i	$r6,124(0x7c)
 1c004014:	2896c0c6 	ld.w	$r6,$r6,1456(0x5b0)
 1c004018:	288000d9 	ld.w	$r25,$r6,0
@@ -4129,7 +4117,7 @@ test_max_value2_8():
 1c0040d8:	0015009e 	move	$r30,$r4
 1c0040dc:	001500b7 	move	$r23,$r5
 1c0040e0:	001500d8 	move	$r24,$r6
-1c0040e4:	54965c00 	bl	38492(0x965c) # 1c00d740 <get_clock>
+1c0040e4:	54967c00 	bl	38524(0x967c) # 1c00d760 <get_clock>
 1c0040e8:	28800330 	ld.w	$r16,$r25,0
 1c0040ec:	1c000f8c 	pcaddu12i	$r12,124(0x7c)
 1c0040f0:	2893518c 	ld.w	$r12,$r12,1236(0x4d4)
@@ -4241,7 +4229,7 @@ test_max_value2_8():
 1c004298:	63fe8f90 	blt	$r28,$r16,-372(0x3fe8c) # 1c004124 <test_max_value2_8+0x84>
 1c00429c:	1c000f99 	pcaddu12i	$r25,124(0x7c)
 1c0042a0:	288c9339 	ld.w	$r25,$r25,804(0x324)
-1c0042a4:	54949c00 	bl	38044(0x949c) # 1c00d740 <get_clock>
+1c0042a4:	5494bc00 	bl	38076(0x94bc) # 1c00d760 <get_clock>
 1c0042a8:	2880033e 	ld.w	$r30,$r25,0
 1c0042ac:	00150091 	move	$r17,$r4
 1c0042b0:	14001e9b 	lu12i.w	$r27,244(0xf4)
@@ -4296,7 +4284,7 @@ test_max_value2_u8():
 1c004368:	0015009e 	move	$r30,$r4
 1c00436c:	001500b7 	move	$r23,$r5
 1c004370:	001500d8 	move	$r24,$r6
-1c004374:	5493cc00 	bl	37836(0x93cc) # 1c00d740 <get_clock>
+1c004374:	5493ec00 	bl	37868(0x93ec) # 1c00d760 <get_clock>
 1c004378:	28800330 	ld.w	$r16,$r25,0
 1c00437c:	1c000f8c 	pcaddu12i	$r12,124(0x7c)
 1c004380:	2889118c 	ld.w	$r12,$r12,580(0x244)
@@ -4408,7 +4396,7 @@ test_max_value2_u8():
 1c004528:	63fe8f90 	blt	$r28,$r16,-372(0x3fe8c) # 1c0043b4 <test_max_value2_u8+0x84>
 1c00452c:	1c000f99 	pcaddu12i	$r25,124(0x7c)
 1c004530:	28825339 	ld.w	$r25,$r25,148(0x94)
-1c004534:	54920c00 	bl	37388(0x920c) # 1c00d740 <get_clock>
+1c004534:	54922c00 	bl	37420(0x922c) # 1c00d760 <get_clock>
 1c004538:	2880033e 	ld.w	$r30,$r25,0
 1c00453c:	00150091 	move	$r17,$r4
 1c004540:	14001e9b 	lu12i.w	$r27,244(0xf4)
@@ -4463,7 +4451,7 @@ test_max_value2_16():
 1c0045f8:	0015009e 	move	$r30,$r4
 1c0045fc:	001500b7 	move	$r23,$r5
 1c004600:	001500d8 	move	$r24,$r6
-1c004604:	54913c00 	bl	37180(0x913c) # 1c00d740 <get_clock>
+1c004604:	54915c00 	bl	37212(0x915c) # 1c00d760 <get_clock>
 1c004608:	28800330 	ld.w	$r16,$r25,0
 1c00460c:	1c000f8c 	pcaddu12i	$r12,124(0x7c)
 1c004610:	28bed18c 	ld.w	$r12,$r12,-76(0xfb4)
@@ -4579,7 +4567,7 @@ test_max_value2_16():
 1c0047c8:	63fe83b0 	blt	$r29,$r16,-384(0x3fe80) # 1c004648 <test_max_value2_16+0x88>
 1c0047cc:	1c000f99 	pcaddu12i	$r25,124(0x7c)
 1c0047d0:	28b7d339 	ld.w	$r25,$r25,-524(0xdf4)
-1c0047d4:	548f6c00 	bl	36716(0x8f6c) # 1c00d740 <get_clock>
+1c0047d4:	548f8c00 	bl	36748(0x8f8c) # 1c00d760 <get_clock>
 1c0047d8:	2880033e 	ld.w	$r30,$r25,0
 1c0047dc:	00150091 	move	$r17,$r4
 1c0047e0:	14001e9c 	lu12i.w	$r28,244(0xf4)
@@ -4634,7 +4622,7 @@ test_max_value2_u16():
 1c004898:	0015009e 	move	$r30,$r4
 1c00489c:	001500b7 	move	$r23,$r5
 1c0048a0:	001500d8 	move	$r24,$r6
-1c0048a4:	548e9c00 	bl	36508(0x8e9c) # 1c00d740 <get_clock>
+1c0048a4:	548ebc00 	bl	36540(0x8ebc) # 1c00d760 <get_clock>
 1c0048a8:	28800330 	ld.w	$r16,$r25,0
 1c0048ac:	1c000f8c 	pcaddu12i	$r12,124(0x7c)
 1c0048b0:	28b4518c 	ld.w	$r12,$r12,-748(0xd14)
@@ -4750,7 +4738,7 @@ test_max_value2_u16():
 1c004a68:	63fe83b0 	blt	$r29,$r16,-384(0x3fe80) # 1c0048e8 <test_max_value2_u16+0x88>
 1c004a6c:	1c000f99 	pcaddu12i	$r25,124(0x7c)
 1c004a70:	28ad5339 	ld.w	$r25,$r25,-1196(0xb54)
-1c004a74:	548ccc00 	bl	36044(0x8ccc) # 1c00d740 <get_clock>
+1c004a74:	548cec00 	bl	36076(0x8cec) # 1c00d760 <get_clock>
 1c004a78:	2880033e 	ld.w	$r30,$r25,0
 1c004a7c:	00150091 	move	$r17,$r4
 1c004a80:	14001e9c 	lu12i.w	$r28,244(0xf4)
@@ -4805,7 +4793,7 @@ test_max_value2_32():
 1c004b38:	0015009e 	move	$r30,$r4
 1c004b3c:	001500b7 	move	$r23,$r5
 1c004b40:	001500d8 	move	$r24,$r6
-1c004b44:	548bfc00 	bl	35836(0x8bfc) # 1c00d740 <get_clock>
+1c004b44:	548c1c00 	bl	35868(0x8c1c) # 1c00d760 <get_clock>
 1c004b48:	2880032f 	ld.w	$r15,$r25,0
 1c004b4c:	1c000f8c 	pcaddu12i	$r12,124(0x7c)
 1c004b50:	28a9d18c 	ld.w	$r12,$r12,-1420(0xa74)
@@ -4911,7 +4899,7 @@ test_max_value2_32():
 1c004ce0:	53feabff 	b	-344(0xffffea8) # 1c004b88 <test_max_value2_32+0x88>
 1c004ce4:	028007bd 	addi.w	$r29,$r29,1(0x1)
 1c004ce8:	63fea3af 	blt	$r29,$r15,-352(0x3fea0) # 1c004b88 <test_max_value2_32+0x88>
-1c004cec:	548a5400 	bl	35412(0x8a54) # 1c00d740 <get_clock>
+1c004cec:	548a7400 	bl	35444(0x8a74) # 1c00d760 <get_clock>
 1c004cf0:	1c000f86 	pcaddu12i	$r6,124(0x7c)
 1c004cf4:	28a340c6 	ld.w	$r6,$r6,-1840(0x8d0)
 1c004cf8:	288000d9 	ld.w	$r25,$r6,0
@@ -4968,7 +4956,7 @@ test_max_value2_u32():
 1c004db8:	0015009e 	move	$r30,$r4
 1c004dbc:	001500b7 	move	$r23,$r5
 1c004dc0:	001500d8 	move	$r24,$r6
-1c004dc4:	54897c00 	bl	35196(0x897c) # 1c00d740 <get_clock>
+1c004dc4:	54899c00 	bl	35228(0x899c) # 1c00d760 <get_clock>
 1c004dc8:	2880032f 	ld.w	$r15,$r25,0
 1c004dcc:	1c000f6c 	pcaddu12i	$r12,123(0x7b)
 1c004dd0:	289fd18c 	ld.w	$r12,$r12,2036(0x7f4)
@@ -5074,7 +5062,7 @@ test_max_value2_u32():
 1c004f60:	53feabff 	b	-344(0xffffea8) # 1c004e08 <test_max_value2_u32+0x88>
 1c004f64:	028007bd 	addi.w	$r29,$r29,1(0x1)
 1c004f68:	63fea3af 	blt	$r29,$r15,-352(0x3fea0) # 1c004e08 <test_max_value2_u32+0x88>
-1c004f6c:	5487d400 	bl	34772(0x87d4) # 1c00d740 <get_clock>
+1c004f6c:	5487f400 	bl	34804(0x87f4) # 1c00d760 <get_clock>
 1c004f70:	1c000f66 	pcaddu12i	$r6,123(0x7b)
 1c004f74:	289940c6 	ld.w	$r6,$r6,1616(0x650)
 1c004f78:	288000d9 	ld.w	$r25,$r6,0
@@ -5130,7 +5118,7 @@ test_min_position1_8():
 1c005034:	00150097 	move	$r23,$r4
 1c005038:	001500bc 	move	$r28,$r5
 1c00503c:	001500d8 	move	$r24,$r6
-1c005040:	54870000 	bl	34560(0x8700) # 1c00d740 <get_clock>
+1c005040:	54872000 	bl	34592(0x8720) # 1c00d760 <get_clock>
 1c005044:	28800330 	ld.w	$r16,$r25,0
 1c005048:	1c000f7b 	pcaddu12i	$r27,123(0x7b)
 1c00504c:	2895e37b 	ld.w	$r27,$r27,1400(0x578)
@@ -5258,7 +5246,7 @@ test_min_position1_8():
 1c005234:	28800330 	ld.w	$r16,$r25,0
 1c005238:	028007bd 	addi.w	$r29,$r29,1(0x1)
 1c00523c:	63fe37b0 	blt	$r29,$r16,-460(0x3fe34) # 1c005070 <test_min_position1_8+0x70>
-1c005240:	54850000 	bl	34048(0x8500) # 1c00d740 <get_clock>
+1c005240:	54852000 	bl	34080(0x8520) # 1c00d760 <get_clock>
 1c005244:	2880036f 	ld.w	$r15,$r27,0
 1c005248:	00150094 	move	$r20,$r4
 1c00524c:	14001e86 	lu12i.w	$r6,244(0xf4)
@@ -5317,7 +5305,7 @@ test_min_position1_u8():
 1c005314:	00150097 	move	$r23,$r4
 1c005318:	001500bc 	move	$r28,$r5
 1c00531c:	001500d8 	move	$r24,$r6
-1c005320:	54842000 	bl	33824(0x8420) # 1c00d740 <get_clock>
+1c005320:	54844000 	bl	33856(0x8440) # 1c00d760 <get_clock>
 1c005324:	28800330 	ld.w	$r16,$r25,0
 1c005328:	1c000f7b 	pcaddu12i	$r27,123(0x7b)
 1c00532c:	288a637b 	ld.w	$r27,$r27,664(0x298)
@@ -5445,7 +5433,7 @@ test_min_position1_u8():
 1c005514:	28800330 	ld.w	$r16,$r25,0
 1c005518:	028007bd 	addi.w	$r29,$r29,1(0x1)
 1c00551c:	63fe37b0 	blt	$r29,$r16,-460(0x3fe34) # 1c005350 <test_min_position1_u8+0x70>
-1c005520:	54822000 	bl	33312(0x8220) # 1c00d740 <get_clock>
+1c005520:	54824000 	bl	33344(0x8240) # 1c00d760 <get_clock>
 1c005524:	2880036f 	ld.w	$r15,$r27,0
 1c005528:	00150094 	move	$r20,$r4
 1c00552c:	14001e86 	lu12i.w	$r6,244(0xf4)
@@ -5504,7 +5492,7 @@ test_min_position1_16():
 1c0055f4:	0015009d 	move	$r29,$r4
 1c0055f8:	001500bb 	move	$r27,$r5
 1c0055fc:	001500d7 	move	$r23,$r6
-1c005600:	54814000 	bl	33088(0x8140) # 1c00d740 <get_clock>
+1c005600:	54816000 	bl	33120(0x8160) # 1c00d760 <get_clock>
 1c005604:	28800310 	ld.w	$r16,$r24,0
 1c005608:	1c000f7a 	pcaddu12i	$r26,123(0x7b)
 1c00560c:	28bee35a 	ld.w	$r26,$r26,-72(0xfb8)
@@ -5628,7 +5616,7 @@ test_min_position1_16():
 1c0057e4:	28800310 	ld.w	$r16,$r24,0
 1c0057e8:	0280079c 	addi.w	$r28,$r28,1(0x1)
 1c0057ec:	63fe4790 	blt	$r28,$r16,-444(0x3fe44) # 1c005630 <test_min_position1_16+0x70>
-1c0057f0:	547f5000 	bl	32592(0x7f50) # 1c00d740 <get_clock>
+1c0057f0:	547f7000 	bl	32624(0x7f70) # 1c00d760 <get_clock>
 1c0057f4:	28800348 	ld.w	$r8,$r26,0
 1c0057f8:	00150091 	move	$r17,$r4
 1c0057fc:	14001e86 	lu12i.w	$r6,244(0xf4)
@@ -5687,7 +5675,7 @@ test_min_position1_u16():
 1c0058c4:	0015009d 	move	$r29,$r4
 1c0058c8:	001500bb 	move	$r27,$r5
 1c0058cc:	001500d7 	move	$r23,$r6
-1c0058d0:	547e7000 	bl	32368(0x7e70) # 1c00d740 <get_clock>
+1c0058d0:	547e9000 	bl	32400(0x7e90) # 1c00d760 <get_clock>
 1c0058d4:	28800310 	ld.w	$r16,$r24,0
 1c0058d8:	1c000f7a 	pcaddu12i	$r26,123(0x7b)
 1c0058dc:	28b3a35a 	ld.w	$r26,$r26,-792(0xce8)
@@ -5811,7 +5799,7 @@ test_min_position1_u16():
 1c005ab4:	28800310 	ld.w	$r16,$r24,0
 1c005ab8:	0280079c 	addi.w	$r28,$r28,1(0x1)
 1c005abc:	63fe4790 	blt	$r28,$r16,-444(0x3fe44) # 1c005900 <test_min_position1_u16+0x70>
-1c005ac0:	547c8000 	bl	31872(0x7c80) # 1c00d740 <get_clock>
+1c005ac0:	547ca000 	bl	31904(0x7ca0) # 1c00d760 <get_clock>
 1c005ac4:	28800348 	ld.w	$r8,$r26,0
 1c005ac8:	00150091 	move	$r17,$r4
 1c005acc:	14001e86 	lu12i.w	$r6,244(0xf4)
@@ -5870,7 +5858,7 @@ test_min_position1_32():
 1c005b94:	0015009d 	move	$r29,$r4
 1c005b98:	001500bb 	move	$r27,$r5
 1c005b9c:	001500d7 	move	$r23,$r6
-1c005ba0:	547ba000 	bl	31648(0x7ba0) # 1c00d740 <get_clock>
+1c005ba0:	547bc000 	bl	31680(0x7bc0) # 1c00d760 <get_clock>
 1c005ba4:	28800310 	ld.w	$r16,$r24,0
 1c005ba8:	1c000f7a 	pcaddu12i	$r26,123(0x7b)
 1c005bac:	28a8635a 	ld.w	$r26,$r26,-1512(0xa18)
@@ -5994,7 +5982,7 @@ test_min_position1_32():
 1c005d84:	28800310 	ld.w	$r16,$r24,0
 1c005d88:	0280079c 	addi.w	$r28,$r28,1(0x1)
 1c005d8c:	63fe4790 	blt	$r28,$r16,-444(0x3fe44) # 1c005bd0 <test_min_position1_32+0x70>
-1c005d90:	5479b000 	bl	31152(0x79b0) # 1c00d740 <get_clock>
+1c005d90:	5479d000 	bl	31184(0x79d0) # 1c00d760 <get_clock>
 1c005d94:	28800348 	ld.w	$r8,$r26,0
 1c005d98:	00150091 	move	$r17,$r4
 1c005d9c:	14001e86 	lu12i.w	$r6,244(0xf4)
@@ -6053,7 +6041,7 @@ test_min_position1_u32():
 1c005e64:	0015009d 	move	$r29,$r4
 1c005e68:	001500bb 	move	$r27,$r5
 1c005e6c:	001500d7 	move	$r23,$r6
-1c005e70:	5478d000 	bl	30928(0x78d0) # 1c00d740 <get_clock>
+1c005e70:	5478f000 	bl	30960(0x78f0) # 1c00d760 <get_clock>
 1c005e74:	28800310 	ld.w	$r16,$r24,0
 1c005e78:	1c000f5a 	pcaddu12i	$r26,122(0x7a)
 1c005e7c:	289d235a 	ld.w	$r26,$r26,1864(0x748)
@@ -6177,7 +6165,7 @@ test_min_position1_u32():
 1c006054:	28800310 	ld.w	$r16,$r24,0
 1c006058:	0280079c 	addi.w	$r28,$r28,1(0x1)
 1c00605c:	63fe4790 	blt	$r28,$r16,-444(0x3fe44) # 1c005ea0 <test_min_position1_u32+0x70>
-1c006060:	5476e000 	bl	30432(0x76e0) # 1c00d740 <get_clock>
+1c006060:	54770000 	bl	30464(0x7700) # 1c00d760 <get_clock>
 1c006064:	28800348 	ld.w	$r8,$r26,0
 1c006068:	00150091 	move	$r17,$r4
 1c00606c:	14001e86 	lu12i.w	$r6,244(0xf4)
@@ -6236,7 +6224,7 @@ test_max_position1_8():
 1c006134:	00150097 	move	$r23,$r4
 1c006138:	001500bc 	move	$r28,$r5
 1c00613c:	001500d8 	move	$r24,$r6
-1c006140:	54760000 	bl	30208(0x7600) # 1c00d740 <get_clock>
+1c006140:	54762000 	bl	30240(0x7620) # 1c00d760 <get_clock>
 1c006144:	28800330 	ld.w	$r16,$r25,0
 1c006148:	1c000f5b 	pcaddu12i	$r27,122(0x7a)
 1c00614c:	2891e37b 	ld.w	$r27,$r27,1144(0x478)
@@ -6364,7 +6352,7 @@ test_max_position1_8():
 1c006334:	28800330 	ld.w	$r16,$r25,0
 1c006338:	028007bd 	addi.w	$r29,$r29,1(0x1)
 1c00633c:	63fe37b0 	blt	$r29,$r16,-460(0x3fe34) # 1c006170 <test_max_position1_8+0x70>
-1c006340:	54740000 	bl	29696(0x7400) # 1c00d740 <get_clock>
+1c006340:	54742000 	bl	29728(0x7420) # 1c00d760 <get_clock>
 1c006344:	2880036f 	ld.w	$r15,$r27,0
 1c006348:	00150094 	move	$r20,$r4
 1c00634c:	14001e86 	lu12i.w	$r6,244(0xf4)
@@ -6423,7 +6411,7 @@ test_max_position1_u8():
 1c006414:	00150097 	move	$r23,$r4
 1c006418:	001500bc 	move	$r28,$r5
 1c00641c:	001500d8 	move	$r24,$r6
-1c006420:	54732000 	bl	29472(0x7320) # 1c00d740 <get_clock>
+1c006420:	54734000 	bl	29504(0x7340) # 1c00d760 <get_clock>
 1c006424:	28800330 	ld.w	$r16,$r25,0
 1c006428:	1c000f5b 	pcaddu12i	$r27,122(0x7a)
 1c00642c:	2886637b 	ld.w	$r27,$r27,408(0x198)
@@ -6551,7 +6539,7 @@ test_max_position1_u8():
 1c006614:	28800330 	ld.w	$r16,$r25,0
 1c006618:	028007bd 	addi.w	$r29,$r29,1(0x1)
 1c00661c:	63fe37b0 	blt	$r29,$r16,-460(0x3fe34) # 1c006450 <test_max_position1_u8+0x70>
-1c006620:	54712000 	bl	28960(0x7120) # 1c00d740 <get_clock>
+1c006620:	54714000 	bl	28992(0x7140) # 1c00d760 <get_clock>
 1c006624:	2880036f 	ld.w	$r15,$r27,0
 1c006628:	00150094 	move	$r20,$r4
 1c00662c:	14001e86 	lu12i.w	$r6,244(0xf4)
@@ -6610,7 +6598,7 @@ test_max_position1_16():
 1c0066f4:	0015009d 	move	$r29,$r4
 1c0066f8:	001500bb 	move	$r27,$r5
 1c0066fc:	001500d7 	move	$r23,$r6
-1c006700:	54704000 	bl	28736(0x7040) # 1c00d740 <get_clock>
+1c006700:	54706000 	bl	28768(0x7060) # 1c00d760 <get_clock>
 1c006704:	28800310 	ld.w	$r16,$r24,0
 1c006708:	1c000f5a 	pcaddu12i	$r26,122(0x7a)
 1c00670c:	28bae35a 	ld.w	$r26,$r26,-328(0xeb8)
@@ -6734,7 +6722,7 @@ test_max_position1_16():
 1c0068e4:	28800310 	ld.w	$r16,$r24,0
 1c0068e8:	0280079c 	addi.w	$r28,$r28,1(0x1)
 1c0068ec:	63fe4790 	blt	$r28,$r16,-444(0x3fe44) # 1c006730 <test_max_position1_16+0x70>
-1c0068f0:	546e5000 	bl	28240(0x6e50) # 1c00d740 <get_clock>
+1c0068f0:	546e7000 	bl	28272(0x6e70) # 1c00d760 <get_clock>
 1c0068f4:	28800348 	ld.w	$r8,$r26,0
 1c0068f8:	00150091 	move	$r17,$r4
 1c0068fc:	14001e86 	lu12i.w	$r6,244(0xf4)
@@ -6793,7 +6781,7 @@ test_max_position1_u16():
 1c0069c4:	0015009d 	move	$r29,$r4
 1c0069c8:	001500bb 	move	$r27,$r5
 1c0069cc:	001500d7 	move	$r23,$r6
-1c0069d0:	546d7000 	bl	28016(0x6d70) # 1c00d740 <get_clock>
+1c0069d0:	546d9000 	bl	28048(0x6d90) # 1c00d760 <get_clock>
 1c0069d4:	28800310 	ld.w	$r16,$r24,0
 1c0069d8:	1c000f5a 	pcaddu12i	$r26,122(0x7a)
 1c0069dc:	28afa35a 	ld.w	$r26,$r26,-1048(0xbe8)
@@ -6917,7 +6905,7 @@ test_max_position1_u16():
 1c006bb4:	28800310 	ld.w	$r16,$r24,0
 1c006bb8:	0280079c 	addi.w	$r28,$r28,1(0x1)
 1c006bbc:	63fe4790 	blt	$r28,$r16,-444(0x3fe44) # 1c006a00 <test_max_position1_u16+0x70>
-1c006bc0:	546b8000 	bl	27520(0x6b80) # 1c00d740 <get_clock>
+1c006bc0:	546ba000 	bl	27552(0x6ba0) # 1c00d760 <get_clock>
 1c006bc4:	28800348 	ld.w	$r8,$r26,0
 1c006bc8:	00150091 	move	$r17,$r4
 1c006bcc:	14001e86 	lu12i.w	$r6,244(0xf4)
@@ -6976,7 +6964,7 @@ test_max_position1_32():
 1c006c94:	0015009d 	move	$r29,$r4
 1c006c98:	001500bb 	move	$r27,$r5
 1c006c9c:	001500d7 	move	$r23,$r6
-1c006ca0:	546aa000 	bl	27296(0x6aa0) # 1c00d740 <get_clock>
+1c006ca0:	546ac000 	bl	27328(0x6ac0) # 1c00d760 <get_clock>
 1c006ca4:	28800310 	ld.w	$r16,$r24,0
 1c006ca8:	1c000f5a 	pcaddu12i	$r26,122(0x7a)
 1c006cac:	28a4635a 	ld.w	$r26,$r26,-1768(0x918)
@@ -7100,7 +7088,7 @@ test_max_position1_32():
 1c006e84:	28800310 	ld.w	$r16,$r24,0
 1c006e88:	0280079c 	addi.w	$r28,$r28,1(0x1)
 1c006e8c:	63fe4790 	blt	$r28,$r16,-444(0x3fe44) # 1c006cd0 <test_max_position1_32+0x70>
-1c006e90:	5468b000 	bl	26800(0x68b0) # 1c00d740 <get_clock>
+1c006e90:	5468d000 	bl	26832(0x68d0) # 1c00d760 <get_clock>
 1c006e94:	28800348 	ld.w	$r8,$r26,0
 1c006e98:	00150091 	move	$r17,$r4
 1c006e9c:	14001e86 	lu12i.w	$r6,244(0xf4)
@@ -7159,7 +7147,7 @@ test_max_position1_u32():
 1c006f64:	0015009d 	move	$r29,$r4
 1c006f68:	001500bb 	move	$r27,$r5
 1c006f6c:	001500d7 	move	$r23,$r6
-1c006f70:	5467d000 	bl	26576(0x67d0) # 1c00d740 <get_clock>
+1c006f70:	5467f000 	bl	26608(0x67f0) # 1c00d760 <get_clock>
 1c006f74:	28800310 	ld.w	$r16,$r24,0
 1c006f78:	1c000f3a 	pcaddu12i	$r26,121(0x79)
 1c006f7c:	2899235a 	ld.w	$r26,$r26,1608(0x648)
@@ -7283,7 +7271,7 @@ test_max_position1_u32():
 1c007154:	28800310 	ld.w	$r16,$r24,0
 1c007158:	0280079c 	addi.w	$r28,$r28,1(0x1)
 1c00715c:	63fe4790 	blt	$r28,$r16,-444(0x3fe44) # 1c006fa0 <test_max_position1_u32+0x70>
-1c007160:	5465e000 	bl	26080(0x65e0) # 1c00d740 <get_clock>
+1c007160:	54660000 	bl	26112(0x6600) # 1c00d760 <get_clock>
 1c007164:	28800348 	ld.w	$r8,$r26,0
 1c007168:	00150091 	move	$r17,$r4
 1c00716c:	14001e86 	lu12i.w	$r6,244(0xf4)
@@ -7342,46 +7330,46 @@ minmax_sequence_TestOneType_8():
 1c007234:	298cf07d 	st.w	$r29,$r3,828(0x33c)
 1c007238:	298ce07e 	st.w	$r30,$r3,824(0x338)
 1c00723c:	298cd07f 	st.w	$r31,$r3,820(0x334)
-1c007240:	5465b000 	bl	26032(0x65b0) # 1c00d7f0 <srand>
+1c007240:	5465d000 	bl	26064(0x65d0) # 1c00d810 <srand>
 1c007244:	02804077 	addi.w	$r23,$r3,16(0x10)
 1c007248:	00150005 	move	$r5,$r0
 1c00724c:	001502f6 	move	$r22,$r23
 1c007250:	580050a0 	beq	$r5,$r0,80(0x50) # 1c0072a0 <minmax_sequence_TestOneType_8+0xa0>
 1c007254:	02804478 	addi.w	$r24,$r3,17(0x11)
-1c007258:	54655800 	bl	25944(0x6558) # 1c00d7b0 <rand>
+1c007258:	54657800 	bl	25976(0x6578) # 1c00d7d0 <rand>
 1c00725c:	293fff04 	st.b	$r4,$r24,-1(0xfff)
-1c007260:	54655000 	bl	25936(0x6550) # 1c00d7b0 <rand>
+1c007260:	54657000 	bl	25968(0x6570) # 1c00d7d0 <rand>
 1c007264:	29000304 	st.b	$r4,$r24,0
-1c007268:	54654800 	bl	25928(0x6548) # 1c00d7b0 <rand>
+1c007268:	54656800 	bl	25960(0x6568) # 1c00d7d0 <rand>
 1c00726c:	29000704 	st.b	$r4,$r24,1(0x1)
-1c007270:	54654000 	bl	25920(0x6540) # 1c00d7b0 <rand>
+1c007270:	54656000 	bl	25952(0x6560) # 1c00d7d0 <rand>
 1c007274:	29000b04 	st.b	$r4,$r24,2(0x2)
-1c007278:	54653800 	bl	25912(0x6538) # 1c00d7b0 <rand>
+1c007278:	54655800 	bl	25944(0x6558) # 1c00d7d0 <rand>
 1c00727c:	29000f04 	st.b	$r4,$r24,3(0x3)
-1c007280:	54653000 	bl	25904(0x6530) # 1c00d7b0 <rand>
+1c007280:	54655000 	bl	25936(0x6550) # 1c00d7d0 <rand>
 1c007284:	29001304 	st.b	$r4,$r24,4(0x4)
-1c007288:	54652800 	bl	25896(0x6528) # 1c00d7b0 <rand>
+1c007288:	54654800 	bl	25928(0x6548) # 1c00d7d0 <rand>
 1c00728c:	02801b16 	addi.w	$r22,$r24,6(0x6)
 1c007290:	293ffec4 	st.b	$r4,$r22,-1(0xfff)
 1c007294:	028cc066 	addi.w	$r6,$r3,816(0x330)
 1c007298:	580056c6 	beq	$r22,$r6,84(0x54) # 1c0072ec <minmax_sequence_TestOneType_8+0xec>
 1c00729c:	03400000 	andi	$r0,$r0,0x0
 1c0072a0:	028022d6 	addi.w	$r22,$r22,8(0x8)
-1c0072a4:	54650c00 	bl	25868(0x650c) # 1c00d7b0 <rand>
+1c0072a4:	54652c00 	bl	25900(0x652c) # 1c00d7d0 <rand>
 1c0072a8:	293fe2c4 	st.b	$r4,$r22,-8(0xff8)
-1c0072ac:	54650400 	bl	25860(0x6504) # 1c00d7b0 <rand>
+1c0072ac:	54652400 	bl	25892(0x6524) # 1c00d7d0 <rand>
 1c0072b0:	293fe6c4 	st.b	$r4,$r22,-7(0xff9)
-1c0072b4:	5464fc00 	bl	25852(0x64fc) # 1c00d7b0 <rand>
+1c0072b4:	54651c00 	bl	25884(0x651c) # 1c00d7d0 <rand>
 1c0072b8:	293feac4 	st.b	$r4,$r22,-6(0xffa)
-1c0072bc:	5464f400 	bl	25844(0x64f4) # 1c00d7b0 <rand>
+1c0072bc:	54651400 	bl	25876(0x6514) # 1c00d7d0 <rand>
 1c0072c0:	293feec4 	st.b	$r4,$r22,-5(0xffb)
-1c0072c4:	5464ec00 	bl	25836(0x64ec) # 1c00d7b0 <rand>
+1c0072c4:	54650c00 	bl	25868(0x650c) # 1c00d7d0 <rand>
 1c0072c8:	293ff2c4 	st.b	$r4,$r22,-4(0xffc)
-1c0072cc:	5464e400 	bl	25828(0x64e4) # 1c00d7b0 <rand>
+1c0072cc:	54650400 	bl	25860(0x6504) # 1c00d7d0 <rand>
 1c0072d0:	293ff6c4 	st.b	$r4,$r22,-3(0xffd)
-1c0072d4:	5464dc00 	bl	25820(0x64dc) # 1c00d7b0 <rand>
+1c0072d4:	5464fc00 	bl	25852(0x64fc) # 1c00d7d0 <rand>
 1c0072d8:	293ffac4 	st.b	$r4,$r22,-2(0xffe)
-1c0072dc:	5464d400 	bl	25812(0x64d4) # 1c00d7b0 <rand>
+1c0072dc:	5464f400 	bl	25844(0x64f4) # 1c00d7d0 <rand>
 1c0072e0:	293ffec4 	st.b	$r4,$r22,-1(0xfff)
 1c0072e4:	028cc067 	addi.w	$r7,$r3,816(0x330)
 1c0072e8:	5fffbac7 	bne	$r22,$r7,-72(0x3ffb8) # 1c0072a0 <minmax_sequence_TestOneType_8+0xa0>
@@ -7730,7 +7718,7 @@ minmax_sequence_TestOneType_8():
 1c007844:	1c000f38 	pcaddu12i	$r24,121(0x79)
 1c007848:	02b5c318 	addi.w	$r24,$r24,-656(0xd70)
 1c00784c:	298000d2 	st.w	$r18,$r6,0
-1c007850:	545ef000 	bl	24304(0x5ef0) # 1c00d740 <get_clock>
+1c007850:	545f1000 	bl	24336(0x5f10) # 1c00d760 <get_clock>
 1c007854:	28800305 	ld.w	$r5,$r24,0
 1c007858:	1c000f3e 	pcaddu12i	$r30,121(0x79)
 1c00785c:	28b5a3de 	ld.w	$r30,$r30,-664(0xd68)
@@ -7841,7 +7829,7 @@ minmax_sequence_TestOneType_8():
 1c007a00:	02af5294 	addi.w	$r20,$r20,-1068(0xbd4)
 1c007a04:	28802073 	ld.w	$r19,$r3,8(0x8)
 1c007a08:	63fe7a45 	blt	$r18,$r5,-392(0x3fe78) # 1c007880 <minmax_sequence_TestOneType_8+0x680>
-1c007a0c:	545d3400 	bl	23860(0x5d34) # 1c00d740 <get_clock>
+1c007a0c:	545d5400 	bl	23892(0x5d54) # 1c00d760 <get_clock>
 1c007a10:	288003d1 	ld.w	$r17,$r30,0
 1c007a14:	14001e8d 	lu12i.w	$r13,244(0xf4)
 1c007a18:	1c000f28 	pcaddu12i	$r8,121(0x79)
@@ -7859,7 +7847,7 @@ minmax_sequence_TestOneType_8():
 1c007a48:	1c000f04 	pcaddu12i	$r4,120(0x78)
 1c007a4c:	02983084 	addi.w	$r4,$r4,1548(0x60c)
 1c007a50:	5457e000 	bl	22496(0x57e0) # 1c00d230 <printf>
-1c007a54:	545cec00 	bl	23788(0x5cec) # 1c00d740 <get_clock>
+1c007a54:	545d0c00 	bl	23820(0x5d0c) # 1c00d760 <get_clock>
 1c007a58:	28800305 	ld.w	$r5,$r24,0
 1c007a5c:	298003c4 	st.w	$r4,$r30,0
 1c007a60:	6401a005 	bge	$r0,$r5,416(0x1a0) # 1c007c00 <minmax_sequence_TestOneType_8+0xa00>
@@ -7966,7 +7954,7 @@ minmax_sequence_TestOneType_8():
 1c007bf4:	28803073 	ld.w	$r19,$r3,12(0xc)
 1c007bf8:	63fe7a45 	blt	$r18,$r5,-392(0x3fe78) # 1c007a70 <minmax_sequence_TestOneType_8+0x870>
 1c007bfc:	00105339 	add.w	$r25,$r25,$r20
-1c007c00:	545b4000 	bl	23360(0x5b40) # 1c00d740 <get_clock>
+1c007c00:	545b6000 	bl	23392(0x5b60) # 1c00d760 <get_clock>
 1c007c04:	288003db 	ld.w	$r27,$r30,0
 1c007c08:	00150096 	move	$r22,$r4
 1c007c0c:	14001e88 	lu12i.w	$r8,244(0xf4)
@@ -7992,7 +7980,7 @@ minmax_sequence_TestOneType_8():
 1c007c5c:	002a0007 	break	0x7
 1c007c60:	2980106d 	st.w	$r13,$r3,4(0x4)
 1c007c64:	2980030f 	st.w	$r15,$r24,0
-1c007c68:	545ad800 	bl	23256(0x5ad8) # 1c00d740 <get_clock>
+1c007c68:	545af800 	bl	23288(0x5af8) # 1c00d760 <get_clock>
 1c007c6c:	28800312 	ld.w	$r18,$r24,0
 1c007c70:	298003c4 	st.w	$r4,$r30,0
 1c007c74:	1c000f16 	pcaddu12i	$r22,120(0x78)
@@ -8100,7 +8088,7 @@ minmax_sequence_TestOneType_8():
 1c007e0c:	28800312 	ld.w	$r18,$r24,0
 1c007e10:	0280077b 	addi.w	$r27,$r27,1(0x1)
 1c007e14:	63fe6f72 	blt	$r27,$r18,-404(0x3fe6c) # 1c007c80 <minmax_sequence_TestOneType_8+0xa80>
-1c007e18:	54592800 	bl	22824(0x5928) # 1c00d740 <get_clock>
+1c007e18:	54594800 	bl	22856(0x5948) # 1c00d760 <get_clock>
 1c007e1c:	288003d0 	ld.w	$r16,$r30,0
 1c007e20:	0015009c 	move	$r28,$r4
 1c007e24:	14001e86 	lu12i.w	$r6,244(0xf4)
@@ -8118,7 +8106,7 @@ minmax_sequence_TestOneType_8():
 1c007e54:	02881084 	addi.w	$r4,$r4,516(0x204)
 1c007e58:	2980029c 	st.w	$r28,$r20,0
 1c007e5c:	5453d400 	bl	21460(0x53d4) # 1c00d230 <printf>
-1c007e60:	5458e000 	bl	22752(0x58e0) # 1c00d740 <get_clock>
+1c007e60:	54590000 	bl	22784(0x5900) # 1c00d760 <get_clock>
 1c007e64:	28800311 	ld.w	$r17,$r24,0
 1c007e68:	298003c4 	st.w	$r4,$r30,0
 1c007e6c:	00150016 	move	$r22,$r0
@@ -8230,7 +8218,7 @@ minmax_sequence_TestOneType_8():
 1c008014:	28800311 	ld.w	$r17,$r24,0
 1c008018:	028006d6 	addi.w	$r22,$r22,1(0x1)
 1c00801c:	63fe6ad1 	blt	$r22,$r17,-408(0x3fe68) # 1c007e84 <minmax_sequence_TestOneType_8+0xc84>
-1c008020:	54572000 	bl	22304(0x5720) # 1c00d740 <get_clock>
+1c008020:	54574000 	bl	22336(0x5740) # 1c00d760 <get_clock>
 1c008024:	288003df 	ld.w	$r31,$r30,0
 1c008028:	00150097 	move	$r23,$r4
 1c00802c:	14001e9a 	lu12i.w	$r26,244(0xf4)
@@ -8397,46 +8385,46 @@ minmax_sequence_TestOneType_u8():
 1c0082a4:	298cf07d 	st.w	$r29,$r3,828(0x33c)
 1c0082a8:	298ce07e 	st.w	$r30,$r3,824(0x338)
 1c0082ac:	298cd07f 	st.w	$r31,$r3,820(0x334)
-1c0082b0:	54554000 	bl	21824(0x5540) # 1c00d7f0 <srand>
+1c0082b0:	54556000 	bl	21856(0x5560) # 1c00d810 <srand>
 1c0082b4:	02804077 	addi.w	$r23,$r3,16(0x10)
 1c0082b8:	00150005 	move	$r5,$r0
 1c0082bc:	001502f6 	move	$r22,$r23
 1c0082c0:	580050a0 	beq	$r5,$r0,80(0x50) # 1c008310 <minmax_sequence_TestOneType_u8+0xa0>
 1c0082c4:	02804478 	addi.w	$r24,$r3,17(0x11)
-1c0082c8:	5454e800 	bl	21736(0x54e8) # 1c00d7b0 <rand>
+1c0082c8:	54550800 	bl	21768(0x5508) # 1c00d7d0 <rand>
 1c0082cc:	293fff04 	st.b	$r4,$r24,-1(0xfff)
-1c0082d0:	5454e000 	bl	21728(0x54e0) # 1c00d7b0 <rand>
+1c0082d0:	54550000 	bl	21760(0x5500) # 1c00d7d0 <rand>
 1c0082d4:	29000304 	st.b	$r4,$r24,0
-1c0082d8:	5454d800 	bl	21720(0x54d8) # 1c00d7b0 <rand>
+1c0082d8:	5454f800 	bl	21752(0x54f8) # 1c00d7d0 <rand>
 1c0082dc:	29000704 	st.b	$r4,$r24,1(0x1)
-1c0082e0:	5454d000 	bl	21712(0x54d0) # 1c00d7b0 <rand>
+1c0082e0:	5454f000 	bl	21744(0x54f0) # 1c00d7d0 <rand>
 1c0082e4:	29000b04 	st.b	$r4,$r24,2(0x2)
-1c0082e8:	5454c800 	bl	21704(0x54c8) # 1c00d7b0 <rand>
+1c0082e8:	5454e800 	bl	21736(0x54e8) # 1c00d7d0 <rand>
 1c0082ec:	29000f04 	st.b	$r4,$r24,3(0x3)
-1c0082f0:	5454c000 	bl	21696(0x54c0) # 1c00d7b0 <rand>
+1c0082f0:	5454e000 	bl	21728(0x54e0) # 1c00d7d0 <rand>
 1c0082f4:	29001304 	st.b	$r4,$r24,4(0x4)
-1c0082f8:	5454b800 	bl	21688(0x54b8) # 1c00d7b0 <rand>
+1c0082f8:	5454d800 	bl	21720(0x54d8) # 1c00d7d0 <rand>
 1c0082fc:	02801b16 	addi.w	$r22,$r24,6(0x6)
 1c008300:	293ffec4 	st.b	$r4,$r22,-1(0xfff)
 1c008304:	028cc066 	addi.w	$r6,$r3,816(0x330)
 1c008308:	580056c6 	beq	$r22,$r6,84(0x54) # 1c00835c <minmax_sequence_TestOneType_u8+0xec>
 1c00830c:	03400000 	andi	$r0,$r0,0x0
 1c008310:	028022d6 	addi.w	$r22,$r22,8(0x8)
-1c008314:	54549c00 	bl	21660(0x549c) # 1c00d7b0 <rand>
+1c008314:	5454bc00 	bl	21692(0x54bc) # 1c00d7d0 <rand>
 1c008318:	293fe2c4 	st.b	$r4,$r22,-8(0xff8)
-1c00831c:	54549400 	bl	21652(0x5494) # 1c00d7b0 <rand>
+1c00831c:	5454b400 	bl	21684(0x54b4) # 1c00d7d0 <rand>
 1c008320:	293fe6c4 	st.b	$r4,$r22,-7(0xff9)
-1c008324:	54548c00 	bl	21644(0x548c) # 1c00d7b0 <rand>
+1c008324:	5454ac00 	bl	21676(0x54ac) # 1c00d7d0 <rand>
 1c008328:	293feac4 	st.b	$r4,$r22,-6(0xffa)
-1c00832c:	54548400 	bl	21636(0x5484) # 1c00d7b0 <rand>
+1c00832c:	5454a400 	bl	21668(0x54a4) # 1c00d7d0 <rand>
 1c008330:	293feec4 	st.b	$r4,$r22,-5(0xffb)
-1c008334:	54547c00 	bl	21628(0x547c) # 1c00d7b0 <rand>
+1c008334:	54549c00 	bl	21660(0x549c) # 1c00d7d0 <rand>
 1c008338:	293ff2c4 	st.b	$r4,$r22,-4(0xffc)
-1c00833c:	54547400 	bl	21620(0x5474) # 1c00d7b0 <rand>
+1c00833c:	54549400 	bl	21652(0x5494) # 1c00d7d0 <rand>
 1c008340:	293ff6c4 	st.b	$r4,$r22,-3(0xffd)
-1c008344:	54546c00 	bl	21612(0x546c) # 1c00d7b0 <rand>
+1c008344:	54548c00 	bl	21644(0x548c) # 1c00d7d0 <rand>
 1c008348:	293ffac4 	st.b	$r4,$r22,-2(0xffe)
-1c00834c:	54546400 	bl	21604(0x5464) # 1c00d7b0 <rand>
+1c00834c:	54548400 	bl	21636(0x5484) # 1c00d7d0 <rand>
 1c008350:	293ffec4 	st.b	$r4,$r22,-1(0xfff)
 1c008354:	028cc067 	addi.w	$r7,$r3,816(0x330)
 1c008358:	5fffbac7 	bne	$r22,$r7,-72(0x3ffb8) # 1c008310 <minmax_sequence_TestOneType_u8+0xa0>
@@ -8785,7 +8773,7 @@ minmax_sequence_TestOneType_u8():
 1c0088b4:	1c000f18 	pcaddu12i	$r24,120(0x78)
 1c0088b8:	02b40318 	addi.w	$r24,$r24,-768(0xd00)
 1c0088bc:	298000d2 	st.w	$r18,$r6,0
-1c0088c0:	544e8000 	bl	20096(0x4e80) # 1c00d740 <get_clock>
+1c0088c0:	544ea000 	bl	20128(0x4ea0) # 1c00d760 <get_clock>
 1c0088c4:	28800305 	ld.w	$r5,$r24,0
 1c0088c8:	1c000f1e 	pcaddu12i	$r30,120(0x78)
 1c0088cc:	28b3e3de 	ld.w	$r30,$r30,-776(0xcf8)
@@ -8896,7 +8884,7 @@ minmax_sequence_TestOneType_u8():
 1c008a70:	02ad9294 	addi.w	$r20,$r20,-1180(0xb64)
 1c008a74:	28802073 	ld.w	$r19,$r3,8(0x8)
 1c008a78:	63fe7a45 	blt	$r18,$r5,-392(0x3fe78) # 1c0088f0 <minmax_sequence_TestOneType_u8+0x680>
-1c008a7c:	544cc400 	bl	19652(0x4cc4) # 1c00d740 <get_clock>
+1c008a7c:	544ce400 	bl	19684(0x4ce4) # 1c00d760 <get_clock>
 1c008a80:	288003d1 	ld.w	$r17,$r30,0
 1c008a84:	14001e8d 	lu12i.w	$r13,244(0xf4)
 1c008a88:	1c000f08 	pcaddu12i	$r8,120(0x78)
@@ -8914,7 +8902,7 @@ minmax_sequence_TestOneType_u8():
 1c008ab8:	1c000ee4 	pcaddu12i	$r4,119(0x77)
 1c008abc:	02967084 	addi.w	$r4,$r4,1436(0x59c)
 1c008ac0:	54477000 	bl	18288(0x4770) # 1c00d230 <printf>
-1c008ac4:	544c7c00 	bl	19580(0x4c7c) # 1c00d740 <get_clock>
+1c008ac4:	544c9c00 	bl	19612(0x4c9c) # 1c00d760 <get_clock>
 1c008ac8:	28800305 	ld.w	$r5,$r24,0
 1c008acc:	298003c4 	st.w	$r4,$r30,0
 1c008ad0:	6401a005 	bge	$r0,$r5,416(0x1a0) # 1c008c70 <minmax_sequence_TestOneType_u8+0xa00>
@@ -9021,7 +9009,7 @@ minmax_sequence_TestOneType_u8():
 1c008c64:	28803073 	ld.w	$r19,$r3,12(0xc)
 1c008c68:	63fe7a45 	blt	$r18,$r5,-392(0x3fe78) # 1c008ae0 <minmax_sequence_TestOneType_u8+0x870>
 1c008c6c:	00105339 	add.w	$r25,$r25,$r20
-1c008c70:	544ad000 	bl	19152(0x4ad0) # 1c00d740 <get_clock>
+1c008c70:	544af000 	bl	19184(0x4af0) # 1c00d760 <get_clock>
 1c008c74:	288003db 	ld.w	$r27,$r30,0
 1c008c78:	00150096 	move	$r22,$r4
 1c008c7c:	14001e88 	lu12i.w	$r8,244(0xf4)
@@ -9047,7 +9035,7 @@ minmax_sequence_TestOneType_u8():
 1c008ccc:	002a0007 	break	0x7
 1c008cd0:	2980106d 	st.w	$r13,$r3,4(0x4)
 1c008cd4:	2980030f 	st.w	$r15,$r24,0
-1c008cd8:	544a6800 	bl	19048(0x4a68) # 1c00d740 <get_clock>
+1c008cd8:	544a8800 	bl	19080(0x4a88) # 1c00d760 <get_clock>
 1c008cdc:	28800312 	ld.w	$r18,$r24,0
 1c008ce0:	298003c4 	st.w	$r4,$r30,0
 1c008ce4:	1c000ef6 	pcaddu12i	$r22,119(0x77)
@@ -9155,7 +9143,7 @@ minmax_sequence_TestOneType_u8():
 1c008e7c:	28800312 	ld.w	$r18,$r24,0
 1c008e80:	0280077b 	addi.w	$r27,$r27,1(0x1)
 1c008e84:	63fe6f72 	blt	$r27,$r18,-404(0x3fe6c) # 1c008cf0 <minmax_sequence_TestOneType_u8+0xa80>
-1c008e88:	5448b800 	bl	18616(0x48b8) # 1c00d740 <get_clock>
+1c008e88:	5448d800 	bl	18648(0x48d8) # 1c00d760 <get_clock>
 1c008e8c:	288003d0 	ld.w	$r16,$r30,0
 1c008e90:	0015009c 	move	$r28,$r4
 1c008e94:	14001e86 	lu12i.w	$r6,244(0xf4)
@@ -9173,7 +9161,7 @@ minmax_sequence_TestOneType_u8():
 1c008ec4:	02865084 	addi.w	$r4,$r4,404(0x194)
 1c008ec8:	2980029c 	st.w	$r28,$r20,0
 1c008ecc:	54436400 	bl	17252(0x4364) # 1c00d230 <printf>
-1c008ed0:	54487000 	bl	18544(0x4870) # 1c00d740 <get_clock>
+1c008ed0:	54489000 	bl	18576(0x4890) # 1c00d760 <get_clock>
 1c008ed4:	28800311 	ld.w	$r17,$r24,0
 1c008ed8:	298003c4 	st.w	$r4,$r30,0
 1c008edc:	00150016 	move	$r22,$r0
@@ -9285,7 +9273,7 @@ minmax_sequence_TestOneType_u8():
 1c009084:	28800311 	ld.w	$r17,$r24,0
 1c009088:	028006d6 	addi.w	$r22,$r22,1(0x1)
 1c00908c:	63fe6ad1 	blt	$r22,$r17,-408(0x3fe68) # 1c008ef4 <minmax_sequence_TestOneType_u8+0xc84>
-1c009090:	5446b000 	bl	18096(0x46b0) # 1c00d740 <get_clock>
+1c009090:	5446d000 	bl	18128(0x46d0) # 1c00d760 <get_clock>
 1c009094:	288003df 	ld.w	$r31,$r30,0
 1c009098:	00150097 	move	$r23,$r4
 1c00909c:	14001e9a 	lu12i.w	$r26,244(0xf4)
@@ -9453,23 +9441,23 @@ minmax_sequence_TestOneType_16():
 1c009318:	2999607e 	st.w	$r30,$r3,1624(0x658)
 1c00931c:	2999507f 	st.w	$r31,$r3,1620(0x654)
 1c009320:	02804077 	addi.w	$r23,$r3,16(0x10)
-1c009324:	5444cc00 	bl	17612(0x44cc) # 1c00d7f0 <srand>
+1c009324:	5444ec00 	bl	17644(0x44ec) # 1c00d810 <srand>
 1c009328:	028042f7 	addi.w	$r23,$r23,16(0x10)
-1c00932c:	54448400 	bl	17540(0x4484) # 1c00d7b0 <rand>
+1c00932c:	5444a400 	bl	17572(0x44a4) # 1c00d7d0 <rand>
 1c009330:	297fc2e4 	st.h	$r4,$r23,-16(0xff0)
-1c009334:	54447c00 	bl	17532(0x447c) # 1c00d7b0 <rand>
+1c009334:	54449c00 	bl	17564(0x449c) # 1c00d7d0 <rand>
 1c009338:	297fcae4 	st.h	$r4,$r23,-14(0xff2)
-1c00933c:	54447400 	bl	17524(0x4474) # 1c00d7b0 <rand>
+1c00933c:	54449400 	bl	17556(0x4494) # 1c00d7d0 <rand>
 1c009340:	297fd2e4 	st.h	$r4,$r23,-12(0xff4)
-1c009344:	54446c00 	bl	17516(0x446c) # 1c00d7b0 <rand>
+1c009344:	54448c00 	bl	17548(0x448c) # 1c00d7d0 <rand>
 1c009348:	297fdae4 	st.h	$r4,$r23,-10(0xff6)
-1c00934c:	54446400 	bl	17508(0x4464) # 1c00d7b0 <rand>
+1c00934c:	54448400 	bl	17540(0x4484) # 1c00d7d0 <rand>
 1c009350:	297fe2e4 	st.h	$r4,$r23,-8(0xff8)
-1c009354:	54445c00 	bl	17500(0x445c) # 1c00d7b0 <rand>
+1c009354:	54447c00 	bl	17532(0x447c) # 1c00d7d0 <rand>
 1c009358:	297feae4 	st.h	$r4,$r23,-6(0xffa)
-1c00935c:	54445400 	bl	17492(0x4454) # 1c00d7b0 <rand>
+1c00935c:	54447400 	bl	17524(0x4474) # 1c00d7d0 <rand>
 1c009360:	297ff2e4 	st.h	$r4,$r23,-4(0xffc)
-1c009364:	54444c00 	bl	17484(0x444c) # 1c00d7b0 <rand>
+1c009364:	54446c00 	bl	17516(0x446c) # 1c00d7d0 <rand>
 1c009368:	297ffae4 	st.h	$r4,$r23,-2(0xffe)
 1c00936c:	02994065 	addi.w	$r5,$r3,1616(0x650)
 1c009370:	5fffbae5 	bne	$r23,$r5,-72(0x3ffb8) # 1c009328 <minmax_sequence_TestOneType_16+0x48>
@@ -9728,7 +9716,7 @@ minmax_sequence_TestOneType_16():
 1c009764:	1c000ef7 	pcaddu12i	$r23,119(0x77)
 1c009768:	02b942f7 	addi.w	$r23,$r23,-432(0xe50)
 1c00976c:	298000d3 	st.w	$r19,$r6,0
-1c009770:	543fd000 	bl	16336(0x3fd0) # 1c00d740 <get_clock>
+1c009770:	543ff000 	bl	16368(0x3ff0) # 1c00d760 <get_clock>
 1c009774:	288002f2 	ld.w	$r18,$r23,0
 1c009778:	1c000efc 	pcaddu12i	$r28,119(0x77)
 1c00977c:	28b9239c 	ld.w	$r28,$r28,-440(0xe48)
@@ -9833,7 +9821,7 @@ minmax_sequence_TestOneType_16():
 1c009908:	028007ff 	addi.w	$r31,$r31,1(0x1)
 1c00990c:	02800718 	addi.w	$r24,$r24,1(0x1)
 1c009910:	63fe87f2 	blt	$r31,$r18,-380(0x3fe84) # 1c009794 <minmax_sequence_TestOneType_16+0x4b4>
-1c009914:	543e2c00 	bl	15916(0x3e2c) # 1c00d740 <get_clock>
+1c009914:	543e4c00 	bl	15948(0x3e4c) # 1c00d760 <get_clock>
 1c009918:	2880038a 	ld.w	$r10,$r28,0
 1c00991c:	0015009e 	move	$r30,$r4
 1c009920:	14001e8b 	lu12i.w	$r11,244(0xf4)
@@ -9851,7 +9839,7 @@ minmax_sequence_TestOneType_16():
 1c009950:	029c2084 	addi.w	$r4,$r4,1800(0x708)
 1c009954:	298001de 	st.w	$r30,$r14,0
 1c009958:	5438d800 	bl	14552(0x38d8) # 1c00d230 <printf>
-1c00995c:	543de400 	bl	15844(0x3de4) # 1c00d740 <get_clock>
+1c00995c:	543e0400 	bl	15876(0x3e04) # 1c00d760 <get_clock>
 1c009960:	288002f3 	ld.w	$r19,$r23,0
 1c009964:	29800384 	st.w	$r4,$r28,0
 1c009968:	64019413 	bge	$r0,$r19,404(0x194) # 1c009afc <minmax_sequence_TestOneType_16+0x81c>
@@ -9955,7 +9943,7 @@ minmax_sequence_TestOneType_16():
 1c009af0:	028007de 	addi.w	$r30,$r30,1(0x1)
 1c009af4:	63fe86d3 	blt	$r22,$r19,-380(0x3fe84) # 1c009978 <minmax_sequence_TestOneType_16+0x698>
 1c009af8:	00107b18 	add.w	$r24,$r24,$r30
-1c009afc:	543c4400 	bl	15428(0x3c44) # 1c00d740 <get_clock>
+1c009afc:	543c6400 	bl	15460(0x3c64) # 1c00d760 <get_clock>
 1c009b00:	28800389 	ld.w	$r9,$r28,0
 1c009b04:	00150090 	move	$r16,$r4
 1c009b08:	14001e99 	lu12i.w	$r25,244(0xf4)
@@ -9981,7 +9969,7 @@ minmax_sequence_TestOneType_16():
 1c009b58:	002a0007 	break	0x7
 1c009b5c:	2980306e 	st.w	$r14,$r3,12(0xc)
 1c009b60:	298002e6 	st.w	$r6,$r23,0
-1c009b64:	543bdc00 	bl	15324(0x3bdc) # 1c00d740 <get_clock>
+1c009b64:	543bfc00 	bl	15356(0x3bfc) # 1c00d760 <get_clock>
 1c009b68:	288002f2 	ld.w	$r18,$r23,0
 1c009b6c:	29800384 	st.w	$r4,$r28,0
 1c009b70:	028c8019 	addi.w	$r25,$r0,800(0x320)
@@ -10079,7 +10067,7 @@ minmax_sequence_TestOneType_16():
 1c009ce0:	288002f2 	ld.w	$r18,$r23,0
 1c009ce4:	028006d6 	addi.w	$r22,$r22,1(0x1)
 1c009ce8:	63fea2d2 	blt	$r22,$r18,-352(0x3fea0) # 1c009b88 <minmax_sequence_TestOneType_16+0x8a8>
-1c009cec:	543a5400 	bl	14932(0x3a54) # 1c00d740 <get_clock>
+1c009cec:	543a7400 	bl	14964(0x3a74) # 1c00d760 <get_clock>
 1c009cf0:	28800393 	ld.w	$r19,$r28,0
 1c009cf4:	0015009a 	move	$r26,$r4
 1c009cf8:	14001e86 	lu12i.w	$r6,244(0xf4)
@@ -10097,7 +10085,7 @@ minmax_sequence_TestOneType_16():
 1c009d28:	028cc084 	addi.w	$r4,$r4,816(0x330)
 1c009d2c:	2980013a 	st.w	$r26,$r9,0
 1c009d30:	54350000 	bl	13568(0x3500) # 1c00d230 <printf>
-1c009d34:	543a0c00 	bl	14860(0x3a0c) # 1c00d740 <get_clock>
+1c009d34:	543a2c00 	bl	14892(0x3a2c) # 1c00d760 <get_clock>
 1c009d38:	288002f1 	ld.w	$r17,$r23,0
 1c009d3c:	29800384 	st.w	$r4,$r28,0
 1c009d40:	0015001f 	move	$r31,$r0
@@ -10199,7 +10187,7 @@ minmax_sequence_TestOneType_16():
 1c009ec0:	288002f1 	ld.w	$r17,$r23,0
 1c009ec4:	028007ff 	addi.w	$r31,$r31,1(0x1)
 1c009ec8:	63fe9bf1 	blt	$r31,$r17,-360(0x3fe98) # 1c009d60 <minmax_sequence_TestOneType_16+0xa80>
-1c009ecc:	54387400 	bl	14452(0x3874) # 1c00d740 <get_clock>
+1c009ecc:	54389400 	bl	14484(0x3894) # 1c00d760 <get_clock>
 1c009ed0:	2880039d 	ld.w	$r29,$r28,0
 1c009ed4:	0015009b 	move	$r27,$r4
 1c009ed8:	14001e86 	lu12i.w	$r6,244(0xf4)
@@ -10392,23 +10380,23 @@ minmax_sequence_TestOneType_u16():
 1c00a1b8:	2999607e 	st.w	$r30,$r3,1624(0x658)
 1c00a1bc:	2999507f 	st.w	$r31,$r3,1620(0x654)
 1c00a1c0:	02804077 	addi.w	$r23,$r3,16(0x10)
-1c00a1c4:	54362c00 	bl	13868(0x362c) # 1c00d7f0 <srand>
+1c00a1c4:	54364c00 	bl	13900(0x364c) # 1c00d810 <srand>
 1c00a1c8:	028042f7 	addi.w	$r23,$r23,16(0x10)
-1c00a1cc:	5435e400 	bl	13796(0x35e4) # 1c00d7b0 <rand>
+1c00a1cc:	54360400 	bl	13828(0x3604) # 1c00d7d0 <rand>
 1c00a1d0:	297fc2e4 	st.h	$r4,$r23,-16(0xff0)
-1c00a1d4:	5435dc00 	bl	13788(0x35dc) # 1c00d7b0 <rand>
+1c00a1d4:	5435fc00 	bl	13820(0x35fc) # 1c00d7d0 <rand>
 1c00a1d8:	297fcae4 	st.h	$r4,$r23,-14(0xff2)
-1c00a1dc:	5435d400 	bl	13780(0x35d4) # 1c00d7b0 <rand>
+1c00a1dc:	5435f400 	bl	13812(0x35f4) # 1c00d7d0 <rand>
 1c00a1e0:	297fd2e4 	st.h	$r4,$r23,-12(0xff4)
-1c00a1e4:	5435cc00 	bl	13772(0x35cc) # 1c00d7b0 <rand>
+1c00a1e4:	5435ec00 	bl	13804(0x35ec) # 1c00d7d0 <rand>
 1c00a1e8:	297fdae4 	st.h	$r4,$r23,-10(0xff6)
-1c00a1ec:	5435c400 	bl	13764(0x35c4) # 1c00d7b0 <rand>
+1c00a1ec:	5435e400 	bl	13796(0x35e4) # 1c00d7d0 <rand>
 1c00a1f0:	297fe2e4 	st.h	$r4,$r23,-8(0xff8)
-1c00a1f4:	5435bc00 	bl	13756(0x35bc) # 1c00d7b0 <rand>
+1c00a1f4:	5435dc00 	bl	13788(0x35dc) # 1c00d7d0 <rand>
 1c00a1f8:	297feae4 	st.h	$r4,$r23,-6(0xffa)
-1c00a1fc:	5435b400 	bl	13748(0x35b4) # 1c00d7b0 <rand>
+1c00a1fc:	5435d400 	bl	13780(0x35d4) # 1c00d7d0 <rand>
 1c00a200:	297ff2e4 	st.h	$r4,$r23,-4(0xffc)
-1c00a204:	5435ac00 	bl	13740(0x35ac) # 1c00d7b0 <rand>
+1c00a204:	5435cc00 	bl	13772(0x35cc) # 1c00d7d0 <rand>
 1c00a208:	297ffae4 	st.h	$r4,$r23,-2(0xffe)
 1c00a20c:	02994065 	addi.w	$r5,$r3,1616(0x650)
 1c00a210:	5fffbae5 	bne	$r23,$r5,-72(0x3ffb8) # 1c00a1c8 <minmax_sequence_TestOneType_u16+0x48>
@@ -10667,7 +10655,7 @@ minmax_sequence_TestOneType_u16():
 1c00a604:	1c000ed7 	pcaddu12i	$r23,118(0x76)
 1c00a608:	02bec2f7 	addi.w	$r23,$r23,-80(0xfb0)
 1c00a60c:	298000d3 	st.w	$r19,$r6,0
-1c00a610:	54313000 	bl	12592(0x3130) # 1c00d740 <get_clock>
+1c00a610:	54315000 	bl	12624(0x3150) # 1c00d760 <get_clock>
 1c00a614:	288002f2 	ld.w	$r18,$r23,0
 1c00a618:	1c000edc 	pcaddu12i	$r28,118(0x76)
 1c00a61c:	28bea39c 	ld.w	$r28,$r28,-88(0xfa8)
@@ -10772,7 +10760,7 @@ minmax_sequence_TestOneType_u16():
 1c00a7a8:	028007ff 	addi.w	$r31,$r31,1(0x1)
 1c00a7ac:	02800718 	addi.w	$r24,$r24,1(0x1)
 1c00a7b0:	63fe87f2 	blt	$r31,$r18,-380(0x3fe84) # 1c00a634 <minmax_sequence_TestOneType_u16+0x4b4>
-1c00a7b4:	542f8c00 	bl	12172(0x2f8c) # 1c00d740 <get_clock>
+1c00a7b4:	542fac00 	bl	12204(0x2fac) # 1c00d760 <get_clock>
 1c00a7b8:	2880038a 	ld.w	$r10,$r28,0
 1c00a7bc:	0015009e 	move	$r30,$r4
 1c00a7c0:	14001e8b 	lu12i.w	$r11,244(0xf4)
@@ -10790,7 +10778,7 @@ minmax_sequence_TestOneType_u16():
 1c00a7f0:	02a1a084 	addi.w	$r4,$r4,-1944(0x868)
 1c00a7f4:	298001de 	st.w	$r30,$r14,0
 1c00a7f8:	542a3800 	bl	10808(0x2a38) # 1c00d230 <printf>
-1c00a7fc:	542f4400 	bl	12100(0x2f44) # 1c00d740 <get_clock>
+1c00a7fc:	542f6400 	bl	12132(0x2f64) # 1c00d760 <get_clock>
 1c00a800:	288002f3 	ld.w	$r19,$r23,0
 1c00a804:	29800384 	st.w	$r4,$r28,0
 1c00a808:	64019413 	bge	$r0,$r19,404(0x194) # 1c00a99c <minmax_sequence_TestOneType_u16+0x81c>
@@ -10894,7 +10882,7 @@ minmax_sequence_TestOneType_u16():
 1c00a990:	028007de 	addi.w	$r30,$r30,1(0x1)
 1c00a994:	63fe86d3 	blt	$r22,$r19,-380(0x3fe84) # 1c00a818 <minmax_sequence_TestOneType_u16+0x698>
 1c00a998:	00107b18 	add.w	$r24,$r24,$r30
-1c00a99c:	542da400 	bl	11684(0x2da4) # 1c00d740 <get_clock>
+1c00a99c:	542dc400 	bl	11716(0x2dc4) # 1c00d760 <get_clock>
 1c00a9a0:	28800389 	ld.w	$r9,$r28,0
 1c00a9a4:	00150090 	move	$r16,$r4
 1c00a9a8:	14001e99 	lu12i.w	$r25,244(0xf4)
@@ -10920,7 +10908,7 @@ minmax_sequence_TestOneType_u16():
 1c00a9f8:	002a0007 	break	0x7
 1c00a9fc:	2980306e 	st.w	$r14,$r3,12(0xc)
 1c00aa00:	298002e6 	st.w	$r6,$r23,0
-1c00aa04:	542d3c00 	bl	11580(0x2d3c) # 1c00d740 <get_clock>
+1c00aa04:	542d5c00 	bl	11612(0x2d5c) # 1c00d760 <get_clock>
 1c00aa08:	288002f2 	ld.w	$r18,$r23,0
 1c00aa0c:	29800384 	st.w	$r4,$r28,0
 1c00aa10:	028c8019 	addi.w	$r25,$r0,800(0x320)
@@ -11018,7 +11006,7 @@ minmax_sequence_TestOneType_u16():
 1c00ab80:	288002f2 	ld.w	$r18,$r23,0
 1c00ab84:	028006d6 	addi.w	$r22,$r22,1(0x1)
 1c00ab88:	63fea2d2 	blt	$r22,$r18,-352(0x3fea0) # 1c00aa28 <minmax_sequence_TestOneType_u16+0x8a8>
-1c00ab8c:	542bb400 	bl	11188(0x2bb4) # 1c00d740 <get_clock>
+1c00ab8c:	542bd400 	bl	11220(0x2bd4) # 1c00d760 <get_clock>
 1c00ab90:	28800393 	ld.w	$r19,$r28,0
 1c00ab94:	0015009a 	move	$r26,$r4
 1c00ab98:	14001e86 	lu12i.w	$r6,244(0xf4)
@@ -11036,7 +11024,7 @@ minmax_sequence_TestOneType_u16():
 1c00abc8:	02924084 	addi.w	$r4,$r4,1168(0x490)
 1c00abcc:	2980013a 	st.w	$r26,$r9,0
 1c00abd0:	54266000 	bl	9824(0x2660) # 1c00d230 <printf>
-1c00abd4:	542b6c00 	bl	11116(0x2b6c) # 1c00d740 <get_clock>
+1c00abd4:	542b8c00 	bl	11148(0x2b8c) # 1c00d760 <get_clock>
 1c00abd8:	288002f1 	ld.w	$r17,$r23,0
 1c00abdc:	29800384 	st.w	$r4,$r28,0
 1c00abe0:	0015001f 	move	$r31,$r0
@@ -11138,7 +11126,7 @@ minmax_sequence_TestOneType_u16():
 1c00ad60:	288002f1 	ld.w	$r17,$r23,0
 1c00ad64:	028007ff 	addi.w	$r31,$r31,1(0x1)
 1c00ad68:	63fe9bf1 	blt	$r31,$r17,-360(0x3fe98) # 1c00ac00 <minmax_sequence_TestOneType_u16+0xa80>
-1c00ad6c:	5429d400 	bl	10708(0x29d4) # 1c00d740 <get_clock>
+1c00ad6c:	5429f400 	bl	10740(0x29f4) # 1c00d760 <get_clock>
 1c00ad70:	2880039d 	ld.w	$r29,$r28,0
 1c00ad74:	0015009b 	move	$r27,$r4
 1c00ad78:	14001e86 	lu12i.w	$r6,244(0xf4)
@@ -11331,7 +11319,7 @@ TestOneType_32():
 1c00b058:	299f107f 	st.w	$r31,$r3,1988(0x7c4)
 1c00b05c:	0281ec84 	addi.w	$r4,$r4,123(0x7b)
 1c00b060:	02acc063 	addi.w	$r3,$r3,-1232(0xb30)
-1c00b064:	54278c00 	bl	10124(0x278c) # 1c00d7f0 <srand>
+1c00b064:	5427ac00 	bl	10156(0x27ac) # 1c00d810 <srand>
 1c00b068:	15fffff7 	lu12i.w	$r23,-1(0xfffff)
 1c00b06c:	03b20006 	ori	$r6,$r0,0xc80
 1c00b070:	0280406d 	addi.w	$r13,$r3,16(0x10)
@@ -11339,25 +11327,25 @@ TestOneType_32():
 1c00b078:	001034c7 	add.w	$r7,$r6,$r13
 1c00b07c:	001014f6 	add.w	$r22,$r7,$r5
 1c00b080:	001502d8 	move	$r24,$r22
-1c00b084:	54272c00 	bl	10028(0x272c) # 1c00d7b0 <rand>
+1c00b084:	54274c00 	bl	10060(0x274c) # 1c00d7d0 <rand>
 1c00b088:	298002c4 	st.w	$r4,$r22,0
-1c00b08c:	54272400 	bl	10020(0x2724) # 1c00d7b0 <rand>
+1c00b08c:	54274400 	bl	10052(0x2744) # 1c00d7d0 <rand>
 1c00b090:	298012c4 	st.w	$r4,$r22,4(0x4)
-1c00b094:	54271c00 	bl	10012(0x271c) # 1c00d7b0 <rand>
+1c00b094:	54273c00 	bl	10044(0x273c) # 1c00d7d0 <rand>
 1c00b098:	298022c4 	st.w	$r4,$r22,8(0x8)
-1c00b09c:	54271400 	bl	10004(0x2714) # 1c00d7b0 <rand>
+1c00b09c:	54273400 	bl	10036(0x2734) # 1c00d7d0 <rand>
 1c00b0a0:	028042dc 	addi.w	$r28,$r22,16(0x10)
 1c00b0a4:	29bff384 	st.w	$r4,$r28,-4(0xffc)
-1c00b0a8:	54270800 	bl	9992(0x2708) # 1c00d7b0 <rand>
+1c00b0a8:	54272800 	bl	10024(0x2728) # 1c00d7d0 <rand>
 1c00b0ac:	028052db 	addi.w	$r27,$r22,20(0x14)
 1c00b0b0:	29bff364 	st.w	$r4,$r27,-4(0xffc)
-1c00b0b4:	5426fc00 	bl	9980(0x26fc) # 1c00d7b0 <rand>
+1c00b0b4:	54271c00 	bl	10012(0x271c) # 1c00d7d0 <rand>
 1c00b0b8:	028062da 	addi.w	$r26,$r22,24(0x18)
 1c00b0bc:	29bff344 	st.w	$r4,$r26,-4(0xffc)
-1c00b0c0:	5426f000 	bl	9968(0x26f0) # 1c00d7b0 <rand>
+1c00b0c0:	54271000 	bl	10000(0x2710) # 1c00d7d0 <rand>
 1c00b0c4:	028072d9 	addi.w	$r25,$r22,28(0x1c)
 1c00b0c8:	29bff324 	st.w	$r4,$r25,-4(0xffc)
-1c00b0cc:	5426e400 	bl	9956(0x26e4) # 1c00d7b0 <rand>
+1c00b0cc:	54270400 	bl	9988(0x2704) # 1c00d7d0 <rand>
 1c00b0d0:	028082d6 	addi.w	$r22,$r22,32(0x20)
 1c00b0d4:	03b20008 	ori	$r8,$r0,0xc80
 1c00b0d8:	02804069 	addi.w	$r9,$r3,16(0x10)
@@ -11700,7 +11688,7 @@ TestOneType_32():
 1c00b61c:	1c000eb7 	pcaddu12i	$r23,117(0x75)
 1c00b620:	02be62f7 	addi.w	$r23,$r23,-104(0xf98)
 1c00b624:	29800152 	st.w	$r18,$r10,0
-1c00b628:	54211800 	bl	8472(0x2118) # 1c00d740 <get_clock>
+1c00b628:	54213800 	bl	8504(0x2138) # 1c00d760 <get_clock>
 1c00b62c:	288002f1 	ld.w	$r17,$r23,0
 1c00b630:	1c000ebc 	pcaddu12i	$r28,117(0x75)
 1c00b634:	28be439c 	ld.w	$r28,$r28,-112(0xf90)
@@ -11798,7 +11786,7 @@ TestOneType_32():
 1c00b7a4:	028007ff 	addi.w	$r31,$r31,1(0x1)
 1c00b7a8:	02800718 	addi.w	$r24,$r24,1(0x1)
 1c00b7ac:	63feabf1 	blt	$r31,$r17,-344(0x3fea8) # 1c00b654 <TestOneType_32+0x634>
-1c00b7b0:	541f9000 	bl	8080(0x1f90) # 1c00d740 <get_clock>
+1c00b7b0:	541fb000 	bl	8112(0x1fb0) # 1c00d760 <get_clock>
 1c00b7b4:	2880038f 	ld.w	$r15,$r28,0
 1c00b7b8:	00150096 	move	$r22,$r4
 1c00b7bc:	14001e86 	lu12i.w	$r6,244(0xf4)
@@ -11816,7 +11804,7 @@ TestOneType_32():
 1c00b7ec:	5c000940 	bne	$r10,$r0,8(0x8) # 1c00b7f4 <TestOneType_32+0x7d4>
 1c00b7f0:	002a0007 	break	0x7
 1c00b7f4:	541a3c00 	bl	6716(0x1a3c) # 1c00d230 <printf>
-1c00b7f8:	541f4800 	bl	8008(0x1f48) # 1c00d740 <get_clock>
+1c00b7f8:	541f6800 	bl	8040(0x1f68) # 1c00d760 <get_clock>
 1c00b7fc:	288002f2 	ld.w	$r18,$r23,0
 1c00b800:	29800384 	st.w	$r4,$r28,0
 1c00b804:	64017c12 	bge	$r0,$r18,380(0x17c) # 1c00b980 <TestOneType_32+0x960>
@@ -11914,7 +11902,7 @@ TestOneType_32():
 1c00b974:	028007de 	addi.w	$r30,$r30,1(0x1)
 1c00b978:	63feaad2 	blt	$r22,$r18,-344(0x3fea8) # 1c00b820 <TestOneType_32+0x800>
 1c00b97c:	00107b18 	add.w	$r24,$r24,$r30
-1c00b980:	541dc000 	bl	7616(0x1dc0) # 1c00d740 <get_clock>
+1c00b980:	541de000 	bl	7648(0x1de0) # 1c00d760 <get_clock>
 1c00b984:	28800389 	ld.w	$r9,$r28,0
 1c00b988:	00150088 	move	$r8,$r4
 1c00b98c:	14001e99 	lu12i.w	$r25,244(0xf4)
@@ -11941,7 +11929,7 @@ TestOneType_32():
 1c00b9e0:	002a0007 	break	0x7
 1c00b9e4:	2980306e 	st.w	$r14,$r3,12(0xc)
 1c00b9e8:	298002e5 	st.w	$r5,$r23,0
-1c00b9ec:	541d5400 	bl	7508(0x1d54) # 1c00d740 <get_clock>
+1c00b9ec:	541d7400 	bl	7540(0x1d74) # 1c00d760 <get_clock>
 1c00b9f0:	288002f2 	ld.w	$r18,$r23,0
 1c00b9f4:	29800384 	st.w	$r4,$r28,0
 1c00b9f8:	028c8019 	addi.w	$r25,$r0,800(0x320)
@@ -12039,7 +12027,7 @@ TestOneType_32():
 1c00bb68:	288002f2 	ld.w	$r18,$r23,0
 1c00bb6c:	028006d6 	addi.w	$r22,$r22,1(0x1)
 1c00bb70:	63fea2d2 	blt	$r22,$r18,-352(0x3fea0) # 1c00ba10 <TestOneType_32+0x9f0>
-1c00bb74:	541bcc00 	bl	7116(0x1bcc) # 1c00d740 <get_clock>
+1c00bb74:	541bec00 	bl	7148(0x1bec) # 1c00d760 <get_clock>
 1c00bb78:	28800393 	ld.w	$r19,$r28,0
 1c00bb7c:	0015009a 	move	$r26,$r4
 1c00bb80:	14001e86 	lu12i.w	$r6,244(0xf4)
@@ -12057,7 +12045,7 @@ TestOneType_32():
 1c00bbb0:	0292a084 	addi.w	$r4,$r4,1192(0x4a8)
 1c00bbb4:	298001fa 	st.w	$r26,$r15,0
 1c00bbb8:	54167800 	bl	5752(0x1678) # 1c00d230 <printf>
-1c00bbbc:	541b8400 	bl	7044(0x1b84) # 1c00d740 <get_clock>
+1c00bbbc:	541ba400 	bl	7076(0x1ba4) # 1c00d760 <get_clock>
 1c00bbc0:	288002f1 	ld.w	$r17,$r23,0
 1c00bbc4:	29800384 	st.w	$r4,$r28,0
 1c00bbc8:	0015001f 	move	$r31,$r0
@@ -12158,7 +12146,7 @@ TestOneType_32():
 1c00bd44:	288002f1 	ld.w	$r17,$r23,0
 1c00bd48:	028007ff 	addi.w	$r31,$r31,1(0x1)
 1c00bd4c:	63fe9bf1 	blt	$r31,$r17,-360(0x3fe98) # 1c00bbe4 <TestOneType_32+0xbc4>
-1c00bd50:	5419f000 	bl	6640(0x19f0) # 1c00d740 <get_clock>
+1c00bd50:	541a1000 	bl	6672(0x1a10) # 1c00d760 <get_clock>
 1c00bd54:	2880039b 	ld.w	$r27,$r28,0
 1c00bd58:	0015009d 	move	$r29,$r4
 1c00bd5c:	14001e86 	lu12i.w	$r6,244(0xf4)
@@ -12334,7 +12322,7 @@ TestOneType_u32():
 1c00bff8:	299f107f 	st.w	$r31,$r3,1988(0x7c4)
 1c00bffc:	0281ec84 	addi.w	$r4,$r4,123(0x7b)
 1c00c000:	02acc063 	addi.w	$r3,$r3,-1232(0xb30)
-1c00c004:	5417ec00 	bl	6124(0x17ec) # 1c00d7f0 <srand>
+1c00c004:	54180c00 	bl	6156(0x180c) # 1c00d810 <srand>
 1c00c008:	15fffff7 	lu12i.w	$r23,-1(0xfffff)
 1c00c00c:	03b20006 	ori	$r6,$r0,0xc80
 1c00c010:	0280406d 	addi.w	$r13,$r3,16(0x10)
@@ -12343,21 +12331,21 @@ TestOneType_u32():
 1c00c01c:	001014f6 	add.w	$r22,$r7,$r5
 1c00c020:	001502d8 	move	$r24,$r22
 1c00c024:	028082d6 	addi.w	$r22,$r22,32(0x20)
-1c00c028:	54178800 	bl	6024(0x1788) # 1c00d7b0 <rand>
+1c00c028:	5417a800 	bl	6056(0x17a8) # 1c00d7d0 <rand>
 1c00c02c:	29bf82c4 	st.w	$r4,$r22,-32(0xfe0)
-1c00c030:	54178000 	bl	6016(0x1780) # 1c00d7b0 <rand>
+1c00c030:	5417a000 	bl	6048(0x17a0) # 1c00d7d0 <rand>
 1c00c034:	29bf92c4 	st.w	$r4,$r22,-28(0xfe4)
-1c00c038:	54177800 	bl	6008(0x1778) # 1c00d7b0 <rand>
+1c00c038:	54179800 	bl	6040(0x1798) # 1c00d7d0 <rand>
 1c00c03c:	29bfa2c4 	st.w	$r4,$r22,-24(0xfe8)
-1c00c040:	54177000 	bl	6000(0x1770) # 1c00d7b0 <rand>
+1c00c040:	54179000 	bl	6032(0x1790) # 1c00d7d0 <rand>
 1c00c044:	29bfb2c4 	st.w	$r4,$r22,-20(0xfec)
-1c00c048:	54176800 	bl	5992(0x1768) # 1c00d7b0 <rand>
+1c00c048:	54178800 	bl	6024(0x1788) # 1c00d7d0 <rand>
 1c00c04c:	29bfc2c4 	st.w	$r4,$r22,-16(0xff0)
-1c00c050:	54176000 	bl	5984(0x1760) # 1c00d7b0 <rand>
+1c00c050:	54178000 	bl	6016(0x1780) # 1c00d7d0 <rand>
 1c00c054:	29bfd2c4 	st.w	$r4,$r22,-12(0xff4)
-1c00c058:	54175800 	bl	5976(0x1758) # 1c00d7b0 <rand>
+1c00c058:	54177800 	bl	6008(0x1778) # 1c00d7d0 <rand>
 1c00c05c:	29bfe2c4 	st.w	$r4,$r22,-8(0xff8)
-1c00c060:	54175000 	bl	5968(0x1750) # 1c00d7b0 <rand>
+1c00c060:	54177000 	bl	6000(0x1770) # 1c00d7d0 <rand>
 1c00c064:	03b20008 	ori	$r8,$r0,0xc80
 1c00c068:	02804069 	addi.w	$r9,$r3,16(0x10)
 1c00c06c:	29bff2c4 	st.w	$r4,$r22,-4(0xffc)
@@ -12699,7 +12687,7 @@ TestOneType_u32():
 1c00c5ac:	1c000e97 	pcaddu12i	$r23,116(0x74)
 1c00c5b0:	028022f7 	addi.w	$r23,$r23,8(0x8)
 1c00c5b4:	29800132 	st.w	$r18,$r9,0
-1c00c5b8:	54118800 	bl	4488(0x1188) # 1c00d740 <get_clock>
+1c00c5b8:	5411a800 	bl	4520(0x11a8) # 1c00d760 <get_clock>
 1c00c5bc:	288002f1 	ld.w	$r17,$r23,0
 1c00c5c0:	1c000e9c 	pcaddu12i	$r28,116(0x74)
 1c00c5c4:	2880039c 	ld.w	$r28,$r28,0
@@ -12797,7 +12785,7 @@ TestOneType_u32():
 1c00c734:	028007ff 	addi.w	$r31,$r31,1(0x1)
 1c00c738:	02800718 	addi.w	$r24,$r24,1(0x1)
 1c00c73c:	63feabf1 	blt	$r31,$r17,-344(0x3fea8) # 1c00c5e4 <TestOneType_u32+0x624>
-1c00c740:	54100000 	bl	4096(0x1000) # 1c00d740 <get_clock>
+1c00c740:	54102000 	bl	4128(0x1020) # 1c00d760 <get_clock>
 1c00c744:	2880038f 	ld.w	$r15,$r28,0
 1c00c748:	00150096 	move	$r22,$r4
 1c00c74c:	14001e86 	lu12i.w	$r6,244(0xf4)
@@ -12816,7 +12804,7 @@ TestOneType_u32():
 1c00c780:	02a36084 	addi.w	$r4,$r4,-1832(0x8d8)
 1c00c784:	298001d6 	st.w	$r22,$r14,0
 1c00c788:	540aa800 	bl	2728(0xaa8) # 1c00d230 <printf>
-1c00c78c:	540fb400 	bl	4020(0xfb4) # 1c00d740 <get_clock>
+1c00c78c:	540fd400 	bl	4052(0xfd4) # 1c00d760 <get_clock>
 1c00c790:	288002f2 	ld.w	$r18,$r23,0
 1c00c794:	29800384 	st.w	$r4,$r28,0
 1c00c798:	64017812 	bge	$r0,$r18,376(0x178) # 1c00c910 <TestOneType_u32+0x950>
@@ -12913,7 +12901,7 @@ TestOneType_u32():
 1c00c904:	028007de 	addi.w	$r30,$r30,1(0x1)
 1c00c908:	63feaad2 	blt	$r22,$r18,-344(0x3fea8) # 1c00c7b0 <TestOneType_u32+0x7f0>
 1c00c90c:	00107b18 	add.w	$r24,$r24,$r30
-1c00c910:	540e3000 	bl	3632(0xe30) # 1c00d740 <get_clock>
+1c00c910:	540e5000 	bl	3664(0xe50) # 1c00d760 <get_clock>
 1c00c914:	2880038d 	ld.w	$r13,$r28,0
 1c00c918:	00150088 	move	$r8,$r4
 1c00c91c:	14001e99 	lu12i.w	$r25,244(0xf4)
@@ -12940,7 +12928,7 @@ TestOneType_u32():
 1c00c970:	002a0007 	break	0x7
 1c00c974:	2980306e 	st.w	$r14,$r3,12(0xc)
 1c00c978:	298002e5 	st.w	$r5,$r23,0
-1c00c97c:	540dc400 	bl	3524(0xdc4) # 1c00d740 <get_clock>
+1c00c97c:	540de400 	bl	3556(0xde4) # 1c00d760 <get_clock>
 1c00c980:	288002f2 	ld.w	$r18,$r23,0
 1c00c984:	29800384 	st.w	$r4,$r28,0
 1c00c988:	028c8019 	addi.w	$r25,$r0,800(0x320)
@@ -13038,7 +13026,7 @@ TestOneType_u32():
 1c00caf8:	288002f2 	ld.w	$r18,$r23,0
 1c00cafc:	028006d6 	addi.w	$r22,$r22,1(0x1)
 1c00cb00:	63fea2d2 	blt	$r22,$r18,-352(0x3fea0) # 1c00c9a0 <TestOneType_u32+0x9e0>
-1c00cb04:	540c3c00 	bl	3132(0xc3c) # 1c00d740 <get_clock>
+1c00cb04:	540c5c00 	bl	3164(0xc5c) # 1c00d760 <get_clock>
 1c00cb08:	2880038b 	ld.w	$r11,$r28,0
 1c00cb0c:	0015009a 	move	$r26,$r4
 1c00cb10:	14001e86 	lu12i.w	$r6,244(0xf4)
@@ -13056,7 +13044,7 @@ TestOneType_u32():
 1c00cb40:	02946084 	addi.w	$r4,$r4,1304(0x518)
 1c00cb44:	2980013a 	st.w	$r26,$r9,0
 1c00cb48:	5406e800 	bl	1768(0x6e8) # 1c00d230 <printf>
-1c00cb4c:	540bf400 	bl	3060(0xbf4) # 1c00d740 <get_clock>
+1c00cb4c:	540c1400 	bl	3092(0xc14) # 1c00d760 <get_clock>
 1c00cb50:	288002f1 	ld.w	$r17,$r23,0
 1c00cb54:	29800384 	st.w	$r4,$r28,0
 1c00cb58:	0015001f 	move	$r31,$r0
@@ -13157,7 +13145,7 @@ TestOneType_u32():
 1c00ccd4:	288002f1 	ld.w	$r17,$r23,0
 1c00ccd8:	028007ff 	addi.w	$r31,$r31,1(0x1)
 1c00ccdc:	63fe9bf1 	blt	$r31,$r17,-360(0x3fe98) # 1c00cb74 <TestOneType_u32+0xbb4>
-1c00cce0:	540a6000 	bl	2656(0xa60) # 1c00d740 <get_clock>
+1c00cce0:	540a8000 	bl	2688(0xa80) # 1c00d760 <get_clock>
 1c00cce4:	2880039b 	ld.w	$r27,$r28,0
 1c00cce8:	0015009d 	move	$r29,$r4
 1c00ccec:	14001e86 	lu12i.w	$r6,244(0xf4)
@@ -13349,10 +13337,10 @@ shell20():
 1c00cfbc:	2980107c 	st.w	$r28,$r3,4(0x4)
 1c00cfc0:	29806077 	st.w	$r23,$r3,24(0x18)
 1c00cfc4:	29805078 	st.w	$r24,$r3,20(0x14)
-1c00cfc8:	54058800 	bl	1416(0x588) # 1c00d550 <puts>
-1c00cfcc:	5406a400 	bl	1700(0x6a4) # 1c00d670 <get_count>
+1c00cfc8:	5405a800 	bl	1448(0x5a8) # 1c00d570 <puts>
+1c00cfcc:	5406c400 	bl	1732(0x6c4) # 1c00d690 <get_count>
 1c00cfd0:	0015009a 	move	$r26,$r4
-1c00cfd4:	5406cc00 	bl	1740(0x6cc) # 1c00d6a0 <get_count_my>
+1c00cfd4:	5406ec00 	bl	1772(0x6ec) # 1c00d6c0 <get_count_my>
 1c00cfd8:	157f5fec 	lu12i.w	$r12,-263425(0xbfaff)
 1c00cfdc:	0015009b 	move	$r27,$r4
 1c00cfe0:	03bc8184 	ori	$r4,$r12,0xf20
@@ -13427,15 +13415,15 @@ shell20():
 1c00d0f4:	02bfef39 	addi.w	$r25,$r25,-5(0xffb)
 1c00d0f8:	00102b1c 	add.w	$r28,$r24,$r10
 1c00d0fc:	5ffefb20 	bne	$r25,$r0,-264(0x3fef8) # 1c00cff4 <shell20+0x54>
-1c00d100:	5405a000 	bl	1440(0x5a0) # 1c00d6a0 <get_count_my>
+1c00d100:	5405c000 	bl	1472(0x5c0) # 1c00d6c0 <get_count_my>
 1c00d104:	00150098 	move	$r24,$r4
-1c00d108:	54056800 	bl	1384(0x568) # 1c00d670 <get_count>
+1c00d108:	54058800 	bl	1416(0x588) # 1c00d690 <get_count>
 1c00d10c:	00116f1b 	sub.w	$r27,$r24,$r27
 1c00d110:	0011689a 	sub.w	$r26,$r4,$r26
 1c00d114:	58009380 	beq	$r28,$r0,144(0x90) # 1c00d1a4 <shell20+0x204>
 1c00d118:	1c000e64 	pcaddu12i	$r4,115(0x73)
 1c00d11c:	028b2084 	addi.w	$r4,$r4,712(0x2c8)
-1c00d120:	54043000 	bl	1072(0x430) # 1c00d550 <puts>
+1c00d120:	54045000 	bl	1104(0x450) # 1c00d570 <puts>
 1c00d124:	157f5feb 	lu12i.w	$r11,-263425(0xbfaff)
 1c00d128:	02800410 	addi.w	$r16,$r0,1(0x1)
 1c00d12c:	0381016f 	ori	$r15,$r11,0x40
@@ -13470,7 +13458,7 @@ shell20():
 1c00d1a0:	50009000 	b	144(0x90) # 1c00d230 <printf>
 1c00d1a4:	1c000e64 	pcaddu12i	$r4,115(0x73)
 1c00d1a8:	02889084 	addi.w	$r4,$r4,548(0x224)
-1c00d1ac:	5403a400 	bl	932(0x3a4) # 1c00d550 <puts>
+1c00d1ac:	5403c400 	bl	964(0x3c4) # 1c00d570 <puts>
 1c00d1b0:	157f5ff2 	lu12i.w	$r18,-263425(0xbfaff)
 1c00d1b4:	02800414 	addi.w	$r20,$r0,1(0x1)
 1c00d1b8:	03810244 	ori	$r4,$r18,0x40
@@ -13495,9 +13483,9 @@ shell20():
 1c00d204:	00101399 	add.w	$r25,$r28,$r4
 1c00d208:	57edbbff 	bl	-4680(0xfffedb8) # 1c00bfc0 <TestOneType_u32>
 1c00d20c:	0010133c 	add.w	$r28,$r25,$r4
-1c00d210:	54049000 	bl	1168(0x490) # 1c00d6a0 <get_count_my>
+1c00d210:	5404b000 	bl	1200(0x4b0) # 1c00d6c0 <get_count_my>
 1c00d214:	00150098 	move	$r24,$r4
-1c00d218:	54045800 	bl	1112(0x458) # 1c00d670 <get_count>
+1c00d218:	54047800 	bl	1144(0x478) # 1c00d690 <get_count>
 1c00d21c:	00116f1b 	sub.w	$r27,$r24,$r27
 1c00d220:	0011689a 	sub.w	$r26,$r4,$r26
 1c00d224:	5ffef780 	bne	$r28,$r0,-268(0x3fef4) # 1c00d118 <shell20+0x178>
@@ -13506,7 +13494,7 @@ shell20():
 
 1c00d230 <printf>:
 printf():
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:2
+/code/fpga/nscscc-team/software/perf/lib/printf.c:2
 int printf(const char *fmt,...)
 {
 1c00d230:	02be8063 	addi.w	$r3,$r3,-96(0xfa0)
@@ -13519,7 +13507,7 @@ int printf(const char *fmt,...)
 1c00d24c:	2980907c 	st.w	$r28,$r3,36(0x24)
 1c00d250:	29811065 	st.w	$r5,$r3,68(0x44)
 1c00d254:	29812066 	st.w	$r6,$r3,72(0x48)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:10
+/code/fpga/nscscc-team/software/perf/lib/printf.c:10
 void **arg;
 void *ap;
 int w;
@@ -13527,20 +13515,20 @@ __builtin_va_start(ap,fmt);
 arg=ap;
 for(i=0;fmt[i];i++)
 1c00d258:	28000097 	ld.b	$r23,$r4,0
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:8
+/code/fpga/nscscc-team/software/perf/lib/printf.c:8
 __builtin_va_start(ap,fmt);
 1c00d25c:	0281107a 	addi.w	$r26,$r3,68(0x44)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:2
+/code/fpga/nscscc-team/software/perf/lib/printf.c:2
 {
 1c00d260:	29813067 	st.w	$r7,$r3,76(0x4c)
 1c00d264:	29814068 	st.w	$r8,$r3,80(0x50)
 1c00d268:	29815069 	st.w	$r9,$r3,84(0x54)
 1c00d26c:	2981606a 	st.w	$r10,$r3,88(0x58)
 1c00d270:	2981706b 	st.w	$r11,$r3,92(0x5c)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:8
+/code/fpga/nscscc-team/software/perf/lib/printf.c:8
 __builtin_va_start(ap,fmt);
 1c00d274:	2980707a 	st.w	$r26,$r3,28(0x1c)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:10
+/code/fpga/nscscc-team/software/perf/lib/printf.c:10
 for(i=0;fmt[i];i++)
 1c00d278:	58008ae0 	beq	$r23,$r0,136(0x88) # 1c00d300 <printf+0xd0>
 1c00d27c:	00150099 	move	$r25,$r4
@@ -13549,7 +13537,7 @@ for(i=0;fmt[i];i++)
 1c00d288:	0287639c 	addi.w	$r28,$r28,472(0x1d8)
 1c00d28c:	0280201b 	addi.w	$r27,$r0,8(0x8)
 1c00d290:	50001c00 	b	28(0x1c) # 1c00d2ac <printf+0x7c>
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:80
+/code/fpga/nscscc-team/software/perf/lib/printf.c:80
 		}
 
 	}
@@ -13558,36 +13546,36 @@ for(i=0;fmt[i];i++)
 		putchar(c);
 1c00d294:	001502e4 	move	$r4,$r23
 1c00d298:	5401d800 	bl	472(0x1d8) # 1c00d470 <putchar>
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:10 (discriminator 2)
+/code/fpga/nscscc-team/software/perf/lib/printf.c:10 (discriminator 2)
 for(i=0;fmt[i];i++)
 1c00d29c:	02800718 	addi.w	$r24,$r24,1(0x1)
 1c00d2a0:	0010632c 	add.w	$r12,$r25,$r24
 1c00d2a4:	28000197 	ld.b	$r23,$r12,0
 1c00d2a8:	58005ae0 	beq	$r23,$r0,88(0x58) # 1c00d300 <printf+0xd0>
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:13
+/code/fpga/nscscc-team/software/perf/lib/printf.c:13
 	if(c=='%')
 1c00d2ac:	0280940c 	addi.w	$r12,$r0,37(0x25)
 1c00d2b0:	58001aec 	beq	$r23,$r12,24(0x18) # 1c00d2c8 <printf+0x98>
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:79
+/code/fpga/nscscc-team/software/perf/lib/printf.c:79
 		if(c=='\n') putchar('\r');
 1c00d2b4:	0280280c 	addi.w	$r12,$r0,10(0xa)
 1c00d2b8:	5fffdeec 	bne	$r23,$r12,-36(0x3ffdc) # 1c00d294 <printf+0x64>
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:79 (discriminator 1)
+/code/fpga/nscscc-team/software/perf/lib/printf.c:79 (discriminator 1)
 1c00d2bc:	02803404 	addi.w	$r4,$r0,13(0xd)
 1c00d2c0:	5401b000 	bl	432(0x1b0) # 1c00d470 <putchar>
 1c00d2c4:	53ffd3ff 	b	-48(0xfffffd0) # 1c00d294 <printf+0x64>
 1c00d2c8:	0010632c 	add.w	$r12,$r25,$r24
 1c00d2cc:	2800058d 	ld.b	$r13,$r12,1(0x1)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:15
+/code/fpga/nscscc-team/software/perf/lib/printf.c:15
 		w=1;
 1c00d2d0:	02800405 	addi.w	$r5,$r0,1(0x1)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:17
+/code/fpga/nscscc-team/software/perf/lib/printf.c:17
 		switch(fmt[i+1])
 1c00d2d4:	02814c10 	addi.w	$r16,$r0,83(0x53)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:68
+/code/fpga/nscscc-team/software/perf/lib/printf.c:68
 				 w=w*10+(fmt[i+1]-'0');
 1c00d2d8:	0280280f 	addi.w	$r15,$r0,10(0xa)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:17
+/code/fpga/nscscc-team/software/perf/lib/printf.c:17
 		switch(fmt[i+1])
 1c00d2dc:	02bf6dac 	addi.w	$r12,$r13,-37(0xfdb)
 1c00d2e0:	2980306c 	st.w	$r12,$r3,12(0xc)
@@ -13598,7 +13586,7 @@ for(i=0;fmt[i];i++)
 1c00d2f4:	2880018c 	ld.w	$r12,$r12,0
 1c00d2f8:	4c000180 	jirl	$r0,$r12,0
 1c00d2fc:	03400000 	andi	$r0,$r0,0x0
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:84
+/code/fpga/nscscc-team/software/perf/lib/printf.c:84
 	}
 }
 	return 0;
@@ -13613,205 +13601,205 @@ for(i=0;fmt[i];i++)
 1c00d31c:	00150004 	move	$r4,$r0
 1c00d320:	02818063 	addi.w	$r3,$r3,96(0x60)
 1c00d324:	4c000020 	jirl	$r0,$r1,0
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:65
+/code/fpga/nscscc-team/software/perf/lib/printf.c:65
 				i++;
 1c00d328:	0010632c 	add.w	$r12,$r25,$r24
 1c00d32c:	2800098d 	ld.b	$r13,$r12,2(0x2)
 1c00d330:	02800718 	addi.w	$r24,$r24,1(0x1)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:67 (discriminator 1)
+/code/fpga/nscscc-team/software/perf/lib/printf.c:67 (discriminator 1)
 				for(w=0;fmt[i+1]>'0' && fmt[i+1]<='9';i++)
 1c00d334:	02bf3dac 	addi.w	$r12,$r13,-49(0xfcf)
 1c00d338:	2980306c 	st.w	$r12,$r3,12(0xc)
 1c00d33c:	2a00306c 	ld.bu	$r12,$r3,12(0xc)
 1c00d340:	00150005 	move	$r5,$r0
 1c00d344:	6bff9b6c 	bltu	$r27,$r12,-104(0x3ff98) # 1c00d2dc <printf+0xac>
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:68 (discriminator 3)
+/code/fpga/nscscc-team/software/perf/lib/printf.c:68 (discriminator 3)
 				 w=w*10+(fmt[i+1]-'0');
 1c00d348:	001c3ca5 	mul.w	$r5,$r5,$r15
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:67 (discriminator 3)
+/code/fpga/nscscc-team/software/perf/lib/printf.c:67 (discriminator 3)
 				for(w=0;fmt[i+1]>'0' && fmt[i+1]<='9';i++)
 1c00d34c:	02800718 	addi.w	$r24,$r24,1(0x1)
 1c00d350:	0010632c 	add.w	$r12,$r25,$r24
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:68 (discriminator 3)
+/code/fpga/nscscc-team/software/perf/lib/printf.c:68 (discriminator 3)
 				 w=w*10+(fmt[i+1]-'0');
 1c00d354:	02bf41ae 	addi.w	$r14,$r13,-48(0xfd0)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:67 (discriminator 3)
+/code/fpga/nscscc-team/software/perf/lib/printf.c:67 (discriminator 3)
 				for(w=0;fmt[i+1]>'0' && fmt[i+1]<='9';i++)
 1c00d358:	2800058d 	ld.b	$r13,$r12,1(0x1)
 1c00d35c:	02bf3dac 	addi.w	$r12,$r13,-49(0xfcf)
 1c00d360:	2980306c 	st.w	$r12,$r3,12(0xc)
 1c00d364:	2a00306c 	ld.bu	$r12,$r3,12(0xc)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:68 (discriminator 3)
+/code/fpga/nscscc-team/software/perf/lib/printf.c:68 (discriminator 3)
 				 w=w*10+(fmt[i+1]-'0');
 1c00d368:	001015c5 	add.w	$r5,$r14,$r5
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:67 (discriminator 3)
+/code/fpga/nscscc-team/software/perf/lib/printf.c:67 (discriminator 3)
 				for(w=0;fmt[i+1]>'0' && fmt[i+1]<='9';i++)
 1c00d36c:	6fffdf6c 	bgeu	$r27,$r12,-36(0x3ffdc) # 1c00d348 <printf+0x118>
 1c00d370:	53ff6fff 	b	-148(0xfffff6c) # 1c00d2dc <printf+0xac>
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:50
+/code/fpga/nscscc-team/software/perf/lib/printf.c:50
 				printbase((long)*arg,w,2,0);
 1c00d374:	28800344 	ld.w	$r4,$r26,0
 1c00d378:	00150007 	move	$r7,$r0
 1c00d37c:	02800806 	addi.w	$r6,$r0,2(0x2)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:51
+/code/fpga/nscscc-team/software/perf/lib/printf.c:51
 				arg++;
 1c00d380:	0280135a 	addi.w	$r26,$r26,4(0x4)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:52
+/code/fpga/nscscc-team/software/perf/lib/printf.c:52
 				i++;
 1c00d384:	02800718 	addi.w	$r24,$r24,1(0x1)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:50
+/code/fpga/nscscc-team/software/perf/lib/printf.c:50
 				printbase((long)*arg,w,2,0);
-1c00d388:	5401f800 	bl	504(0x1f8) # 1c00d580 <printbase>
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:53
+1c00d388:	54021800 	bl	536(0x218) # 1c00d5a0 <printbase>
+/code/fpga/nscscc-team/software/perf/lib/printf.c:53
 				break;
 1c00d38c:	53ff13ff 	b	-240(0xfffff10) # 1c00d29c <printf+0x6c>
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:25
+/code/fpga/nscscc-team/software/perf/lib/printf.c:25
 				putchar((long)*arg);
 1c00d390:	28800344 	ld.w	$r4,$r26,0
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:27
+/code/fpga/nscscc-team/software/perf/lib/printf.c:27
 				i++;
 1c00d394:	02800718 	addi.w	$r24,$r24,1(0x1)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:26
+/code/fpga/nscscc-team/software/perf/lib/printf.c:26
 				arg++;
 1c00d398:	0280135a 	addi.w	$r26,$r26,4(0x4)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:25
+/code/fpga/nscscc-team/software/perf/lib/printf.c:25
 				putchar((long)*arg);
 1c00d39c:	5400d400 	bl	212(0xd4) # 1c00d470 <putchar>
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:28
+/code/fpga/nscscc-team/software/perf/lib/printf.c:28
 				break;
 1c00d3a0:	53feffff 	b	-260(0xffffefc) # 1c00d29c <printf+0x6c>
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:35
+/code/fpga/nscscc-team/software/perf/lib/printf.c:35
 				printbase((long)*arg,w,10,1);
 1c00d3a4:	28800344 	ld.w	$r4,$r26,0
 1c00d3a8:	02800407 	addi.w	$r7,$r0,1(0x1)
 1c00d3ac:	02802806 	addi.w	$r6,$r0,10(0xa)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:36
+/code/fpga/nscscc-team/software/perf/lib/printf.c:36
 				arg++;
 1c00d3b0:	0280135a 	addi.w	$r26,$r26,4(0x4)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:37
+/code/fpga/nscscc-team/software/perf/lib/printf.c:37
 				i++;
 1c00d3b4:	02800718 	addi.w	$r24,$r24,1(0x1)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:35
+/code/fpga/nscscc-team/software/perf/lib/printf.c:35
 				printbase((long)*arg,w,10,1);
-1c00d3b8:	5401c800 	bl	456(0x1c8) # 1c00d580 <printbase>
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:38
+1c00d3b8:	5401e800 	bl	488(0x1e8) # 1c00d5a0 <printbase>
+/code/fpga/nscscc-team/software/perf/lib/printf.c:38
 				break;
 1c00d3bc:	53fee3ff 	b	-288(0xffffee0) # 1c00d29c <printf+0x6c>
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:40
+/code/fpga/nscscc-team/software/perf/lib/printf.c:40
                 printbase((long)*arg,w,10,0);
 1c00d3c0:	28800344 	ld.w	$r4,$r26,0
 1c00d3c4:	00150007 	move	$r7,$r0
 1c00d3c8:	02802806 	addi.w	$r6,$r0,10(0xa)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:41
+/code/fpga/nscscc-team/software/perf/lib/printf.c:41
                 arg++;
 1c00d3cc:	0280135a 	addi.w	$r26,$r26,4(0x4)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:42
+/code/fpga/nscscc-team/software/perf/lib/printf.c:42
                 i=i+2;
 1c00d3d0:	02800b18 	addi.w	$r24,$r24,2(0x2)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:40
+/code/fpga/nscscc-team/software/perf/lib/printf.c:40
                 printbase((long)*arg,w,10,0);
-1c00d3d4:	5401ac00 	bl	428(0x1ac) # 1c00d580 <printbase>
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:43
+1c00d3d4:	5401cc00 	bl	460(0x1cc) # 1c00d5a0 <printbase>
+/code/fpga/nscscc-team/software/perf/lib/printf.c:43
                 break;
 1c00d3d8:	53fec7ff 	b	-316(0xffffec4) # 1c00d29c <printf+0x6c>
 1c00d3dc:	03400000 	andi	$r0,$r0,0x0
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:45
+/code/fpga/nscscc-team/software/perf/lib/printf.c:45
 				printbase((long)*arg,w,8,0);
 1c00d3e0:	28800344 	ld.w	$r4,$r26,0
 1c00d3e4:	00150007 	move	$r7,$r0
 1c00d3e8:	02802006 	addi.w	$r6,$r0,8(0x8)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:46
+/code/fpga/nscscc-team/software/perf/lib/printf.c:46
 				arg++;
 1c00d3ec:	0280135a 	addi.w	$r26,$r26,4(0x4)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:47
+/code/fpga/nscscc-team/software/perf/lib/printf.c:47
 				i++;
 1c00d3f0:	02800718 	addi.w	$r24,$r24,1(0x1)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:45
+/code/fpga/nscscc-team/software/perf/lib/printf.c:45
 				printbase((long)*arg,w,8,0);
-1c00d3f4:	54018c00 	bl	396(0x18c) # 1c00d580 <printbase>
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:48
+1c00d3f4:	5401ac00 	bl	428(0x1ac) # 1c00d5a0 <printbase>
+/code/fpga/nscscc-team/software/perf/lib/printf.c:48
 				break;
 1c00d3f8:	53fea7ff 	b	-348(0xffffea4) # 1c00d29c <printf+0x6c>
 1c00d3fc:	03400000 	andi	$r0,$r0,0x0
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:56
+/code/fpga/nscscc-team/software/perf/lib/printf.c:56
 				printbase((long)*arg,w,16,0);
 1c00d400:	28800344 	ld.w	$r4,$r26,0
 1c00d404:	00150007 	move	$r7,$r0
 1c00d408:	02804006 	addi.w	$r6,$r0,16(0x10)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:57
+/code/fpga/nscscc-team/software/perf/lib/printf.c:57
 				arg++;
 1c00d40c:	0280135a 	addi.w	$r26,$r26,4(0x4)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:58
+/code/fpga/nscscc-team/software/perf/lib/printf.c:58
 				i++;
 1c00d410:	02800718 	addi.w	$r24,$r24,1(0x1)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:56
+/code/fpga/nscscc-team/software/perf/lib/printf.c:56
 				printbase((long)*arg,w,16,0);
-1c00d414:	54016c00 	bl	364(0x16c) # 1c00d580 <printbase>
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:59
+1c00d414:	54018c00 	bl	396(0x18c) # 1c00d5a0 <printbase>
+/code/fpga/nscscc-team/software/perf/lib/printf.c:59
 				break;
 1c00d418:	53fe87ff 	b	-380(0xffffe84) # 1c00d29c <printf+0x6c>
 1c00d41c:	03400000 	andi	$r0,$r0,0x0
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:20
+/code/fpga/nscscc-team/software/perf/lib/printf.c:20
 				putstring(*arg);
 1c00d420:	28800344 	ld.w	$r4,$r26,0
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:22
+/code/fpga/nscscc-team/software/perf/lib/printf.c:22
 				i++;
 1c00d424:	02800718 	addi.w	$r24,$r24,1(0x1)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:21
+/code/fpga/nscscc-team/software/perf/lib/printf.c:21
 				arg++;
 1c00d428:	0280135a 	addi.w	$r26,$r26,4(0x4)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:20
+/code/fpga/nscscc-team/software/perf/lib/printf.c:20
 				putstring(*arg);
-1c00d42c:	5400a400 	bl	164(0xa4) # 1c00d4d0 <putstring>
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:23
+1c00d42c:	5400c400 	bl	196(0xc4) # 1c00d4f0 <putstring>
+/code/fpga/nscscc-team/software/perf/lib/printf.c:23
 				break;
 1c00d430:	53fe6fff 	b	-404(0xffffe6c) # 1c00d29c <printf+0x6c>
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:30
+/code/fpga/nscscc-team/software/perf/lib/printf.c:30
 				printbase((long)*arg,w,10,0);
 1c00d434:	28800344 	ld.w	$r4,$r26,0
 1c00d438:	00150007 	move	$r7,$r0
 1c00d43c:	02802806 	addi.w	$r6,$r0,10(0xa)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:31
+/code/fpga/nscscc-team/software/perf/lib/printf.c:31
 				arg++;
 1c00d440:	0280135a 	addi.w	$r26,$r26,4(0x4)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:32
+/code/fpga/nscscc-team/software/perf/lib/printf.c:32
 				i++;
 1c00d444:	02800718 	addi.w	$r24,$r24,1(0x1)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:30
+/code/fpga/nscscc-team/software/perf/lib/printf.c:30
 				printbase((long)*arg,w,10,0);
-1c00d448:	54013800 	bl	312(0x138) # 1c00d580 <printbase>
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:33
+1c00d448:	54015800 	bl	344(0x158) # 1c00d5a0 <printbase>
+/code/fpga/nscscc-team/software/perf/lib/printf.c:33
 				break;
 1c00d44c:	53fe53ff 	b	-432(0xffffe50) # 1c00d29c <printf+0x6c>
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:61
+/code/fpga/nscscc-team/software/perf/lib/printf.c:61
 				putchar('%');
 1c00d450:	02809404 	addi.w	$r4,$r0,37(0x25)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:62
+/code/fpga/nscscc-team/software/perf/lib/printf.c:62
 				i++;
 1c00d454:	02800718 	addi.w	$r24,$r24,1(0x1)
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:61
+/code/fpga/nscscc-team/software/perf/lib/printf.c:61
 				putchar('%');
 1c00d458:	54001800 	bl	24(0x18) # 1c00d470 <putchar>
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:63
+/code/fpga/nscscc-team/software/perf/lib/printf.c:63
 				break;
 1c00d45c:	53fe43ff 	b	-448(0xffffe40) # 1c00d29c <printf+0x6c>
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:73
+/code/fpga/nscscc-team/software/perf/lib/printf.c:73
 				putchar('%');
 1c00d460:	02809404 	addi.w	$r4,$r0,37(0x25)
 1c00d464:	54000c00 	bl	12(0xc) # 1c00d470 <putchar>
-/home/132/git_rep/perf/soft/perf_func/lib/printf.c:74
+/code/fpga/nscscc-team/software/perf/lib/printf.c:74
 				break;
 1c00d468:	53fe37ff 	b	-460(0xffffe34) # 1c00d29c <printf+0x6c>
 1c00d46c:	03400000 	andi	$r0,$r0,0x0
 
 1c00d470 <putchar>:
 putchar():
-/home/132/git_rep/perf/soft/perf_func/lib/putchar.c:2
+/code/fpga/nscscc-team/software/perf/lib/putchar.c:2
 int putchar(int c)
 {
 1c00d470:	02bfc063 	addi.w	$r3,$r3,-16(0xff0)
 1c00d474:	29803079 	st.w	$r25,$r3,12(0xc)
-/home/132/git_rep/perf/soft/perf_func/lib/putchar.c:9
+/code/fpga/nscscc-team/software/perf/lib/putchar.c:9
 return 0;
 }
 
@@ -13822,7 +13810,7 @@ void tgt_putchar(c)
 1c00d47c:	03bc4339 	ori	$r25,$r25,0xf10
 1c00d480:	29000324 	st.b	$r4,$r25,0
 1c00d484:	03400000 	andi	$r0,$r0,0x0
-/home/132/git_rep/perf/soft/perf_func/lib/putchar.c:5
+/code/fpga/nscscc-team/software/perf/lib/putchar.c:5
 }
 1c00d488:	00150004 	move	$r4,$r0
 1c00d48c:	28803079 	ld.w	$r25,$r3,12(0xc)
@@ -13833,17 +13821,17 @@ void tgt_putchar(c)
 
 1c00d4a0 <tgt_putchar>:
 tgt_putchar():
-/home/132/git_rep/perf/soft/perf_func/lib/putchar.c:8
+/code/fpga/nscscc-team/software/perf/lib/putchar.c:8
 {   //UART_ADDR
 1c00d4a0:	02bfc063 	addi.w	$r3,$r3,-16(0xff0)
 1c00d4a4:	29803079 	st.w	$r25,$r3,12(0xc)
-/home/132/git_rep/perf/soft/perf_func/lib/putchar.c:9
+/code/fpga/nscscc-team/software/perf/lib/putchar.c:9
     asm(
 1c00d4a8:	157f5ff9 	lu12i.w	$r25,-263425(0xbfaff)
 1c00d4ac:	03bc4339 	ori	$r25,$r25,0xf10
 1c00d4b0:	29000324 	st.b	$r4,$r25,0
 1c00d4b4:	03400000 	andi	$r0,$r0,0x0
-/home/132/git_rep/perf/soft/perf_func/lib/putchar.c:16
+/code/fpga/nscscc-team/software/perf/lib/putchar.c:16
         "st.b %0,$r25,0\n\t"        
         "nop\n\t"
         :
@@ -13857,460 +13845,481 @@ tgt_putchar():
 1c00d4c8:	03400000 	andi	$r0,$r0,0x0
 1c00d4cc:	03400000 	andi	$r0,$r0,0x0
 
-1c00d4d0 <putstring>:
+1c00d4d0 <uart_putchar>:
+uart_putchar():
+/code/fpga/nscscc-team/software/perf/lib/putchar.c:20
+
+void uart_putchar (int c)
+{
+    while ((*((volatile uint32_t *)0xbeaf0004)) & 0x1);
+1c00d4d0:	157d5e0e 	lu12i.w	$r14,-267536(0xbeaf0)
+1c00d4d4:	038011cd 	ori	$r13,$r14,0x4
+/code/fpga/nscscc-team/software/perf/lib/putchar.c:20 (discriminator 1)
+1c00d4d8:	288001ac 	ld.w	$r12,$r13,0
+1c00d4dc:	0340058c 	andi	$r12,$r12,0x1
+1c00d4e0:	5ffff980 	bne	$r12,$r0,-8(0x3fff8) # 1c00d4d8 <uart_putchar+0x8>
+/code/fpga/nscscc-team/software/perf/lib/putchar.c:21
+    (*((volatile uint32_t *)0xbeaf000c)) = c;
+1c00d4e4:	038031ce 	ori	$r14,$r14,0xc
+1c00d4e8:	298001c4 	st.w	$r4,$r14,0
+/code/fpga/nscscc-team/software/perf/lib/putchar.c:22
+}
+1c00d4ec:	4c000020 	jirl	$r0,$r1,0
+
+1c00d4f0 <putstring>:
 putstring():
-/home/132/git_rep/perf/soft/perf_func/lib/puts.c:2
+/code/fpga/nscscc-team/software/perf/lib/puts.c:2
 int putstring(char *s)
 {
-1c00d4d0:	02bfc063 	addi.w	$r3,$r3,-16(0xff0)
-1c00d4d4:	29803061 	st.w	$r1,$r3,12(0xc)
-1c00d4d8:	29802077 	st.w	$r23,$r3,8(0x8)
-1c00d4dc:	29801078 	st.w	$r24,$r3,4(0x4)
-1c00d4e0:	29800079 	st.w	$r25,$r3,0
-/home/132/git_rep/perf/soft/perf_func/lib/puts.c:4
+1c00d4f0:	02bfc063 	addi.w	$r3,$r3,-16(0xff0)
+1c00d4f4:	29803061 	st.w	$r1,$r3,12(0xc)
+1c00d4f8:	29802077 	st.w	$r23,$r3,8(0x8)
+1c00d4fc:	29801078 	st.w	$r24,$r3,4(0x4)
+1c00d500:	29800079 	st.w	$r25,$r3,0
+/code/fpga/nscscc-team/software/perf/lib/puts.c:4
 char c;
 while((c=*s))
-1c00d4e4:	28000097 	ld.b	$r23,$r4,0
-1c00d4e8:	580042e0 	beq	$r23,$r0,64(0x40) # 1c00d528 <putstring+0x58>
-1c00d4ec:	00150098 	move	$r24,$r4
-/home/132/git_rep/perf/soft/perf_func/lib/puts.c:6
+1c00d504:	28000097 	ld.b	$r23,$r4,0
+1c00d508:	580042e0 	beq	$r23,$r0,64(0x40) # 1c00d548 <putstring+0x58>
+1c00d50c:	00150098 	move	$r24,$r4
+/code/fpga/nscscc-team/software/perf/lib/puts.c:6
 {
  if(c == '\n') putchar('\r');
-1c00d4f0:	02802819 	addi.w	$r25,$r0,10(0xa)
-1c00d4f4:	50001400 	b	20(0x14) # 1c00d508 <putstring+0x38>
-/home/132/git_rep/perf/soft/perf_func/lib/puts.c:7
- putchar(c);
-1c00d4f8:	001502e4 	move	$r4,$r23
-1c00d4fc:	57ff77ff 	bl	-140(0xfffff74) # 1c00d470 <putchar>
-/home/132/git_rep/perf/soft/perf_func/lib/puts.c:4
-while((c=*s))
-1c00d500:	28000317 	ld.b	$r23,$r24,0
-1c00d504:	580026e0 	beq	$r23,$r0,36(0x24) # 1c00d528 <putstring+0x58>
-/home/132/git_rep/perf/soft/perf_func/lib/puts.c:8
- s++;
-1c00d508:	02800718 	addi.w	$r24,$r24,1(0x1)
-/home/132/git_rep/perf/soft/perf_func/lib/puts.c:6
- if(c == '\n') putchar('\r');
-1c00d50c:	5fffeef9 	bne	$r23,$r25,-20(0x3ffec) # 1c00d4f8 <putstring+0x28>
-/home/132/git_rep/perf/soft/perf_func/lib/puts.c:6 (discriminator 1)
-1c00d510:	02803404 	addi.w	$r4,$r0,13(0xd)
-1c00d514:	57ff5fff 	bl	-164(0xfffff5c) # 1c00d470 <putchar>
-/home/132/git_rep/perf/soft/perf_func/lib/puts.c:7 (discriminator 1)
+1c00d510:	02802819 	addi.w	$r25,$r0,10(0xa)
+1c00d514:	50001400 	b	20(0x14) # 1c00d528 <putstring+0x38>
+/code/fpga/nscscc-team/software/perf/lib/puts.c:7
  putchar(c);
 1c00d518:	001502e4 	move	$r4,$r23
 1c00d51c:	57ff57ff 	bl	-172(0xfffff54) # 1c00d470 <putchar>
-/home/132/git_rep/perf/soft/perf_func/lib/puts.c:4 (discriminator 1)
+/code/fpga/nscscc-team/software/perf/lib/puts.c:4
 while((c=*s))
 1c00d520:	28000317 	ld.b	$r23,$r24,0
-1c00d524:	5fffe6e0 	bne	$r23,$r0,-28(0x3ffe4) # 1c00d508 <putstring+0x38>
-/home/132/git_rep/perf/soft/perf_func/lib/puts.c:11
+1c00d524:	580026e0 	beq	$r23,$r0,36(0x24) # 1c00d548 <putstring+0x58>
+/code/fpga/nscscc-team/software/perf/lib/puts.c:8
+ s++;
+1c00d528:	02800718 	addi.w	$r24,$r24,1(0x1)
+/code/fpga/nscscc-team/software/perf/lib/puts.c:6
+ if(c == '\n') putchar('\r');
+1c00d52c:	5fffeef9 	bne	$r23,$r25,-20(0x3ffec) # 1c00d518 <putstring+0x28>
+/code/fpga/nscscc-team/software/perf/lib/puts.c:6 (discriminator 1)
+1c00d530:	02803404 	addi.w	$r4,$r0,13(0xd)
+1c00d534:	57ff3fff 	bl	-196(0xfffff3c) # 1c00d470 <putchar>
+/code/fpga/nscscc-team/software/perf/lib/puts.c:7 (discriminator 1)
+ putchar(c);
+1c00d538:	001502e4 	move	$r4,$r23
+1c00d53c:	57ff37ff 	bl	-204(0xfffff34) # 1c00d470 <putchar>
+/code/fpga/nscscc-team/software/perf/lib/puts.c:4 (discriminator 1)
+while((c=*s))
+1c00d540:	28000317 	ld.b	$r23,$r24,0
+1c00d544:	5fffe6e0 	bne	$r23,$r0,-28(0x3ffe4) # 1c00d528 <putstring+0x38>
+/code/fpga/nscscc-team/software/perf/lib/puts.c:11
 }
 return 0;
 }
-1c00d528:	28803061 	ld.w	$r1,$r3,12(0xc)
-1c00d52c:	28802077 	ld.w	$r23,$r3,8(0x8)
-1c00d530:	28801078 	ld.w	$r24,$r3,4(0x4)
-1c00d534:	28800079 	ld.w	$r25,$r3,0
-1c00d538:	00150004 	move	$r4,$r0
-1c00d53c:	02804063 	addi.w	$r3,$r3,16(0x10)
-1c00d540:	4c000020 	jirl	$r0,$r1,0
-1c00d544:	03400000 	andi	$r0,$r0,0x0
-1c00d548:	03400000 	andi	$r0,$r0,0x0
-1c00d54c:	03400000 	andi	$r0,$r0,0x0
+1c00d548:	28803061 	ld.w	$r1,$r3,12(0xc)
+1c00d54c:	28802077 	ld.w	$r23,$r3,8(0x8)
+1c00d550:	28801078 	ld.w	$r24,$r3,4(0x4)
+1c00d554:	28800079 	ld.w	$r25,$r3,0
+1c00d558:	00150004 	move	$r4,$r0
+1c00d55c:	02804063 	addi.w	$r3,$r3,16(0x10)
+1c00d560:	4c000020 	jirl	$r0,$r1,0
+1c00d564:	03400000 	andi	$r0,$r0,0x0
+1c00d568:	03400000 	andi	$r0,$r0,0x0
+1c00d56c:	03400000 	andi	$r0,$r0,0x0
 
-1c00d550 <puts>:
+1c00d570 <puts>:
 puts():
-/home/132/git_rep/perf/soft/perf_func/lib/puts.c:15
+/code/fpga/nscscc-team/software/perf/lib/puts.c:15
 
 
 int puts(char *s)
 {
-1c00d550:	02bfc063 	addi.w	$r3,$r3,-16(0xff0)
-1c00d554:	29803061 	st.w	$r1,$r3,12(0xc)
-/home/132/git_rep/perf/soft/perf_func/lib/puts.c:16
+1c00d570:	02bfc063 	addi.w	$r3,$r3,-16(0xff0)
+1c00d574:	29803061 	st.w	$r1,$r3,12(0xc)
+/code/fpga/nscscc-team/software/perf/lib/puts.c:16
 putstring(s);
-1c00d558:	57ff7bff 	bl	-136(0xfffff78) # 1c00d4d0 <putstring>
-/home/132/git_rep/perf/soft/perf_func/lib/puts.c:17
+1c00d578:	57ff7bff 	bl	-136(0xfffff78) # 1c00d4f0 <putstring>
+/code/fpga/nscscc-team/software/perf/lib/puts.c:17
 putchar('\r');
-1c00d55c:	02803404 	addi.w	$r4,$r0,13(0xd)
-1c00d560:	57ff13ff 	bl	-240(0xfffff10) # 1c00d470 <putchar>
-/home/132/git_rep/perf/soft/perf_func/lib/puts.c:18
+1c00d57c:	02803404 	addi.w	$r4,$r0,13(0xd)
+1c00d580:	57fef3ff 	bl	-272(0xffffef0) # 1c00d470 <putchar>
+/code/fpga/nscscc-team/software/perf/lib/puts.c:18
 putchar('\n');
-1c00d564:	02802804 	addi.w	$r4,$r0,10(0xa)
-1c00d568:	57ff0bff 	bl	-248(0xfffff08) # 1c00d470 <putchar>
-/home/132/git_rep/perf/soft/perf_func/lib/puts.c:20
+1c00d584:	02802804 	addi.w	$r4,$r0,10(0xa)
+1c00d588:	57feebff 	bl	-280(0xffffee8) # 1c00d470 <putchar>
+/code/fpga/nscscc-team/software/perf/lib/puts.c:20
 return 0;
 }
-1c00d56c:	28803061 	ld.w	$r1,$r3,12(0xc)
-1c00d570:	00150004 	move	$r4,$r0
-1c00d574:	02804063 	addi.w	$r3,$r3,16(0x10)
-1c00d578:	4c000020 	jirl	$r0,$r1,0
-1c00d57c:	03400000 	andi	$r0,$r0,0x0
+1c00d58c:	28803061 	ld.w	$r1,$r3,12(0xc)
+1c00d590:	00150004 	move	$r4,$r0
+1c00d594:	02804063 	addi.w	$r3,$r3,16(0x10)
+1c00d598:	4c000020 	jirl	$r0,$r1,0
+1c00d59c:	03400000 	andi	$r0,$r0,0x0
 
-1c00d580 <printbase>:
+1c00d5a0 <printbase>:
 printbase():
-/home/132/git_rep/perf/soft/perf_func/lib/printbase.c:2
+/code/fpga/nscscc-team/software/perf/lib/printbase.c:2
 int printbase(long v,int w,int base,int sign)
 {
-1c00d580:	02be8063 	addi.w	$r3,$r3,-96(0xfa0)
-1c00d584:	29816077 	st.w	$r23,$r3,88(0x58)
-1c00d588:	29817061 	st.w	$r1,$r3,92(0x5c)
-1c00d58c:	29815078 	st.w	$r24,$r3,84(0x54)
-1c00d590:	29814079 	st.w	$r25,$r3,80(0x50)
-1c00d594:	00150097 	move	$r23,$r4
-/home/132/git_rep/perf/soft/perf_func/lib/printbase.c:7
+1c00d5a0:	02be8063 	addi.w	$r3,$r3,-96(0xfa0)
+1c00d5a4:	29816077 	st.w	$r23,$r3,88(0x58)
+1c00d5a8:	29817061 	st.w	$r1,$r3,92(0x5c)
+1c00d5ac:	29815078 	st.w	$r24,$r3,84(0x54)
+1c00d5b0:	29814079 	st.w	$r25,$r3,80(0x50)
+1c00d5b4:	00150097 	move	$r23,$r4
+/code/fpga/nscscc-team/software/perf/lib/printbase.c:7
 	int i,j;
 	int c;
 	char buf[64];
 	unsigned long value;
 	if(sign && v<0)
-1c00d598:	580008e0 	beq	$r7,$r0,8(0x8) # 1c00d5a0 <printbase+0x20>
-/home/132/git_rep/perf/soft/perf_func/lib/printbase.c:7 (discriminator 1)
-1c00d59c:	6000a480 	blt	$r4,$r0,164(0xa4) # 1c00d640 <printbase+0xc0>
-/home/132/git_rep/perf/soft/perf_func/lib/printbase.c:14
+1c00d5b8:	580008e0 	beq	$r7,$r0,8(0x8) # 1c00d5c0 <printbase+0x20>
+/code/fpga/nscscc-team/software/perf/lib/printbase.c:7 (discriminator 1)
+1c00d5bc:	6000a480 	blt	$r4,$r0,164(0xa4) # 1c00d660 <printbase+0xc0>
+/code/fpga/nscscc-team/software/perf/lib/printbase.c:14
 	value = -v;
 	putchar('-');
 	}
 	else value=v;
 
 	for(i=0;value;i++)
-1c00d5a0:	5800c2e0 	beq	$r23,$r0,192(0xc0) # 1c00d660 <printbase+0xe0>
-1c00d5a4:	0280406c 	addi.w	$r12,$r3,16(0x10)
-1c00d5a8:	0280040e 	addi.w	$r14,$r0,1(0x1)
-1c00d5ac:	001131ce 	sub.w	$r14,$r14,$r12
-1c00d5b0:	50000800 	b	8(0x8) # 1c00d5b8 <printbase+0x38>
-/home/132/git_rep/perf/soft/perf_func/lib/printbase.c:17
+1c00d5c0:	5800c2e0 	beq	$r23,$r0,192(0xc0) # 1c00d680 <printbase+0xe0>
+1c00d5c4:	0280406c 	addi.w	$r12,$r3,16(0x10)
+1c00d5c8:	0280040e 	addi.w	$r14,$r0,1(0x1)
+1c00d5cc:	001131ce 	sub.w	$r14,$r14,$r12
+1c00d5d0:	50000800 	b	8(0x8) # 1c00d5d8 <printbase+0x38>
+/code/fpga/nscscc-team/software/perf/lib/printbase.c:17
 	{
 	buf[i]=value%base;
 	value=value/base;
-1c00d5b4:	001501b7 	move	$r23,$r13
-/home/132/git_rep/perf/soft/perf_func/lib/printbase.c:16 (discriminator 3)
+1c00d5d4:	001501b7 	move	$r23,$r13
+/code/fpga/nscscc-team/software/perf/lib/printbase.c:16 (discriminator 3)
 	buf[i]=value%base;
-1c00d5b8:	00219aed 	mod.wu	$r13,$r23,$r6
-1c00d5bc:	5c0008c0 	bne	$r6,$r0,8(0x8) # 1c00d5c4 <printbase+0x44>
-1c00d5c0:	002a0007 	break	0x7
-1c00d5c4:	2900018d 	st.b	$r13,$r12,0
-/home/132/git_rep/perf/soft/perf_func/lib/printbase.c:17 (discriminator 3)
+1c00d5d8:	00219aed 	mod.wu	$r13,$r23,$r6
+1c00d5dc:	5c0008c0 	bne	$r6,$r0,8(0x8) # 1c00d5e4 <printbase+0x44>
+1c00d5e0:	002a0007 	break	0x7
+1c00d5e4:	2900018d 	st.b	$r13,$r12,0
+/code/fpga/nscscc-team/software/perf/lib/printbase.c:17 (discriminator 3)
 	value=value/base;
-1c00d5c8:	001031d8 	add.w	$r24,$r14,$r12
-1c00d5cc:	00211aed 	div.wu	$r13,$r23,$r6
-1c00d5d0:	5c0008c0 	bne	$r6,$r0,8(0x8) # 1c00d5d8 <printbase+0x58>
-1c00d5d4:	002a0007 	break	0x7
-1c00d5d8:	0280058c 	addi.w	$r12,$r12,1(0x1)
-/home/132/git_rep/perf/soft/perf_func/lib/printbase.c:14 (discriminator 3)
+1c00d5e8:	001031d8 	add.w	$r24,$r14,$r12
+1c00d5ec:	00211aed 	div.wu	$r13,$r23,$r6
+1c00d5f0:	5c0008c0 	bne	$r6,$r0,8(0x8) # 1c00d5f8 <printbase+0x58>
+1c00d5f4:	002a0007 	break	0x7
+1c00d5f8:	0280058c 	addi.w	$r12,$r12,1(0x1)
+/code/fpga/nscscc-team/software/perf/lib/printbase.c:14 (discriminator 3)
 	for(i=0;value;i++)
-1c00d5dc:	6fffdae6 	bgeu	$r23,$r6,-40(0x3ffd8) # 1c00d5b4 <printbase+0x34>
-/home/132/git_rep/perf/soft/perf_func/lib/printbase.c:22
+1c00d5fc:	6fffdae6 	bgeu	$r23,$r6,-40(0x3ffd8) # 1c00d5d4 <printbase+0x34>
+/code/fpga/nscscc-team/software/perf/lib/printbase.c:22
 	}
 
 #define max(a,b) (((a)>(b))?(a):(b))
 
 	for(j=max(w,i);j>0;j--)
-1c00d5e0:	600058b8 	blt	$r5,$r24,88(0x58) # 1c00d638 <printbase+0xb8>
-1c00d5e4:	001500b7 	move	$r23,$r5
-/home/132/git_rep/perf/soft/perf_func/lib/printbase.c:25
+1c00d600:	600058b8 	blt	$r5,$r24,88(0x58) # 1c00d658 <printbase+0xb8>
+1c00d604:	001500b7 	move	$r23,$r5
+/code/fpga/nscscc-team/software/perf/lib/printbase.c:25
 	{
 		c=j>i?0:buf[j-1];
 		putchar((c<=9)?c+'0':c-0xa+'a');
-1c00d5e8:	02802419 	addi.w	$r25,$r0,9(0x9)
-1c00d5ec:	03400000 	andi	$r0,$r0,0x0
-/home/132/git_rep/perf/soft/perf_func/lib/printbase.c:24
+1c00d608:	02802419 	addi.w	$r25,$r0,9(0x9)
+1c00d60c:	03400000 	andi	$r0,$r0,0x0
+/code/fpga/nscscc-team/software/perf/lib/printbase.c:24
 		c=j>i?0:buf[j-1];
-1c00d5f0:	0280406c 	addi.w	$r12,$r3,16(0x10)
-1c00d5f4:	00105d8c 	add.w	$r12,$r12,$r23
-1c00d5f8:	0280c004 	addi.w	$r4,$r0,48(0x30)
-1c00d5fc:	60001717 	blt	$r24,$r23,20(0x14) # 1c00d610 <printbase+0x90>
-/home/132/git_rep/perf/soft/perf_func/lib/printbase.c:24 (discriminator 1)
-1c00d600:	283ffd8c 	ld.b	$r12,$r12,-1(0xfff)
-/home/132/git_rep/perf/soft/perf_func/lib/printbase.c:25 (discriminator 1)
+1c00d610:	0280406c 	addi.w	$r12,$r3,16(0x10)
+1c00d614:	00105d8c 	add.w	$r12,$r12,$r23
+1c00d618:	0280c004 	addi.w	$r4,$r0,48(0x30)
+1c00d61c:	60001717 	blt	$r24,$r23,20(0x14) # 1c00d630 <printbase+0x90>
+/code/fpga/nscscc-team/software/perf/lib/printbase.c:24 (discriminator 1)
+1c00d620:	283ffd8c 	ld.b	$r12,$r12,-1(0xfff)
+/code/fpga/nscscc-team/software/perf/lib/printbase.c:25 (discriminator 1)
 		putchar((c<=9)?c+'0':c-0xa+'a');
-1c00d604:	02815d84 	addi.w	$r4,$r12,87(0x57)
-1c00d608:	60000b2c 	blt	$r25,$r12,8(0x8) # 1c00d610 <printbase+0x90>
-1c00d60c:	0280c184 	addi.w	$r4,$r12,48(0x30)
-1c00d610:	02bffef7 	addi.w	$r23,$r23,-1(0xfff)
-/home/132/git_rep/perf/soft/perf_func/lib/printbase.c:25 (discriminator 4)
-1c00d614:	57fe5fff 	bl	-420(0xffffe5c) # 1c00d470 <putchar>
-/home/132/git_rep/perf/soft/perf_func/lib/printbase.c:22 (discriminator 4)
+1c00d624:	02815d84 	addi.w	$r4,$r12,87(0x57)
+1c00d628:	60000b2c 	blt	$r25,$r12,8(0x8) # 1c00d630 <printbase+0x90>
+1c00d62c:	0280c184 	addi.w	$r4,$r12,48(0x30)
+1c00d630:	02bffef7 	addi.w	$r23,$r23,-1(0xfff)
+/code/fpga/nscscc-team/software/perf/lib/printbase.c:25 (discriminator 4)
+1c00d634:	57fe3fff 	bl	-452(0xffffe3c) # 1c00d470 <putchar>
+/code/fpga/nscscc-team/software/perf/lib/printbase.c:22 (discriminator 4)
 	for(j=max(w,i);j>0;j--)
-1c00d618:	5fffdae0 	bne	$r23,$r0,-40(0x3ffd8) # 1c00d5f0 <printbase+0x70>
-/home/132/git_rep/perf/soft/perf_func/lib/printbase.c:28
+1c00d638:	5fffdae0 	bne	$r23,$r0,-40(0x3ffd8) # 1c00d610 <printbase+0x70>
+/code/fpga/nscscc-team/software/perf/lib/printbase.c:28
 	}
 	return 0;
 }
-1c00d61c:	28817061 	ld.w	$r1,$r3,92(0x5c)
-1c00d620:	28816077 	ld.w	$r23,$r3,88(0x58)
-1c00d624:	28815078 	ld.w	$r24,$r3,84(0x54)
-1c00d628:	28814079 	ld.w	$r25,$r3,80(0x50)
-1c00d62c:	00150004 	move	$r4,$r0
-1c00d630:	02818063 	addi.w	$r3,$r3,96(0x60)
-1c00d634:	4c000020 	jirl	$r0,$r1,0
-/home/132/git_rep/perf/soft/perf_func/lib/printbase.c:22
+1c00d63c:	28817061 	ld.w	$r1,$r3,92(0x5c)
+1c00d640:	28816077 	ld.w	$r23,$r3,88(0x58)
+1c00d644:	28815078 	ld.w	$r24,$r3,84(0x54)
+1c00d648:	28814079 	ld.w	$r25,$r3,80(0x50)
+1c00d64c:	00150004 	move	$r4,$r0
+1c00d650:	02818063 	addi.w	$r3,$r3,96(0x60)
+1c00d654:	4c000020 	jirl	$r0,$r1,0
+/code/fpga/nscscc-team/software/perf/lib/printbase.c:22
 	for(j=max(w,i);j>0;j--)
-1c00d638:	00150305 	move	$r5,$r24
-1c00d63c:	53ffabff 	b	-88(0xfffffa8) # 1c00d5e4 <printbase+0x64>
-/home/132/git_rep/perf/soft/perf_func/lib/printbase.c:10
+1c00d658:	00150305 	move	$r5,$r24
+1c00d65c:	53ffabff 	b	-88(0xfffffa8) # 1c00d604 <printbase+0x64>
+/code/fpga/nscscc-team/software/perf/lib/printbase.c:10
 	putchar('-');
-1c00d640:	0280b404 	addi.w	$r4,$r0,45(0x2d)
-1c00d644:	29803066 	st.w	$r6,$r3,12(0xc)
-1c00d648:	29802065 	st.w	$r5,$r3,8(0x8)
-1c00d64c:	57fe27ff 	bl	-476(0xffffe24) # 1c00d470 <putchar>
-/home/132/git_rep/perf/soft/perf_func/lib/printbase.c:9
+1c00d660:	0280b404 	addi.w	$r4,$r0,45(0x2d)
+1c00d664:	29803066 	st.w	$r6,$r3,12(0xc)
+1c00d668:	29802065 	st.w	$r5,$r3,8(0x8)
+1c00d66c:	57fe07ff 	bl	-508(0xffffe04) # 1c00d470 <putchar>
+/code/fpga/nscscc-team/software/perf/lib/printbase.c:9
 	value = -v;
-1c00d650:	00115c17 	sub.w	$r23,$r0,$r23
-/home/132/git_rep/perf/soft/perf_func/lib/printbase.c:10
+1c00d670:	00115c17 	sub.w	$r23,$r0,$r23
+/code/fpga/nscscc-team/software/perf/lib/printbase.c:10
 	putchar('-');
-1c00d654:	28802065 	ld.w	$r5,$r3,8(0x8)
-1c00d658:	28803066 	ld.w	$r6,$r3,12(0xc)
-1c00d65c:	53ff4bff 	b	-184(0xfffff48) # 1c00d5a4 <printbase+0x24>
-/home/132/git_rep/perf/soft/perf_func/lib/printbase.c:22
+1c00d674:	28802065 	ld.w	$r5,$r3,8(0x8)
+1c00d678:	28803066 	ld.w	$r6,$r3,12(0xc)
+1c00d67c:	53ff4bff 	b	-184(0xfffff48) # 1c00d5c4 <printbase+0x24>
+/code/fpga/nscscc-team/software/perf/lib/printbase.c:22
 	for(j=max(w,i);j>0;j--)
-1c00d660:	67ffbc05 	bge	$r0,$r5,-68(0x3ffbc) # 1c00d61c <printbase+0x9c>
-1c00d664:	00150018 	move	$r24,$r0
-1c00d668:	53ff7fff 	b	-132(0xfffff7c) # 1c00d5e4 <printbase+0x64>
-1c00d66c:	03400000 	andi	$r0,$r0,0x0
+1c00d680:	67ffbc05 	bge	$r0,$r5,-68(0x3ffbc) # 1c00d63c <printbase+0x9c>
+1c00d684:	00150018 	move	$r24,$r0
+1c00d688:	53ff7fff 	b	-132(0xfffff7c) # 1c00d604 <printbase+0x64>
+1c00d68c:	03400000 	andi	$r0,$r0,0x0
 
-1c00d670 <get_count>:
+1c00d690 <get_count>:
 get_count():
-/home/132/git_rep/perf/soft/perf_func/lib/time.c:18
+/code/fpga/nscscc-team/software/perf/lib/time.c:18
         );
     return  _contval;
 }
 
 unsigned long get_count()
 {
-1c00d670:	02bfc063 	addi.w	$r3,$r3,-16(0xff0)
-1c00d674:	29803079 	st.w	$r25,$r3,12(0xc)
-/home/132/git_rep/perf/soft/perf_func/lib/time.c:7
+1c00d690:	02bfc063 	addi.w	$r3,$r3,-16(0xff0)
+1c00d694:	29803079 	st.w	$r25,$r3,12(0xc)
+/code/fpga/nscscc-team/software/perf/lib/time.c:7
     asm volatile(
-1c00d678:	157f5fd9 	lu12i.w	$r25,-263426(0xbfafe)
-1c00d67c:	28800324 	ld.w	$r4,$r25,0
-/home/132/git_rep/perf/soft/perf_func/lib/time.c:20
+1c00d698:	157f5fd9 	lu12i.w	$r25,-263426(0xbfafe)
+1c00d69c:	28800324 	ld.w	$r4,$r25,0
+/code/fpga/nscscc-team/software/perf/lib/time.c:20
     return  _get_count();
 }
-1c00d680:	28803079 	ld.w	$r25,$r3,12(0xc)
-1c00d684:	02804063 	addi.w	$r3,$r3,16(0x10)
-1c00d688:	4c000020 	jirl	$r0,$r1,0
-1c00d68c:	03400000 	andi	$r0,$r0,0x0
+1c00d6a0:	28803079 	ld.w	$r25,$r3,12(0xc)
+1c00d6a4:	02804063 	addi.w	$r3,$r3,16(0x10)
+1c00d6a8:	4c000020 	jirl	$r0,$r1,0
+1c00d6ac:	03400000 	andi	$r0,$r0,0x0
 
-1c00d690 <_get_count>:
+1c00d6b0 <_get_count>:
 _get_count():
-/home/132/git_rep/perf/soft/perf_func/lib/time.c:20
-1c00d690:	53ffe3ff 	b	-32(0xfffffe0) # 1c00d670 <get_count>
-1c00d694:	03400000 	andi	$r0,$r0,0x0
-1c00d698:	03400000 	andi	$r0,$r0,0x0
-1c00d69c:	03400000 	andi	$r0,$r0,0x0
+/code/fpga/nscscc-team/software/perf/lib/time.c:20
+1c00d6b0:	53ffe3ff 	b	-32(0xfffffe0) # 1c00d690 <get_count>
+1c00d6b4:	03400000 	andi	$r0,$r0,0x0
+1c00d6b8:	03400000 	andi	$r0,$r0,0x0
+1c00d6bc:	03400000 	andi	$r0,$r0,0x0
 
-1c00d6a0 <get_count_my>:
+1c00d6c0 <get_count_my>:
 get_count_my():
-/home/132/git_rep/perf/soft/perf_func/lib/time.c:25
+/code/fpga/nscscc-team/software/perf/lib/time.c:25
 
 unsigned long get_count_my()
 {
     unsigned long n;
     asm volatile(
-1c00d6a0:	00006004 	rdtimel.w	$r4,$r0
-/home/132/git_rep/perf/soft/perf_func/lib/time.c:30
+1c00d6c0:	00006004 	rdtimel.w	$r4,$r0
+/code/fpga/nscscc-team/software/perf/lib/time.c:30
         "rdcntvl.w %0\n\t"
         :"=r"(n)
         );
     return  n;
 }
-1c00d6a4:	4c000020 	jirl	$r0,$r1,0
-1c00d6a8:	03400000 	andi	$r0,$r0,0x0
-1c00d6ac:	03400000 	andi	$r0,$r0,0x0
+1c00d6c4:	4c000020 	jirl	$r0,$r1,0
+1c00d6c8:	03400000 	andi	$r0,$r0,0x0
+1c00d6cc:	03400000 	andi	$r0,$r0,0x0
 
-1c00d6b0 <clock_gettime>:
+1c00d6d0 <clock_gettime>:
 clock_gettime():
-/home/132/git_rep/perf/soft/perf_func/lib/time.c:33
+/code/fpga/nscscc-team/software/perf/lib/time.c:33
 
 unsigned long clock_gettime(int sel,struct timespec *tmp)
 {
-1c00d6b0:	02bfc063 	addi.w	$r3,$r3,-16(0xff0)
-1c00d6b4:	29803079 	st.w	$r25,$r3,12(0xc)
+1c00d6d0:	02bfc063 	addi.w	$r3,$r3,-16(0xff0)
+1c00d6d4:	29803079 	st.w	$r25,$r3,12(0xc)
 _get_count():
-/home/132/git_rep/perf/soft/perf_func/lib/time.c:7
+/code/fpga/nscscc-team/software/perf/lib/time.c:7
     asm volatile(
-1c00d6b8:	157f5fd9 	lu12i.w	$r25,-263426(0xbfafe)
-1c00d6bc:	2880032f 	ld.w	$r15,$r25,0
+1c00d6d8:	157f5fd9 	lu12i.w	$r25,-263426(0xbfafe)
+1c00d6dc:	2880032f 	ld.w	$r15,$r25,0
 clock_gettime():
-/home/132/git_rep/perf/soft/perf_func/lib/time.c:36
+/code/fpga/nscscc-team/software/perf/lib/time.c:36
     unsigned long n = 0;
     n = _get_count();
     tmp->tv_nsec = n*(NSEC_PER_USEC/CPU_COUNT_PER_US)%NSEC_PER_USEC;
-1c00d6c0:	0280280d 	addi.w	$r13,$r0,10(0xa)
-1c00d6c4:	001c35ed 	mul.w	$r13,$r15,$r13
-/home/132/git_rep/perf/soft/perf_func/lib/time.c:37
+1c00d6e0:	0280280d 	addi.w	$r13,$r0,10(0xa)
+1c00d6e4:	001c35ed 	mul.w	$r13,$r15,$r13
+/code/fpga/nscscc-team/software/perf/lib/time.c:37
     tmp->tv_usec = (n/CPU_COUNT_PER_US)%USEC_PER_MSEC;
-1c00d6c8:	02819011 	addi.w	$r17,$r0,100(0x64)
-/home/132/git_rep/perf/soft/perf_func/lib/time.c:38
+1c00d6e8:	02819011 	addi.w	$r17,$r0,100(0x64)
+/code/fpga/nscscc-team/software/perf/lib/time.c:38
     tmp->tv_msec = (n/CPU_COUNT_PER_US/USEC_PER_MSEC)%MSEC_PER_SEC;
-1c00d6cc:	1400030e 	lu12i.w	$r14,24(0x18)
-/home/132/git_rep/perf/soft/perf_func/lib/time.c:37
+1c00d6ec:	1400030e 	lu12i.w	$r14,24(0x18)
+/code/fpga/nscscc-team/software/perf/lib/time.c:37
     tmp->tv_usec = (n/CPU_COUNT_PER_US)%USEC_PER_MSEC;
-1c00d6d0:	002145f0 	div.wu	$r16,$r15,$r17
-1c00d6d4:	5c000a20 	bne	$r17,$r0,8(0x8) # 1c00d6dc <clock_gettime+0x2c>
-1c00d6d8:	002a0007 	break	0x7
-/home/132/git_rep/perf/soft/perf_func/lib/time.c:36
-    tmp->tv_nsec = n*(NSEC_PER_USEC/CPU_COUNT_PER_US)%NSEC_PER_USEC;
-1c00d6dc:	028fa00c 	addi.w	$r12,$r0,1000(0x3e8)
-/home/132/git_rep/perf/soft/perf_func/lib/time.c:38
-    tmp->tv_msec = (n/CPU_COUNT_PER_US/USEC_PER_MSEC)%MSEC_PER_SEC;
-1c00d6e0:	039a81ce 	ori	$r14,$r14,0x6a0
-/home/132/git_rep/perf/soft/perf_func/lib/time.c:37
-    tmp->tv_usec = (n/CPU_COUNT_PER_US)%USEC_PER_MSEC;
-1c00d6e4:	0021b211 	mod.wu	$r17,$r16,$r12
-1c00d6e8:	5c000980 	bne	$r12,$r0,8(0x8) # 1c00d6f0 <clock_gettime+0x40>
-1c00d6ec:	002a0007 	break	0x7
-/home/132/git_rep/perf/soft/perf_func/lib/time.c:38
-    tmp->tv_msec = (n/CPU_COUNT_PER_US/USEC_PER_MSEC)%MSEC_PER_SEC;
-1c00d6f0:	002139f0 	div.wu	$r16,$r15,$r14
-1c00d6f4:	5c0009c0 	bne	$r14,$r0,8(0x8) # 1c00d6fc <clock_gettime+0x4c>
+1c00d6f0:	002145f0 	div.wu	$r16,$r15,$r17
+1c00d6f4:	5c000a20 	bne	$r17,$r0,8(0x8) # 1c00d6fc <clock_gettime+0x2c>
 1c00d6f8:	002a0007 	break	0x7
-1c00d6fc:	0021b20e 	mod.wu	$r14,$r16,$r12
-1c00d700:	5c000980 	bne	$r12,$r0,8(0x8) # 1c00d708 <clock_gettime+0x58>
-1c00d704:	002a0007 	break	0x7
-/home/132/git_rep/perf/soft/perf_func/lib/time.c:39
-    tmp->tv_sec  = n/CPU_COUNT_PER_US/NSEC_PER_SEC;
-1c00d708:	298000a0 	st.w	$r0,$r5,0
-/home/132/git_rep/perf/soft/perf_func/lib/time.c:38
+/code/fpga/nscscc-team/software/perf/lib/time.c:36
+    tmp->tv_nsec = n*(NSEC_PER_USEC/CPU_COUNT_PER_US)%NSEC_PER_USEC;
+1c00d6fc:	028fa00c 	addi.w	$r12,$r0,1000(0x3e8)
+/code/fpga/nscscc-team/software/perf/lib/time.c:38
     tmp->tv_msec = (n/CPU_COUNT_PER_US/USEC_PER_MSEC)%MSEC_PER_SEC;
-1c00d70c:	298030ae 	st.w	$r14,$r5,12(0xc)
-/home/132/git_rep/perf/soft/perf_func/lib/time.c:37
+1c00d700:	039a81ce 	ori	$r14,$r14,0x6a0
+/code/fpga/nscscc-team/software/perf/lib/time.c:37
     tmp->tv_usec = (n/CPU_COUNT_PER_US)%USEC_PER_MSEC;
-1c00d710:	298020b1 	st.w	$r17,$r5,8(0x8)
-/home/132/git_rep/perf/soft/perf_func/lib/time.c:42
+1c00d704:	0021b211 	mod.wu	$r17,$r16,$r12
+1c00d708:	5c000980 	bne	$r12,$r0,8(0x8) # 1c00d710 <clock_gettime+0x40>
+1c00d70c:	002a0007 	break	0x7
+/code/fpga/nscscc-team/software/perf/lib/time.c:38
+    tmp->tv_msec = (n/CPU_COUNT_PER_US/USEC_PER_MSEC)%MSEC_PER_SEC;
+1c00d710:	002139f0 	div.wu	$r16,$r15,$r14
+1c00d714:	5c0009c0 	bne	$r14,$r0,8(0x8) # 1c00d71c <clock_gettime+0x4c>
+1c00d718:	002a0007 	break	0x7
+1c00d71c:	0021b20e 	mod.wu	$r14,$r16,$r12
+1c00d720:	5c000980 	bne	$r12,$r0,8(0x8) # 1c00d728 <clock_gettime+0x58>
+1c00d724:	002a0007 	break	0x7
+/code/fpga/nscscc-team/software/perf/lib/time.c:39
+    tmp->tv_sec  = n/CPU_COUNT_PER_US/NSEC_PER_SEC;
+1c00d728:	298000a0 	st.w	$r0,$r5,0
+/code/fpga/nscscc-team/software/perf/lib/time.c:38
+    tmp->tv_msec = (n/CPU_COUNT_PER_US/USEC_PER_MSEC)%MSEC_PER_SEC;
+1c00d72c:	298030ae 	st.w	$r14,$r5,12(0xc)
+/code/fpga/nscscc-team/software/perf/lib/time.c:37
+    tmp->tv_usec = (n/CPU_COUNT_PER_US)%USEC_PER_MSEC;
+1c00d730:	298020b1 	st.w	$r17,$r5,8(0x8)
+/code/fpga/nscscc-team/software/perf/lib/time.c:42
     //printf("clock ns=%d,sec=%d\n",tmp->tv_nsec,tmp->tv_sec);
     return 0;
 }
-1c00d714:	28803079 	ld.w	$r25,$r3,12(0xc)
-1c00d718:	00150004 	move	$r4,$r0
-/home/132/git_rep/perf/soft/perf_func/lib/time.c:36
+1c00d734:	28803079 	ld.w	$r25,$r3,12(0xc)
+1c00d738:	00150004 	move	$r4,$r0
+/code/fpga/nscscc-team/software/perf/lib/time.c:36
     tmp->tv_nsec = n*(NSEC_PER_USEC/CPU_COUNT_PER_US)%NSEC_PER_USEC;
-1c00d71c:	0021b1ae 	mod.wu	$r14,$r13,$r12
-1c00d720:	5c000980 	bne	$r12,$r0,8(0x8) # 1c00d728 <clock_gettime+0x78>
-1c00d724:	002a0007 	break	0x7
-1c00d728:	298010ae 	st.w	$r14,$r5,4(0x4)
-/home/132/git_rep/perf/soft/perf_func/lib/time.c:42
+1c00d73c:	0021b1ae 	mod.wu	$r14,$r13,$r12
+1c00d740:	5c000980 	bne	$r12,$r0,8(0x8) # 1c00d748 <clock_gettime+0x78>
+1c00d744:	002a0007 	break	0x7
+1c00d748:	298010ae 	st.w	$r14,$r5,4(0x4)
+/code/fpga/nscscc-team/software/perf/lib/time.c:42
 }
-1c00d72c:	02804063 	addi.w	$r3,$r3,16(0x10)
-1c00d730:	4c000020 	jirl	$r0,$r1,0
-1c00d734:	03400000 	andi	$r0,$r0,0x0
-1c00d738:	03400000 	andi	$r0,$r0,0x0
-1c00d73c:	03400000 	andi	$r0,$r0,0x0
+1c00d74c:	02804063 	addi.w	$r3,$r3,16(0x10)
+1c00d750:	4c000020 	jirl	$r0,$r1,0
+1c00d754:	03400000 	andi	$r0,$r0,0x0
+1c00d758:	03400000 	andi	$r0,$r0,0x0
+1c00d75c:	03400000 	andi	$r0,$r0,0x0
 
-1c00d740 <get_clock>:
+1c00d760 <get_clock>:
 get_clock():
-/home/132/git_rep/perf/soft/perf_func/lib/time.c:42
-1c00d740:	53ff33ff 	b	-208(0xfffff30) # 1c00d670 <get_count>
-1c00d744:	03400000 	andi	$r0,$r0,0x0
-1c00d748:	03400000 	andi	$r0,$r0,0x0
-1c00d74c:	03400000 	andi	$r0,$r0,0x0
+/code/fpga/nscscc-team/software/perf/lib/time.c:42
+1c00d760:	53ff33ff 	b	-208(0xfffff30) # 1c00d690 <get_count>
+1c00d764:	03400000 	andi	$r0,$r0,0x0
+1c00d768:	03400000 	andi	$r0,$r0,0x0
+1c00d76c:	03400000 	andi	$r0,$r0,0x0
 
-1c00d750 <get_ns>:
+1c00d770 <get_ns>:
 get_ns():
-/home/132/git_rep/perf/soft/perf_func/lib/time.c:52
+/code/fpga/nscscc-team/software/perf/lib/time.c:52
     n=_get_count();
     return n;
 }
 
 unsigned long get_ns(void)
 {
-1c00d750:	02bfc063 	addi.w	$r3,$r3,-16(0xff0)
-1c00d754:	29803079 	st.w	$r25,$r3,12(0xc)
+1c00d770:	02bfc063 	addi.w	$r3,$r3,-16(0xff0)
+1c00d774:	29803079 	st.w	$r25,$r3,12(0xc)
 _get_count():
-/home/132/git_rep/perf/soft/perf_func/lib/time.c:7
+/code/fpga/nscscc-team/software/perf/lib/time.c:7
     asm volatile(
-1c00d758:	157f5fd9 	lu12i.w	$r25,-263426(0xbfafe)
-1c00d75c:	28800324 	ld.w	$r4,$r25,0
+1c00d778:	157f5fd9 	lu12i.w	$r25,-263426(0xbfafe)
+1c00d77c:	28800324 	ld.w	$r4,$r25,0
 get_ns():
-/home/132/git_rep/perf/soft/perf_func/lib/time.c:55
+/code/fpga/nscscc-team/software/perf/lib/time.c:55
     unsigned long n=0;
     n = _get_count();
     n=n*(NSEC_PER_USEC/CPU_COUNT_PER_US);
-1c00d760:	0280280c 	addi.w	$r12,$r0,10(0xa)
-/home/132/git_rep/perf/soft/perf_func/lib/time.c:57
+1c00d780:	0280280c 	addi.w	$r12,$r0,10(0xa)
+/code/fpga/nscscc-team/software/perf/lib/time.c:57
     return n;
 }
-1c00d764:	28803079 	ld.w	$r25,$r3,12(0xc)
-1c00d768:	001c3084 	mul.w	$r4,$r4,$r12
-1c00d76c:	02804063 	addi.w	$r3,$r3,16(0x10)
-1c00d770:	4c000020 	jirl	$r0,$r1,0
-1c00d774:	03400000 	andi	$r0,$r0,0x0
-1c00d778:	03400000 	andi	$r0,$r0,0x0
-1c00d77c:	03400000 	andi	$r0,$r0,0x0
+1c00d784:	28803079 	ld.w	$r25,$r3,12(0xc)
+1c00d788:	001c3084 	mul.w	$r4,$r4,$r12
+1c00d78c:	02804063 	addi.w	$r3,$r3,16(0x10)
+1c00d790:	4c000020 	jirl	$r0,$r1,0
+1c00d794:	03400000 	andi	$r0,$r0,0x0
+1c00d798:	03400000 	andi	$r0,$r0,0x0
+1c00d79c:	03400000 	andi	$r0,$r0,0x0
 
-1c00d780 <get_us>:
+1c00d7a0 <get_us>:
 get_us():
-/home/132/git_rep/perf/soft/perf_func/lib/time.c:61
+/code/fpga/nscscc-team/software/perf/lib/time.c:61
 
 
 unsigned long get_us(void)
 {
-1c00d780:	02bfc063 	addi.w	$r3,$r3,-16(0xff0)
-1c00d784:	29803079 	st.w	$r25,$r3,12(0xc)
+1c00d7a0:	02bfc063 	addi.w	$r3,$r3,-16(0xff0)
+1c00d7a4:	29803079 	st.w	$r25,$r3,12(0xc)
 _get_count():
-/home/132/git_rep/perf/soft/perf_func/lib/time.c:7
+/code/fpga/nscscc-team/software/perf/lib/time.c:7
     asm volatile(
-1c00d788:	157f5fd9 	lu12i.w	$r25,-263426(0xbfafe)
-1c00d78c:	28800324 	ld.w	$r4,$r25,0
+1c00d7a8:	157f5fd9 	lu12i.w	$r25,-263426(0xbfafe)
+1c00d7ac:	28800324 	ld.w	$r4,$r25,0
 get_us():
-/home/132/git_rep/perf/soft/perf_func/lib/time.c:64
+/code/fpga/nscscc-team/software/perf/lib/time.c:64
     unsigned long n=0;
     n = _get_count();
     n=n/CPU_COUNT_PER_US;
-1c00d790:	0281900c 	addi.w	$r12,$r0,100(0x64)
-/home/132/git_rep/perf/soft/perf_func/lib/time.c:66
+1c00d7b0:	0281900c 	addi.w	$r12,$r0,100(0x64)
+/code/fpga/nscscc-team/software/perf/lib/time.c:66
     return n;
 }
-1c00d794:	28803079 	ld.w	$r25,$r3,12(0xc)
-1c00d798:	0021308d 	div.wu	$r13,$r4,$r12
-1c00d79c:	5c000980 	bne	$r12,$r0,8(0x8) # 1c00d7a4 <get_us+0x24>
-1c00d7a0:	002a0007 	break	0x7
-1c00d7a4:	001501a4 	move	$r4,$r13
-1c00d7a8:	02804063 	addi.w	$r3,$r3,16(0x10)
-1c00d7ac:	4c000020 	jirl	$r0,$r1,0
+1c00d7b4:	28803079 	ld.w	$r25,$r3,12(0xc)
+1c00d7b8:	0021308d 	div.wu	$r13,$r4,$r12
+1c00d7bc:	5c000980 	bne	$r12,$r0,8(0x8) # 1c00d7c4 <get_us+0x24>
+1c00d7c0:	002a0007 	break	0x7
+1c00d7c4:	001501a4 	move	$r4,$r13
+1c00d7c8:	02804063 	addi.w	$r3,$r3,16(0x10)
+1c00d7cc:	4c000020 	jirl	$r0,$r1,0
 
-1c00d7b0 <rand>:
+1c00d7d0 <rand>:
 rand():
-/home/132/git_rep/perf/soft/perf_func/lib/rand.c:4
+/code/fpga/nscscc-team/software/perf/lib/rand.c:4
 static unsigned long next = 0xDEEDBEEF;
 
 int rand(void) {
     next = next * 1103515245 + 12345;
-1c00d7b0:	1c000e6f 	pcaddu12i	$r15,115(0x73)
-1c00d7b4:	02b7f1ef 	addi.w	$r15,$r15,-516(0xdfc)
-1c00d7b8:	288001ec 	ld.w	$r12,$r15,0
-1c00d7bc:	14838c8e 	lu12i.w	$r14,269412(0x41c64)
-1c00d7c0:	03b9b5ce 	ori	$r14,$r14,0xe6d
-1c00d7c4:	001c398c 	mul.w	$r12,$r12,$r14
-1c00d7c8:	1400006d 	lu12i.w	$r13,3(0x3)
-1c00d7cc:	0380e5ad 	ori	$r13,$r13,0x39
-1c00d7d0:	0010358c 	add.w	$r12,$r12,$r13
-/home/132/git_rep/perf/soft/perf_func/lib/rand.c:5
+1c00d7d0:	1c000e6f 	pcaddu12i	$r15,115(0x73)
+1c00d7d4:	02b771ef 	addi.w	$r15,$r15,-548(0xddc)
+1c00d7d8:	288001ec 	ld.w	$r12,$r15,0
+1c00d7dc:	14838c8e 	lu12i.w	$r14,269412(0x41c64)
+1c00d7e0:	03b9b5ce 	ori	$r14,$r14,0xe6d
+1c00d7e4:	001c398c 	mul.w	$r12,$r12,$r14
+1c00d7e8:	1400006d 	lu12i.w	$r13,3(0x3)
+1c00d7ec:	0380e5ad 	ori	$r13,$r13,0x39
+1c00d7f0:	0010358c 	add.w	$r12,$r12,$r13
+/code/fpga/nscscc-team/software/perf/lib/rand.c:5
     return (unsigned int)(next/65536) % 32768;
-1c00d7d4:	00408584 	slli.w	$r4,$r12,0x1
-/home/132/git_rep/perf/soft/perf_func/lib/rand.c:4
+1c00d7f4:	00408584 	slli.w	$r4,$r12,0x1
+/code/fpga/nscscc-team/software/perf/lib/rand.c:4
     next = next * 1103515245 + 12345;
-1c00d7d8:	298001ec 	st.w	$r12,$r15,0
-/home/132/git_rep/perf/soft/perf_func/lib/rand.c:6
+1c00d7f8:	298001ec 	st.w	$r12,$r15,0
+/code/fpga/nscscc-team/software/perf/lib/rand.c:6
 }
-1c00d7dc:	0044c484 	srli.w	$r4,$r4,0x11
-1c00d7e0:	4c000020 	jirl	$r0,$r1,0
-1c00d7e4:	03400000 	andi	$r0,$r0,0x0
-1c00d7e8:	03400000 	andi	$r0,$r0,0x0
-1c00d7ec:	03400000 	andi	$r0,$r0,0x0
+1c00d7fc:	0044c484 	srli.w	$r4,$r4,0x11
+1c00d800:	4c000020 	jirl	$r0,$r1,0
+1c00d804:	03400000 	andi	$r0,$r0,0x0
+1c00d808:	03400000 	andi	$r0,$r0,0x0
+1c00d80c:	03400000 	andi	$r0,$r0,0x0
 
-1c00d7f0 <srand>:
+1c00d810 <srand>:
 srand():
-/home/132/git_rep/perf/soft/perf_func/lib/rand.c:8
+/code/fpga/nscscc-team/software/perf/lib/rand.c:8
 void srand(unsigned int seed) {
     next = seed;
-1c00d7f0:	1c000e6c 	pcaddu12i	$r12,115(0x73)
-1c00d7f4:	02b6f18c 	addi.w	$r12,$r12,-580(0xdbc)
-1c00d7f8:	29800184 	st.w	$r4,$r12,0
-/home/132/git_rep/perf/soft/perf_func/lib/rand.c:9
+1c00d810:	1c000e6c 	pcaddu12i	$r12,115(0x73)
+1c00d814:	02b6718c 	addi.w	$r12,$r12,-612(0xd9c)
+1c00d818:	29800184 	st.w	$r4,$r12,0
+/code/fpga/nscscc-team/software/perf/lib/rand.c:9
 }
-1c00d7fc:	4c000020 	jirl	$r0,$r1,0
+1c00d81c:	4c000020 	jirl	$r0,$r1,0
 
 Disassembly of section .data:
 
@@ -14333,8 +14342,8 @@ Disassembly of section .data:
 1c08003c:	20746f67 	ll.w	$r7,$r27,29804(0x746c)
 1c080040:	69206725 	bltu	$r25,$r5,73828(0x12064) # 1c0920a4 <_end+0x11ac4>
 1c080044:	6574736e 	bge	$r27,$r14,95344(0x17470) # 1c0974b4 <_end+0x16ed4>
-1c080048:	6f206461 	bgeu	$r3,$r1,-57244(0x32064) # 1c0720ac <_data_lma+0x648ac>
-1c08004c:	67252066 	bge	$r3,$r6,-56032(0x32520) # 1c07256c <_data_lma+0x64d6c>
+1c080048:	6f206461 	bgeu	$r3,$r1,-57244(0x32064) # 1c0720ac <_data_lma+0x6488c>
+1c08004c:	67252066 	bge	$r3,$r6,-56032(0x32520) # 1c07256c <_data_lma+0x64d4c>
 1c080050:	00000a29 	0x00000a29
 1c080054:	2c732522 	vst	$vr2,$r9,-823(0xcc9)
 1c080058:	20752520 	ll.w	$r0,$r9,29988(0x7524)
@@ -14348,7 +14357,7 @@ Disassembly of section .data:
 1c080078:	76206d75 	0x76206d75
 1c08007c:	65756c61 	bge	$r3,$r1,95596(0x1756c) # 1c0975e8 <_end+0x17008>
 1c080080:	71657320 	0x71657320
-1c080084:	636e6575 	blt	$r11,$r21,-37276(0x36e64) # 1c076ee8 <_data_lma+0x696e8>
+1c080084:	636e6575 	blt	$r11,$r21,-37276(0x36e64) # 1c076ee8 <_data_lma+0x696c8>
 1c080088:	00003265 	revb.2h	$r5,$r19
 1c08008c:	38746e69 	fldgt.s	$f9,$r19,$r27
 1c080090:	6d20745f 	bgeu	$r2,$r31,73844(0x12074) # 1c092104 <_end+0x11b24>
@@ -14356,7 +14365,7 @@ Disassembly of section .data:
 1c080098:	76206d75 	0x76206d75
 1c08009c:	65756c61 	bge	$r3,$r1,95596(0x1756c) # 1c097608 <_end+0x17028>
 1c0800a0:	71657320 	0x71657320
-1c0800a4:	636e6575 	blt	$r11,$r21,-37276(0x36e64) # 1c076f08 <_data_lma+0x69708>
+1c0800a4:	636e6575 	blt	$r11,$r21,-37276(0x36e64) # 1c076f08 <_data_lma+0x696e8>
 1c0800a8:	00003265 	revb.2h	$r5,$r19
 1c0800ac:	38746e69 	fldgt.s	$f9,$r19,$r27
 1c0800b0:	6d20745f 	bgeu	$r2,$r31,73844(0x12074) # 1c092124 <_end+0x11b44>
@@ -14382,7 +14391,7 @@ Disassembly of section .data:
 1c080100:	206d756d 	ll.w	$r13,$r11,28020(0x6d74)
 1c080104:	756c6176 	0x756c6176
 1c080108:	65732065 	bge	$r3,$r5,95008(0x17320) # 1c097428 <_end+0x16e48>
-1c08010c:	6e657571 	bgeu	$r11,$r17,-105100(0x26574) # 1c066680 <_data_lma+0x58e80>
+1c08010c:	6e657571 	bgeu	$r11,$r17,-105100(0x26574) # 1c066680 <_data_lma+0x58e60>
 1c080110:	00326563 	0x00326563
 1c080114:	746e6975 	0x746e6975
 1c080118:	20745f38 	ll.w	$r24,$r25,29788(0x745c)
@@ -14390,25 +14399,25 @@ Disassembly of section .data:
 1c080120:	206d756d 	ll.w	$r13,$r11,28020(0x6d74)
 1c080124:	756c6176 	0x756c6176
 1c080128:	65732065 	bge	$r3,$r5,95008(0x17320) # 1c097448 <_end+0x16e68>
-1c08012c:	6e657571 	bgeu	$r11,$r17,-105100(0x26574) # 1c0666a0 <_data_lma+0x58ea0>
+1c08012c:	6e657571 	bgeu	$r11,$r17,-105100(0x26574) # 1c0666a0 <_data_lma+0x58e80>
 1c080130:	00326563 	0x00326563
 1c080134:	746e6975 	0x746e6975
 1c080138:	20745f38 	ll.w	$r24,$r25,29788(0x745c)
 1c08013c:	696e696d 	bltu	$r11,$r13,93800(0x16e68) # 1c096fa4 <_end+0x169c4>
 1c080140:	206d756d 	ll.w	$r13,$r11,28020(0x6d74)
 1c080144:	69736f70 	bltu	$r27,$r16,95084(0x1736c) # 1c0974b0 <_end+0x16ed0>
-1c080148:	6e6f6974 	bgeu	$r11,$r20,-102552(0x26f68) # 1c0670b0 <_data_lma+0x598b0>
+1c080148:	6e6f6974 	bgeu	$r11,$r20,-102552(0x26f68) # 1c0670b0 <_data_lma+0x59890>
 1c08014c:	71657320 	0x71657320
-1c080150:	636e6575 	blt	$r11,$r21,-37276(0x36e64) # 1c076fb4 <_data_lma+0x697b4>
+1c080150:	636e6575 	blt	$r11,$r21,-37276(0x36e64) # 1c076fb4 <_data_lma+0x69794>
 1c080154:	00003165 	revb.2h	$r5,$r11
 1c080158:	746e6975 	0x746e6975
 1c08015c:	20745f38 	ll.w	$r24,$r25,29788(0x745c)
 1c080160:	6978616d 	bltu	$r11,$r13,96352(0x17860) # 1c0979c0 <_end+0x173e0>
 1c080164:	206d756d 	ll.w	$r13,$r11,28020(0x6d74)
 1c080168:	69736f70 	bltu	$r27,$r16,95084(0x1736c) # 1c0974d4 <_end+0x16ef4>
-1c08016c:	6e6f6974 	bgeu	$r11,$r20,-102552(0x26f68) # 1c0670d4 <_data_lma+0x598d4>
+1c08016c:	6e6f6974 	bgeu	$r11,$r20,-102552(0x26f68) # 1c0670d4 <_data_lma+0x598b4>
 1c080170:	71657320 	0x71657320
-1c080174:	636e6575 	blt	$r11,$r21,-37276(0x36e64) # 1c076fd8 <_data_lma+0x697d8>
+1c080174:	636e6575 	blt	$r11,$r21,-37276(0x36e64) # 1c076fd8 <_data_lma+0x697b8>
 1c080178:	00003165 	revb.2h	$r5,$r11
 1c08017c:	31746e69 	0x31746e69
 1c080180:	20745f36 	ll.w	$r22,$r25,29788(0x745c)
@@ -14416,7 +14425,7 @@ Disassembly of section .data:
 1c080188:	206d756d 	ll.w	$r13,$r11,28020(0x6d74)
 1c08018c:	756c6176 	0x756c6176
 1c080190:	65732065 	bge	$r3,$r5,95008(0x17320) # 1c0974b0 <_end+0x16ed0>
-1c080194:	6e657571 	bgeu	$r11,$r17,-105100(0x26574) # 1c066708 <_data_lma+0x58f08>
+1c080194:	6e657571 	bgeu	$r11,$r17,-105100(0x26574) # 1c066708 <_data_lma+0x58ee8>
 1c080198:	00326563 	0x00326563
 1c08019c:	31746e69 	0x31746e69
 1c0801a0:	20745f36 	ll.w	$r22,$r25,29788(0x745c)
@@ -14424,29 +14433,29 @@ Disassembly of section .data:
 1c0801a8:	206d756d 	ll.w	$r13,$r11,28020(0x6d74)
 1c0801ac:	756c6176 	0x756c6176
 1c0801b0:	65732065 	bge	$r3,$r5,95008(0x17320) # 1c0974d0 <_end+0x16ef0>
-1c0801b4:	6e657571 	bgeu	$r11,$r17,-105100(0x26574) # 1c066728 <_data_lma+0x58f28>
+1c0801b4:	6e657571 	bgeu	$r11,$r17,-105100(0x26574) # 1c066728 <_data_lma+0x58f08>
 1c0801b8:	00326563 	0x00326563
 1c0801bc:	31746e69 	0x31746e69
 1c0801c0:	20745f36 	ll.w	$r22,$r25,29788(0x745c)
 1c0801c4:	696e696d 	bltu	$r11,$r13,93800(0x16e68) # 1c09702c <_end+0x16a4c>
 1c0801c8:	206d756d 	ll.w	$r13,$r11,28020(0x6d74)
 1c0801cc:	69736f70 	bltu	$r27,$r16,95084(0x1736c) # 1c097538 <_end+0x16f58>
-1c0801d0:	6e6f6974 	bgeu	$r11,$r20,-102552(0x26f68) # 1c067138 <_data_lma+0x59938>
+1c0801d0:	6e6f6974 	bgeu	$r11,$r20,-102552(0x26f68) # 1c067138 <_data_lma+0x59918>
 1c0801d4:	71657320 	0x71657320
-1c0801d8:	636e6575 	blt	$r11,$r21,-37276(0x36e64) # 1c07703c <_data_lma+0x6983c>
+1c0801d8:	636e6575 	blt	$r11,$r21,-37276(0x36e64) # 1c07703c <_data_lma+0x6981c>
 1c0801dc:	00003165 	revb.2h	$r5,$r11
 1c0801e0:	31746e69 	0x31746e69
 1c0801e4:	20745f36 	ll.w	$r22,$r25,29788(0x745c)
 1c0801e8:	6978616d 	bltu	$r11,$r13,96352(0x17860) # 1c097a48 <_end+0x17468>
 1c0801ec:	206d756d 	ll.w	$r13,$r11,28020(0x6d74)
 1c0801f0:	69736f70 	bltu	$r27,$r16,95084(0x1736c) # 1c09755c <_end+0x16f7c>
-1c0801f4:	6e6f6974 	bgeu	$r11,$r20,-102552(0x26f68) # 1c06715c <_data_lma+0x5995c>
+1c0801f4:	6e6f6974 	bgeu	$r11,$r20,-102552(0x26f68) # 1c06715c <_data_lma+0x5993c>
 1c0801f8:	71657320 	0x71657320
-1c0801fc:	636e6575 	blt	$r11,$r21,-37276(0x36e64) # 1c077060 <_data_lma+0x69860>
+1c0801fc:	636e6575 	blt	$r11,$r21,-37276(0x36e64) # 1c077060 <_data_lma+0x69840>
 1c080200:	00003165 	revb.2h	$r5,$r11
 1c080204:	746e6975 	0x746e6975
 1c080208:	745f3631 	0x745f3631
-1c08020c:	6e696d20 	bgeu	$r9,$r0,-104084(0x2696c) # 1c066b78 <_data_lma+0x59378>
+1c08020c:	6e696d20 	bgeu	$r9,$r0,-104084(0x2696c) # 1c066b78 <_data_lma+0x59358>
 1c080210:	6d756d69 	bgeu	$r11,$r9,95596(0x1756c) # 1c09777c <_end+0x1719c>
 1c080214:	6c617620 	bgeu	$r17,$r0,24948(0x6174) # 1c086388 <_end+0x5da8>
 1c080218:	73206575 	0x73206575
@@ -14464,21 +14473,21 @@ Disassembly of section .data:
 1c080248:	00000000 	0x00000000
 1c08024c:	746e6975 	0x746e6975
 1c080250:	745f3631 	0x745f3631
-1c080254:	6e696d20 	bgeu	$r9,$r0,-104084(0x2696c) # 1c066bc0 <_data_lma+0x593c0>
+1c080254:	6e696d20 	bgeu	$r9,$r0,-104084(0x2696c) # 1c066bc0 <_data_lma+0x593a0>
 1c080258:	6d756d69 	bgeu	$r11,$r9,95596(0x1756c) # 1c0977c4 <_end+0x171e4>
 1c08025c:	736f7020 	vssrarni.du.q	$vr0,$vr1,0x5c
-1c080260:	6f697469 	bgeu	$r3,$r9,-38540(0x36974) # 1c076bd4 <_data_lma+0x693d4>
+1c080260:	6f697469 	bgeu	$r3,$r9,-38540(0x36974) # 1c076bd4 <_data_lma+0x693b4>
 1c080264:	6573206e 	bge	$r3,$r14,95008(0x17320) # 1c097584 <_end+0x16fa4>
-1c080268:	6e657571 	bgeu	$r11,$r17,-105100(0x26574) # 1c0667dc <_data_lma+0x58fdc>
+1c080268:	6e657571 	bgeu	$r11,$r17,-105100(0x26574) # 1c0667dc <_data_lma+0x58fbc>
 1c08026c:	00316563 	0x00316563
 1c080270:	746e6975 	0x746e6975
 1c080274:	745f3631 	0x745f3631
 1c080278:	78616d20 	0x78616d20
 1c08027c:	6d756d69 	bgeu	$r11,$r9,95596(0x1756c) # 1c0977e8 <_end+0x17208>
 1c080280:	736f7020 	vssrarni.du.q	$vr0,$vr1,0x5c
-1c080284:	6f697469 	bgeu	$r3,$r9,-38540(0x36974) # 1c076bf8 <_data_lma+0x693f8>
+1c080284:	6f697469 	bgeu	$r3,$r9,-38540(0x36974) # 1c076bf8 <_data_lma+0x693d8>
 1c080288:	6573206e 	bge	$r3,$r14,95008(0x17320) # 1c0975a8 <_end+0x16fc8>
-1c08028c:	6e657571 	bgeu	$r11,$r17,-105100(0x26574) # 1c066800 <_data_lma+0x59000>
+1c08028c:	6e657571 	bgeu	$r11,$r17,-105100(0x26574) # 1c066800 <_data_lma+0x58fe0>
 1c080290:	00316563 	0x00316563
 1c080294:	33746e69 	xvstelm.h	$xr9,$r19,54(0x36),0xd
 1c080298:	20745f32 	ll.w	$r18,$r25,29788(0x745c)
@@ -14486,7 +14495,7 @@ Disassembly of section .data:
 1c0802a0:	206d756d 	ll.w	$r13,$r11,28020(0x6d74)
 1c0802a4:	756c6176 	0x756c6176
 1c0802a8:	65732065 	bge	$r3,$r5,95008(0x17320) # 1c0975c8 <_end+0x16fe8>
-1c0802ac:	6e657571 	bgeu	$r11,$r17,-105100(0x26574) # 1c066820 <_data_lma+0x59020>
+1c0802ac:	6e657571 	bgeu	$r11,$r17,-105100(0x26574) # 1c066820 <_data_lma+0x59000>
 1c0802b0:	00326563 	0x00326563
 1c0802b4:	33746e69 	xvstelm.h	$xr9,$r19,54(0x36),0xd
 1c0802b8:	20745f32 	ll.w	$r18,$r25,29788(0x745c)
@@ -14494,29 +14503,29 @@ Disassembly of section .data:
 1c0802c0:	206d756d 	ll.w	$r13,$r11,28020(0x6d74)
 1c0802c4:	756c6176 	0x756c6176
 1c0802c8:	65732065 	bge	$r3,$r5,95008(0x17320) # 1c0975e8 <_end+0x17008>
-1c0802cc:	6e657571 	bgeu	$r11,$r17,-105100(0x26574) # 1c066840 <_data_lma+0x59040>
+1c0802cc:	6e657571 	bgeu	$r11,$r17,-105100(0x26574) # 1c066840 <_data_lma+0x59020>
 1c0802d0:	00326563 	0x00326563
 1c0802d4:	33746e69 	xvstelm.h	$xr9,$r19,54(0x36),0xd
 1c0802d8:	20745f32 	ll.w	$r18,$r25,29788(0x745c)
 1c0802dc:	696e696d 	bltu	$r11,$r13,93800(0x16e68) # 1c097144 <_end+0x16b64>
 1c0802e0:	206d756d 	ll.w	$r13,$r11,28020(0x6d74)
 1c0802e4:	69736f70 	bltu	$r27,$r16,95084(0x1736c) # 1c097650 <_end+0x17070>
-1c0802e8:	6e6f6974 	bgeu	$r11,$r20,-102552(0x26f68) # 1c067250 <_data_lma+0x59a50>
+1c0802e8:	6e6f6974 	bgeu	$r11,$r20,-102552(0x26f68) # 1c067250 <_data_lma+0x59a30>
 1c0802ec:	71657320 	0x71657320
-1c0802f0:	636e6575 	blt	$r11,$r21,-37276(0x36e64) # 1c077154 <_data_lma+0x69954>
+1c0802f0:	636e6575 	blt	$r11,$r21,-37276(0x36e64) # 1c077154 <_data_lma+0x69934>
 1c0802f4:	00003165 	revb.2h	$r5,$r11
 1c0802f8:	33746e69 	xvstelm.h	$xr9,$r19,54(0x36),0xd
 1c0802fc:	20745f32 	ll.w	$r18,$r25,29788(0x745c)
 1c080300:	6978616d 	bltu	$r11,$r13,96352(0x17860) # 1c097b60 <_end+0x17580>
 1c080304:	206d756d 	ll.w	$r13,$r11,28020(0x6d74)
 1c080308:	69736f70 	bltu	$r27,$r16,95084(0x1736c) # 1c097674 <_end+0x17094>
-1c08030c:	6e6f6974 	bgeu	$r11,$r20,-102552(0x26f68) # 1c067274 <_data_lma+0x59a74>
+1c08030c:	6e6f6974 	bgeu	$r11,$r20,-102552(0x26f68) # 1c067274 <_data_lma+0x59a54>
 1c080310:	71657320 	0x71657320
-1c080314:	636e6575 	blt	$r11,$r21,-37276(0x36e64) # 1c077178 <_data_lma+0x69978>
+1c080314:	636e6575 	blt	$r11,$r21,-37276(0x36e64) # 1c077178 <_data_lma+0x69958>
 1c080318:	00003165 	revb.2h	$r5,$r11
 1c08031c:	746e6975 	0x746e6975
 1c080320:	745f3233 	0x745f3233
-1c080324:	6e696d20 	bgeu	$r9,$r0,-104084(0x2696c) # 1c066c90 <_data_lma+0x59490>
+1c080324:	6e696d20 	bgeu	$r9,$r0,-104084(0x2696c) # 1c066c90 <_data_lma+0x59470>
 1c080328:	6d756d69 	bgeu	$r11,$r9,95596(0x1756c) # 1c097894 <_end+0x172b4>
 1c08032c:	6c617620 	bgeu	$r17,$r0,24948(0x6174) # 1c0864a0 <_end+0x5ec0>
 1c080330:	73206575 	0x73206575
@@ -14534,28 +14543,28 @@ Disassembly of section .data:
 1c080360:	00000000 	0x00000000
 1c080364:	746e6975 	0x746e6975
 1c080368:	745f3233 	0x745f3233
-1c08036c:	6e696d20 	bgeu	$r9,$r0,-104084(0x2696c) # 1c066cd8 <_data_lma+0x594d8>
+1c08036c:	6e696d20 	bgeu	$r9,$r0,-104084(0x2696c) # 1c066cd8 <_data_lma+0x594b8>
 1c080370:	6d756d69 	bgeu	$r11,$r9,95596(0x1756c) # 1c0978dc <_end+0x172fc>
 1c080374:	736f7020 	vssrarni.du.q	$vr0,$vr1,0x5c
-1c080378:	6f697469 	bgeu	$r3,$r9,-38540(0x36974) # 1c076cec <_data_lma+0x694ec>
+1c080378:	6f697469 	bgeu	$r3,$r9,-38540(0x36974) # 1c076cec <_data_lma+0x694cc>
 1c08037c:	6573206e 	bge	$r3,$r14,95008(0x17320) # 1c09769c <_end+0x170bc>
-1c080380:	6e657571 	bgeu	$r11,$r17,-105100(0x26574) # 1c0668f4 <_data_lma+0x590f4>
+1c080380:	6e657571 	bgeu	$r11,$r17,-105100(0x26574) # 1c0668f4 <_data_lma+0x590d4>
 1c080384:	00316563 	0x00316563
 1c080388:	746e6975 	0x746e6975
 1c08038c:	745f3233 	0x745f3233
 1c080390:	78616d20 	0x78616d20
 1c080394:	6d756d69 	bgeu	$r11,$r9,95596(0x1756c) # 1c097900 <_end+0x17320>
 1c080398:	736f7020 	vssrarni.du.q	$vr0,$vr1,0x5c
-1c08039c:	6f697469 	bgeu	$r3,$r9,-38540(0x36974) # 1c076d10 <_data_lma+0x69510>
+1c08039c:	6f697469 	bgeu	$r3,$r9,-38540(0x36974) # 1c076d10 <_data_lma+0x694f0>
 1c0803a0:	6573206e 	bge	$r3,$r14,95008(0x17320) # 1c0976c0 <_end+0x170e0>
-1c0803a4:	6e657571 	bgeu	$r11,$r17,-105100(0x26574) # 1c066918 <_data_lma+0x59118>
+1c0803a4:	6e657571 	bgeu	$r11,$r17,-105100(0x26574) # 1c066918 <_data_lma+0x590f8>
 1c0803a8:	00316563 	0x00316563
 1c0803ac:	6d6e696d 	bgeu	$r11,$r13,93800(0x16e68) # 1c097214 <_end+0x16c34>
 1c0803b0:	73207861 	0x73207861
 1c0803b4:	65757165 	bge	$r11,$r5,95600(0x17570) # 1c097924 <_end+0x17344>
 1c0803b8:	2065636e 	ll.w	$r14,$r27,25952(0x6560)
 1c0803bc:	74736574 	xvmin.w	$xr20,$xr11,$xr25
-1c0803c0:	67656220 	bge	$r17,$r0,-39584(0x36560) # 1c076920 <_data_lma+0x69120>
+1c0803c0:	67656220 	bge	$r17,$r0,-39584(0x36560) # 1c076920 <_data_lma+0x69100>
 1c0803c4:	002e6e69 	0x002e6e69
 1c0803c8:	6d6e696d 	bgeu	$r11,$r13,93800(0x16e68) # 1c097230 <_end+0x16c50>
 1c0803cc:	73207861 	0x73207861
@@ -14749,8 +14758,8 @@ Disassembly of section .debug_info:
    4:	00000004 	0x00000004
    8:	01040000 	0x01040000
    c:	00000018 	0x00000018
-  10:	0000b30c 	0x0000b30c
-  14:	0000bc00 	0x0000bc00
+  10:	0000d20c 	0x0000d20c
+  14:	00009f00 	0x00009f00
   18:	00d23000 	bstrpick.d	$r0,$r0,0x12,0xc
   1c:	00023c1c 	0x00023c1c
   20:	00000000 	0x00000000
@@ -14758,7 +14767,7 @@ Disassembly of section .debug_info:
   28:	000b0704 	0x000b0704
   2c:	04030000 	csrrd	$r0,0xc0
   30:	00000607 	0x00000607
-  34:	00e60400 	bstrpick.d	$r0,$r0,0x26,0x1
+  34:	00e50400 	bstrpick.d	$r0,$r0,0x25,0x1
   38:	01010000 	fadd.d	$f0,$f0,$f0
   3c:	00022805 	0x00022805
   40:	00d23000 	bstrpick.d	$r0,$r0,0x12,0xc
@@ -14797,16 +14806,16 @@ Disassembly of section .debug_info:
   c4:	00d2dc01 	bstrpick.d	$r1,$r0,0x12,0x37
   c8:	00180a1c 	sra.w	$r28,$r16,$r2
   cc:	01d00000 	0x01d00000
-  d0:	a90b0000 	0xa90b0000
+  d0:	c80b0000 	0xc80b0000
   d4:	01000000 	0x01000000
   d8:	02280514 	slti	$r20,$r8,-1535(0xa01)
   dc:	00e40000 	bstrpick.d	$r0,$r0,0x24,0x0
   e0:	00060000 	alsl.wu	$r0,$r0,$r0,0x1
-  e4:	0000f10b 	0x0000f10b
+  e4:	0000fd0b 	0x0000fd0b
   e8:	05190100 	0x05190100
   ec:	00000228 	0x00000228
   f0:	000000f6 	0x000000f6
-  f4:	9f0b0006 	0x9f0b0006
+  f4:	db0b0006 	0xdb0b0006
   f8:	01000000 	0x01000000
   fc:	0228051e 	slti	$r30,$r8,-1535(0xa01)
  100:	01080000 	0x01080000
@@ -14862,7 +14871,7 @@ Disassembly of section .debug_info:
  1c8:	0254010d 	sltui	$r13,$r8,1280(0x500)
  1cc:	00002508 	clz.d	$r8,$r8
  1d0:	00000010 	0x00000010
- 1d4:	00f10b00 	bstrpick.d	$r0,$r24,0x31,0x2
+ 1d4:	00fd0b00 	bstrpick.d	$r0,$r24,0x3d,0x2
  1d8:	19010000 	pcaddi	$r0,-522240(0x80800)
  1dc:	00022805 	0x00022805
  1e0:	0001e700 	asrtgt.d	$r24,$r25
@@ -14870,7 +14879,7 @@ Disassembly of section .debug_info:
  1e8:	1c00d2bc 	pcaddu12i	$r28,1685(0x695)
  1ec:	00000014 	0x00000014
  1f0:	00000216 	0x00000216
- 1f4:	0000f10b 	0x0000f10b
+ 1f4:	0000fd0b 	0x0000fd0b
  1f8:	05190100 	0x05190100
  1fc:	00000228 	0x00000228
  200:	00000206 	0x00000206
@@ -14887,437 +14896,450 @@ Disassembly of section .debug_info:
  22c:	1300746e 	addu16i.d	$r14,$r3,-16355(0xc01d)
  230:	00023c04 	0x00023c04
  234:	06010300 	cacop	0x0,$r24,64(0x40)
- 238:	000000f4 	0x000000f4
+ 238:	00000100 	0x00000100
  23c:	00023514 	0x00023514
  240:	25041300 	stptr.w	$r0,$r24,1040(0x410)
  244:	15000000 	lu12i.w	$r0,-524288(0x80000)
- 248:	0000009f 	0x0000009f
- 24c:	0000009f 	0x0000009f
+ 248:	000000db 	0x000000db
+ 24c:	000000db 	0x000000db
  250:	15051e01 	lu12i.w	$r1,-513808(0x828f0)
- 254:	000000f1 	0x000000f1
- 258:	000000f1 	0x000000f1
+ 254:	000000fd 	0x000000fd
+ 258:	000000fd 	0x000000fd
  25c:	15051901 	lu12i.w	$r1,-513848(0x828c8)
- 260:	000000a9 	0x000000a9
- 264:	000000a9 	0x000000a9
+ 260:	000000c8 	0x000000c8
+ 264:	000000c8 	0x000000c8
  268:	00051401 	alsl.w	$r1,$r0,$r5,0x3
- 26c:	000000c4 	0x000000c4
+ 26c:	000000f3 	0x000000f3
  270:	011e0004 	0x011e0004
  274:	01040000 	0x01040000
  278:	00000018 	0x00000018
- 27c:	0000f90c 	0x0000f90c
- 280:	0000bc00 	0x0000bc00
+ 27c:	00010e0c 	0x00010e0c
+ 280:	00009f00 	0x00009f00
  284:	00d47000 	bstrpick.d	$r0,$r0,0x14,0x1c
- 288:	0000541c 	bitrev.d	$r28,$r0
+ 288:	0000801c 	0x0000801c
  28c:	0001a800 	asrtgt.d	$r0,$r10
  290:	07040200 	0x07040200
  294:	0000000b 	0x0000000b
  298:	06070402 	cacop	0x2,$r0,449(0x1c1)
  29c:	03000000 	lu52i.d	$r0,$r0,0
- 2a0:	000000ed 	0x000000ed
- 2a4:	01060701 	0x01060701
- 2a8:	0000004b 	0x0000004b
- 2ac:	01006304 	0x01006304
- 2b0:	004b0607 	0x004b0607
- 2b4:	05000000 	0x05000000
- 2b8:	6e690504 	bgeu	$r8,$r4,-104188(0x26904) # fffe6bbc <_stack+0xe3ee6bc0>
- 2bc:	f1060074 	0xf1060074
- 2c0:	01000000 	0x01000000
- 2c4:	004b0501 	0x004b0501
- 2c8:	d4700000 	0xd4700000
- 2cc:	00281c00 	0x00281c00
- 2d0:	9c010000 	0x9c010000
- 2d4:	000000b0 	0x000000b0
- 2d8:	01006307 	0x01006307
- 2dc:	004b1101 	0x004b1101
- 2e0:	03970000 	ori	$r0,$r0,0x5c0
- 2e4:	03930000 	ori	$r0,$r0,0x4c0
- 2e8:	ed080000 	0xed080000
- 2ec:	01000000 	0x01000000
- 2f0:	004b0103 	0x004b0103
- 2f4:	00900000 	bstrins.d	$r0,$r0,0x10,0x0
- 2f8:	00090000 	bytepick.w	$r0,$r0,$r0,0x2
- 2fc:	0000330a 	revb.2h	$r10,$r24
- 300:	00d47000 	bstrpick.d	$r0,$r0,0x14,0x1c
- 304:	0030021c 	0x0030021c
- 308:	03010000 	lu52i.d	$r0,$r0,64(0x40)
- 30c:	00400b01 	0x00400b01
- 310:	03ba0000 	ori	$r0,$r0,0xe80
- 314:	03b80000 	ori	$r0,$r0,0xe00
- 318:	00000000 	0x00000000
- 31c:	0000330c 	revb.2h	$r12,$r24
- 320:	00d4a000 	bstrpick.d	$r0,$r0,0x14,0x28
- 324:	0000241c 	clz.d	$r28,$r0
- 328:	0d9c0100 	0x0d9c0100
- 32c:	00000040 	0x00000040
- 330:	00005401 	bitrev.d	$r1,$r0
- 334:	00000170 	0x00000170
- 338:	01ef0004 	0x01ef0004
- 33c:	01040000 	0x01040000
- 340:	00000018 	0x00000018
- 344:	0001030c 	0x0001030c
- 348:	0000bc00 	0x0000bc00
- 34c:	00d4d000 	bstrpick.d	$r0,$r0,0x14,0x34
- 350:	0000ac1c 	0x0000ac1c
- 354:	00020900 	0x00020900
- 358:	07040200 	0x07040200
- 35c:	0000000b 	0x0000000b
- 360:	06070402 	cacop	0x2,$r0,449(0x1c1)
- 364:	03000000 	lu52i.d	$r0,$r0,0
- 368:	0000010a 	0x0000010a
- 36c:	a9050e01 	0xa9050e01
- 370:	50000000 	b	0 # 370 <__stack_size-0xfc90>
- 374:	2c1c00d5 	vld	$vr21,$r6,1792(0x700)
- 378:	01000000 	0x01000000
- 37c:	0000a99c 	0x0000a99c
- 380:	00730400 	bstrins.w	$r0,$r0,0x13,0x1
- 384:	b0100e01 	0xb0100e01
- 388:	d1000000 	0xd1000000
- 38c:	cd000003 	0xcd000003
- 390:	05000003 	0x05000003
- 394:	000000f1 	0x000000f1
- 398:	a9100601 	0xa9100601
- 39c:	71000000 	0x71000000
- 3a0:	06000000 	cacop	0x0,$r0,0
- 3a4:	d55c0700 	0xd55c0700
- 3a8:	00bd1c00 	bstrins.d	$r0,$r0,0x3d,0x7
- 3ac:	00860000 	bstrins.d	$r0,$r0,0x6,0x0
- 3b0:	01080000 	0x01080000
- 3b4:	01f30354 	0x01f30354
- 3b8:	64070054 	bge	$r2,$r20,1792(0x700) # ab8 <__stack_size-0xf548>
- 3bc:	671c00d5 	bge	$r6,$r21,-58368(0x31c00) # ffff1fbc <_stack+0xe3ef1fc0>
- 3c0:	99000001 	0x99000001
- 3c4:	08000000 	0x08000000
- 3c8:	3d015401 	0x3d015401
- 3cc:	d56c0900 	0xd56c0900
- 3d0:	01671c00 	0x01671c00
- 3d4:	01080000 	0x01080000
- 3d8:	003a0154 	0x003a0154
- 3dc:	05040a00 	0x05040a00
- 3e0:	00746e69 	bstrins.w	$r9,$r19,0x14,0x1b
- 3e4:	00b6040b 	bstrins.d	$r11,$r0,0x36,0x1
- 3e8:	01020000 	0x01020000
- 3ec:	0000f406 	0x0000f406
- 3f0:	00a90300 	bstrins.d	$r0,$r24,0x29,0x0
- 3f4:	01010000 	fadd.d	$f0,$f0,$f0
- 3f8:	0000a905 	0x0000a905
- 3fc:	00d4d000 	bstrpick.d	$r0,$r0,0x14,0x34
- 400:	0000741c 	0x0000741c
- 404:	679c0100 	bge	$r8,$r0,-25600(0x39c00) # ffffa004 <_stack+0xe3efa008>
- 408:	04000001 	csrrd	$r1,0x0
- 40c:	01010073 	fadd.d	$f19,$f3,$f0
- 410:	0000b015 	0x0000b015
- 414:	0003fc00 	0x0003fc00
- 418:	0003f200 	0x0003f200
- 41c:	00630c00 	bstrins.w	$r0,$r0,0x3,0x3
- 420:	b6060301 	0xb6060301
- 424:	41000000 	beqz	$r0,65536(0x10000) # 10424 <__stack_size+0x424>
- 428:	3f000004 	0x3f000004
- 42c:	0d000004 	fsel	$f4,$f0,$f0,$fcc0
- 430:	00000048 	0x00000048
- 434:	0000f105 	0x0000f105
- 438:	10060100 	addu16i.d	$r0,$r8,384(0x180)
- 43c:	000000a9 	0x000000a9
- 440:	00000112 	0x00000112
- 444:	100e0006 	addu16i.d	$r6,$r0,896(0x380)
- 448:	081c00d5 	fmadd.s	$f21,$f6,$f0,$f24
- 44c:	41000000 	beqz	$r0,65536(0x10000) # 1044c <__stack_size+0x44c>
- 450:	05000001 	0x05000001
- 454:	000000f1 	0x000000f1
- 458:	a9100601 	0xa9100601
- 45c:	31000000 	0x31000000
- 460:	06000001 	cacop	0x1,$r0,0
- 464:	d5180900 	0xd5180900
- 468:	01671c00 	0x01671c00
- 46c:	01080000 	0x01080000
- 470:	003d0154 	0x003d0154
- 474:	d5000700 	0xd5000700
- 478:	01671c00 	0x01671c00
- 47c:	01550000 	0x01550000
- 480:	01080000 	0x01080000
- 484:	00870254 	bstrins.d	$r20,$r18,0x7,0x0
- 488:	d5200900 	0xd5200900
- 48c:	01671c00 	0x01671c00
- 490:	01080000 	0x01080000
- 494:	00870254 	bstrins.d	$r20,$r18,0x7,0x0
- 498:	0f000000 	0x0f000000
- 49c:	000000f1 	0x000000f1
- 4a0:	000000f1 	0x000000f1
- 4a4:	00100601 	add.w	$r1,$r16,$r1
- 4a8:	00000177 	0x00000177
- 4ac:	02cb0004 	addi.d	$r4,$r0,704(0x2c0)
- 4b0:	01040000 	0x01040000
- 4b4:	00000018 	0x00000018
- 4b8:	00010f0c 	0x00010f0c
- 4bc:	0000bc00 	0x0000bc00
- 4c0:	00d58000 	bstrpick.d	$r0,$r0,0x15,0x20
- 4c4:	0000ec1c 	0x0000ec1c
- 4c8:	0002a100 	0x0002a100
- 4cc:	07040200 	0x07040200
- 4d0:	0000000b 	0x0000000b
- 4d4:	06070402 	cacop	0x2,$r0,449(0x1c1)
- 4d8:	03000000 	lu52i.d	$r0,$r0,0
- 4dc:	0000009f 	0x0000009f
- 4e0:	49050101 	bcnez	$fcc0,328960(0x50500) # 509e0 <__stack_size+0x409e0>
- 4e4:	80000001 	0x80000001
- 4e8:	ec1c00d5 	0xec1c00d5
- 4ec:	01000000 	0x01000000
- 4f0:	0001499c 	0x0001499c
- 4f4:	00760400 	bstrins.w	$r0,$r0,0x16,0x1
- 4f8:	50140101 	b	67376128(0x4041400) # 40418f8 <__stack_size+0x40318f8>
- 4fc:	60000001 	blt	$r0,$r1,0 # 4fc <__stack_size-0xfb04>
- 500:	54000004 	bl	1048576(0x100000) # 100500 <__stack_size+0xf0500>
- 504:	04000004 	csrrd	$r4,0x0
- 508:	01010077 	fadd.d	$f23,$f3,$f0
- 50c:	0001491a 	0x0001491a
- 510:	0004ba00 	alsl.w	$r0,$r16,$r14,0x2
- 514:	0004b000 	alsl.w	$r0,$r0,$r12,0x2
- 518:	00a40500 	bstrins.d	$r0,$r8,0x24,0x1
- 51c:	01010000 	fadd.d	$f0,$f0,$f0
- 520:	00014920 	asrtle.d	$r9,$r18
- 524:	00050800 	alsl.w	$r0,$r0,$r2,0x3
- 528:	0004fe00 	alsl.w	$r0,$r16,$r31,0x2
- 52c:	01210500 	0x01210500
- 530:	01010000 	fadd.d	$f0,$f0,$f0
- 534:	00014929 	0x00014929
- 538:	00055600 	alsl.w	$r0,$r16,$r21,0x3
- 53c:	00054c00 	alsl.w	$r0,$r0,$r19,0x3
- 540:	00690600 	bstrins.w	$r0,$r16,0x9,0x1
- 544:	49060301 	0x49060301
- 548:	a7000001 	0xa7000001
- 54c:	9b000005 	0x9b000005
- 550:	06000005 	cacop	0x5,$r0,0
- 554:	0301006a 	lu52i.d	$r10,$r3,64(0x40)
- 558:	00014908 	0x00014908
- 55c:	00060400 	alsl.wu	$r0,$r0,$r1,0x1
- 560:	0005fa00 	alsl.w	$r0,$r16,$r30,0x4
- 564:	00630600 	bstrins.w	$r0,$r16,0x3,0x1
- 568:	49060401 	bceqz	$fcc0,329220(0x50604) # 50b6c <__stack_size+0x40b6c>
- 56c:	53000001 	b	458752(0x70000) # 7056c <__stack_size+0x6056c>
- 570:	51000006 	b	1638400(0x190000) # 190570 <__stack_size+0x180570>
- 574:	07000006 	0x07000006
- 578:	00667562 	bstrins.w	$r2,$r11,0x6,0x1d
- 57c:	57070501 	bl	67569412(0x4070704) # 4070c80 <__stack_size+0x4060c80>
- 580:	03000001 	lu52i.d	$r1,$r0,0
- 584:	087fb091 	0x087fb091
- 588:	0000011b 	0x0000011b
- 58c:	2c100601 	vld	$vr1,$r16,1025(0x401)
- 590:	76000000 	0x76000000
- 594:	66000006 	bge	$r0,$r6,-131072(0x20000) # fffe0594 <_stack+0xe3ee0598>
- 598:	09000006 	0x09000006
- 59c:	1c00d640 	pcaddu12i	$r0,1714(0x6b2)
- 5a0:	00000020 	0x00000020
- 5a4:	00000123 	0x00000123
- 5a8:	0000f10a 	0x0000f10a
- 5ac:	020a0100 	slti	$r0,$r8,640(0x280)
- 5b0:	00000149 	0x00000149
- 5b4:	00000112 	0x00000112
- 5b8:	500c000b 	b	2886656(0x2c0c00) # 2c11b8 <__stack_size+0x2b11b8>
- 5bc:	6e1c00d6 	bgeu	$r6,$r22,-123904(0x21c00) # fffe21bc <_stack+0xe3ee21c0>
- 5c0:	0d000001 	fsel	$f1,$f0,$f0,$fcc0
- 5c4:	08025401 	0x08025401
- 5c8:	0e00002d 	0x0e00002d
- 5cc:	1c00d5e8 	pcaddu12i	$r8,1711(0x6af)
- 5d0:	00000030 	0x00000030
- 5d4:	0000f10a 	0x0000f10a
- 5d8:	020a0100 	slti	$r0,$r8,640(0x280)
- 5dc:	00000149 	0x00000149
- 5e0:	0000013e 	0x0000013e
- 5e4:	180f000b 	pcaddi	$r11,30720(0x7800)
- 5e8:	6e1c00d6 	bgeu	$r6,$r22,-123904(0x21c00) # fffe21e8 <_stack+0xe3ee21ec>
- 5ec:	00000001 	0x00000001
- 5f0:	05041000 	0x05041000
- 5f4:	00746e69 	bstrins.w	$r9,$r19,0x14,0x1b
- 5f8:	26050402 	ldptr.d	$r2,$r0,1284(0x504)
- 5fc:	11000001 	addu16i.d	$r1,$r0,16384(0x4000)
- 600:	00000167 	0x00000167
- 604:	00000167 	0x00000167
- 608:	00002512 	clz.d	$r18,$r8
- 60c:	02003f00 	slti	$r0,$r24,15(0xf)
- 610:	00f40601 	bstrpick.d	$r1,$r16,0x34,0x1
- 614:	f1130000 	0xf1130000
- 618:	f1000000 	0xf1000000
- 61c:	01000000 	0x01000000
- 620:	4500020a 	bnez	$r16,2686976(0x290000) # 290620 <__stack_size+0x280620>
- 624:	04000002 	csrrd	$r2,0x0
- 628:	0003e900 	0x0003e900
- 62c:	18010400 	pcaddi	$r0,2080(0x820)
- 630:	0c000000 	0x0c000000
- 634:	00000161 	0x00000161
- 638:	000000bc 	0x000000bc
- 63c:	1c00d670 	pcaddu12i	$r16,1715(0x6b3)
- 640:	00000140 	0x00000140
- 644:	0000038d 	0x0000038d
- 648:	0b070402 	0x0b070402
- 64c:	02000000 	slti	$r0,$r0,0
- 650:	00060704 	alsl.wu	$r4,$r24,$r1,0x1
- 654:	50030000 	b	768(0x300) # 954 <__stack_size-0xf6ac>
- 658:	02000001 	slti	$r1,$r0,0
- 65c:	002c1703 	alsl.d	$r3,$r24,$r5,0x1
- 660:	04040000 	csrrd	$r0,0x100
- 664:	746e6905 	0x746e6905
- 668:	01470500 	0x01470500
- 66c:	02100000 	slti	$r0,$r0,1024(0x400)
- 670:	00880820 	bstrins.d	$r0,$r1,0x8,0x2
- 674:	8a060000 	0x8a060000
- 678:	02000001 	slti	$r1,$r0,0
- 67c:	00330b21 	0x00330b21
- 680:	06000000 	cacop	0x0,$r0,0
- 684:	00000198 	0x00000198
- 688:	330b2202 	0x330b2202
- 68c:	04000000 	csrrd	$r0,0x0
- 690:	00017906 	0x00017906
- 694:	0b230200 	0x0b230200
- 698:	00000033 	0x00000033
- 69c:	01590608 	0x01590608
- 6a0:	24020000 	ldptr.w	$r0,$r0,512(0x200)
- 6a4:	0000330b 	revb.2h	$r11,$r24
- 6a8:	07000c00 	0x07000c00
- 6ac:	00000168 	0x00000168
- 6b0:	2c0f3c01 	vld	$vr1,$r0,975(0x3cf)
- 6b4:	80000000 	0x80000000
- 6b8:	301c00d7 	0x301c00d7
- 6bc:	01000000 	0x01000000
- 6c0:	0000da9c 	0x0000da9c
- 6c4:	006e0800 	bstrins.w	$r0,$r0,0xe,0x2
- 6c8:	2c133e01 	vld	$vr1,$r16,1231(0x4cf)
- 6cc:	de000000 	0xde000000
- 6d0:	d6000006 	0xd6000006
- 6d4:	09000006 	0x09000006
- 6d8:	0000022e 	0x0000022e
- 6dc:	1c00d780 	pcaddu12i	$r0,1724(0x6bc)
- 6e0:	0000a803 	0x0000a803
- 6e4:	093f0100 	0x093f0100
- 6e8:	0000a80a 	0x0000a80a
- 6ec:	023b0b00 	slti	$r0,$r24,-318(0xec2)
- 6f0:	07200000 	0x07200000
- 6f4:	071e0000 	0x071e0000
- 6f8:	00000000 	0x00000000
- 6fc:	01910700 	0x01910700
- 700:	33010000 	0x33010000
- 704:	00002c0f 	ctz.d	$r15,$r0
- 708:	00d75000 	bstrpick.d	$r0,$r0,0x17,0x14
- 70c:	0000241c 	clz.d	$r28,$r0
- 710:	2c9c0100 	xvld	$xr0,$r8,1792(0x700)
- 714:	08000001 	0x08000001
- 718:	3501006e 	0x3501006e
- 71c:	00002c13 	ctz.d	$r19,$r0
- 720:	00073b00 	alsl.wu	$r0,$r24,$r14,0x3
- 724:	00073300 	alsl.wu	$r0,$r24,$r12,0x3
- 728:	022e0900 	slti	$r0,$r8,-1150(0xb82)
- 72c:	d7500000 	0xd7500000
- 730:	90031c00 	0x90031c00
- 734:	01000000 	0x01000000
- 738:	900a0936 	0x900a0936
- 73c:	0b000000 	0x0b000000
- 740:	0000023b 	0x0000023b
- 744:	00000776 	0x00000776
- 748:	00000774 	0x00000774
- 74c:	0c000000 	0x0c000000
- 750:	0000016f 	0x0000016f
- 754:	2c0f2c01 	vld	$vr1,$r0,971(0x3cb)
- 758:	47000000 	bnez	$r0,196608(0x30000) # 30758 <__stack_size+0x20758>
- 75c:	0d000001 	fsel	$f1,$f0,$f0,$fcc0
- 760:	2e01006e 	0x2e01006e
- 764:	00002c13 	ctz.d	$r19,$r0
- 768:	a0070000 	0xa0070000
- 76c:	01000001 	0x01000001
- 770:	002c0f20 	alsl.d	$r0,$r25,$r3,0x1
- 774:	d6b00000 	0xd6b00000
- 778:	00841c00 	bstrins.d	$r0,$r0,0x4,0x7
- 77c:	9c010000 	0x9c010000
- 780:	000001bb 	0x000001bb
- 784:	6c65730e 	bgeu	$r24,$r14,25968(0x6570) # 6cf4 <__stack_size-0x930c>
- 788:	21200100 	sc.w	$r0,$r8,8192(0x2000)
- 78c:	0000003f 	0x0000003f
- 790:	0000078d 	0x0000078d
- 794:	00000789 	0x00000789
- 798:	706d740f 	0x706d740f
- 79c:	36200100 	0x36200100
- 7a0:	000001bb 	0x000001bb
- 7a4:	6e085501 	bgeu	$r8,$r1,-128940(0x20854) # fffe0ff8 <_stack+0xe3ee0ffc>
- 7a8:	13220100 	addu16i.d	$r0,$r8,-14208(0xc880)
- 7ac:	0000002c 	0x0000002c
- 7b0:	000007b2 	0x000007b2
- 7b4:	000007ae 	0x000007ae
- 7b8:	00022e09 	0x00022e09
- 7bc:	00d6b000 	bstrpick.d	$r0,$r0,0x16,0x2c
- 7c0:	0078031c 	bstrins.w	$r28,$r24,0x18,0x0
- 7c4:	23010000 	sc.d	$r0,$r0,256(0x100)
- 7c8:	00780a09 	bstrins.w	$r9,$r16,0x18,0x2
- 7cc:	3b0b0000 	0x3b0b0000
- 7d0:	d3000002 	0xd3000002
- 7d4:	d1000007 	0xd1000007
- 7d8:	00000007 	0x00000007
- 7dc:	04100000 	csrrd	$r0,0x400
- 7e0:	00000046 	0x00000046
- 7e4:	00012f11 	0x00012f11
- 7e8:	0f160100 	0x0f160100
- 7ec:	0000002c 	0x0000002c
- 7f0:	1c00d6a0 	pcaddu12i	$r0,1717(0x6b5)
- 7f4:	00000008 	0x00000008
- 7f8:	01ee9c01 	0x01ee9c01
- 7fc:	6e080000 	bgeu	$r0,$r0,-129024(0x20800) # fffe0ffc <_stack+0xe3ee1000>
- 800:	13180100 	addu16i.d	$r0,$r8,-14848(0xc600)
- 804:	0000002c 	0x0000002c
- 808:	000007e8 	0x000007e8
- 80c:	000007e6 	0x000007e6
- 810:	013d1100 	0x013d1100
- 814:	11010000 	addu16i.d	$r0,$r0,16448(0x4040)
- 818:	00002c0f 	ctz.d	$r15,$r0
- 81c:	00d67000 	bstrpick.d	$r0,$r0,0x16,0x1c
- 820:	00001c1c 	ctz.w	$r28,$r0
- 824:	2e9c0100 	0x2e9c0100
- 828:	09000002 	0x09000002
- 82c:	0000022e 	0x0000022e
- 830:	1c00d670 	pcaddu12i	$r16,1715(0x6b3)
- 834:	00006002 	rdtimel.w	$r2,$r0
- 838:	0d130100 	vbitsel.v	$vr0,$vr8,$vr0,$vr6
- 83c:	0000600a 	rdtimel.w	$r10,$r0
- 840:	023b0b00 	slti	$r0,$r24,-318(0xec2)
- 844:	07fd0000 	0x07fd0000
- 848:	07fb0000 	0x07fb0000
- 84c:	00000000 	0x00000000
- 850:	013c1200 	0x013c1200
- 854:	04010000 	csrrd	$r0,0x40
- 858:	00002c0f 	ctz.d	$r15,$r0
- 85c:	81130100 	0x81130100
- 860:	01000001 	0x01000001
- 864:	002c1306 	alsl.d	$r6,$r24,$r4,0x1
- 868:	00000000 	0x00000000
- 86c:	00000084 	0x00000084
- 870:	052b0004 	0x052b0004
- 874:	01040000 	0x01040000
- 878:	00000018 	0x00000018
- 87c:	0001ae0c 	0x0001ae0c
- 880:	0000bc00 	0x0000bc00
- 884:	00d7b000 	bstrpick.d	$r0,$r0,0x17,0x2c
- 888:	0000501c 	bitrev.w	$r28,$r0
- 88c:	0004b800 	alsl.w	$r0,$r0,$r14,0x2
- 890:	07040200 	0x07040200
- 894:	0000000b 	0x0000000b
- 898:	06070402 	cacop	0x2,$r0,449(0x1c1)
- 89c:	03000000 	lu52i.d	$r0,$r0,0
- 8a0:	000001bb 	0x000001bb
- 8a4:	2c160101 	vld	$vr1,$r8,1408(0x580)
- 8a8:	05000000 	0x05000000
- 8ac:	0805ac03 	0x0805ac03
- 8b0:	01b5041c 	0x01b5041c
- 8b4:	07010000 	0x07010000
- 8b8:	00d7f006 	bstrpick.d	$r6,$r0,0x17,0x3c
- 8bc:	0000101c 	clo.w	$r28,$r0
- 8c0:	6a9c0100 	bltu	$r8,$r0,-91136(0x29c00) # fffea4c0 <_stack+0xe3eea4c4>
- 8c4:	05000000 	0x05000000
- 8c8:	000001c0 	0x000001c0
- 8cc:	25190701 	stptr.w	$r1,$r24,6404(0x1904)
- 8d0:	01000000 	0x01000000
- 8d4:	b6060054 	0xb6060054
- 8d8:	01000001 	0x01000001
- 8dc:	00800503 	bstrins.d	$r3,$r8,0x0,0x1
- 8e0:	d7b00000 	0xd7b00000
- 8e4:	00341c00 	0x00341c00
- 8e8:	9c010000 	0x9c010000
- 8ec:	69050407 	bltu	$r0,$r7,66820(0x10504) # 10df0 <__stack_size+0xdf0>
- 8f0:	0000746e 	0x0000746e
+ 2a0:	00000105 	0x00000105
+ 2a4:	25160e02 	stptr.w	$r2,$r16,5644(0x160c)
+ 2a8:	04000000 	csrrd	$r0,0x0
+ 2ac:	000000ec 	0x000000ec
+ 2b0:	d0061201 	0xd0061201
+ 2b4:	201c00d4 	ll.w	$r20,$r6,7168(0x1c00)
+ 2b8:	01000000 	0x01000000
+ 2bc:	0000629c 	rdtimel.w	$r28,$r20
+ 2c0:	00630500 	bstrins.w	$r0,$r8,0x3,0x1
+ 2c4:	62181201 	blt	$r16,$r1,-124912(0x21810) # fffe1ad4 <_stack+0xe3ee1ad8>
+ 2c8:	01000000 	0x01000000
+ 2cc:	04060054 	csrxchg	$r20,$r2,0x180
+ 2d0:	746e6905 	0x746e6905
+ 2d4:	00f90700 	bstrpick.d	$r0,$r24,0x39,0x1
+ 2d8:	07010000 	0x07010000
+ 2dc:	00810106 	bstrins.d	$r6,$r8,0x1,0x0
+ 2e0:	63080000 	blt	$r0,$r0,-63488(0x30800) # ffff0ae0 <_stack+0xe3ef0ae4>
+ 2e4:	06070100 	cacop	0x0,$r8,448(0x1c0)
+ 2e8:	00000062 	0x00000062
+ 2ec:	00fd0900 	bstrpick.d	$r0,$r8,0x3d,0x2
+ 2f0:	01010000 	fadd.d	$f0,$f0,$f0
+ 2f4:	00006205 	rdtimel.w	$r5,$r16
+ 2f8:	00d47000 	bstrpick.d	$r0,$r0,0x14,0x1c
+ 2fc:	0000281c 	cto.d	$r28,$r0
+ 300:	df9c0100 	0xdf9c0100
+ 304:	0a000000 	0x0a000000
+ 308:	01010063 	fadd.d	$f3,$f3,$f0
+ 30c:	00006211 	rdtimel.w	$r17,$r16
+ 310:	00039700 	0x00039700
+ 314:	00039300 	0x00039300
+ 318:	00f90b00 	bstrpick.d	$r0,$r24,0x39,0x2
+ 31c:	03010000 	lu52i.d	$r0,$r0,64(0x40)
+ 320:	00006201 	rdtimel.w	$r1,$r16
+ 324:	0000bf00 	0x0000bf00
+ 328:	0d000c00 	fsel	$f0,$f0,$f3,$fcc0
+ 32c:	00000069 	0x00000069
+ 330:	1c00d470 	pcaddu12i	$r16,1699(0x6a3)
+ 334:	00003002 	revb.2h	$r2,$r0
+ 338:	01030100 	fsub.d	$f0,$f8,$f0
+ 33c:	0000760e 	0x0000760e
+ 340:	0003ba00 	0x0003ba00
+ 344:	0003b800 	0x0003b800
+ 348:	0f000000 	0x0f000000
+ 34c:	00000069 	0x00000069
+ 350:	1c00d4a0 	pcaddu12i	$r0,1701(0x6a5)
+ 354:	00000024 	0x00000024
+ 358:	76109c01 	0x76109c01
+ 35c:	01000000 	0x01000000
+ 360:	70000054 	vseq.b	$vr20,$vr2,$vr0
+ 364:	04000001 	csrrd	$r1,0x0
+ 368:	00022b00 	0x00022b00
+ 36c:	18010400 	pcaddi	$r0,2080(0x820)
+ 370:	0c000000 	0x0c000000
+ 374:	00000118 	0x00000118
+ 378:	0000009f 	0x0000009f
+ 37c:	1c00d4f0 	pcaddu12i	$r16,1703(0x6a7)
+ 380:	000000ac 	0x000000ac
+ 384:	00000255 	0x00000255
+ 388:	0b070402 	0x0b070402
+ 38c:	02000000 	slti	$r0,$r0,0
+ 390:	00060704 	alsl.wu	$r4,$r24,$r1,0x1
+ 394:	1f030000 	pcaddu18i	$r0,-518144(0x81800)
+ 398:	01000001 	0x01000001
+ 39c:	00a9050e 	bstrins.d	$r14,$r8,0x29,0x1
+ 3a0:	d5700000 	0xd5700000
+ 3a4:	002c1c00 	alsl.d	$r0,$r0,$r7,0x1
+ 3a8:	9c010000 	0x9c010000
+ 3ac:	000000a9 	0x000000a9
+ 3b0:	01007304 	0x01007304
+ 3b4:	00b0100e 	bstrins.d	$r14,$r0,0x30,0x4
+ 3b8:	03d10000 	xori	$r0,$r0,0x440
+ 3bc:	03cd0000 	xori	$r0,$r0,0x340
+ 3c0:	fd050000 	0xfd050000
+ 3c4:	01000000 	0x01000000
+ 3c8:	00a91006 	bstrins.d	$r6,$r0,0x29,0x4
+ 3cc:	00710000 	bstrins.w	$r0,$r0,0x11,0x0
+ 3d0:	00060000 	alsl.wu	$r0,$r0,$r0,0x1
+ 3d4:	00d57c07 	bstrpick.d	$r7,$r0,0x15,0x1f
+ 3d8:	0000bd1c 	0x0000bd1c
+ 3dc:	00008600 	0x00008600
+ 3e0:	54010800 	bl	264(0x108) # 4e8 <__stack_size-0xfb18>
+ 3e4:	5401f303 	bl	-66321936(0xc0c01f0) # fc0c05d4 <_stack+0xdffc05d8>
+ 3e8:	d5840700 	0xd5840700
+ 3ec:	01671c00 	0x01671c00
+ 3f0:	00990000 	bstrins.d	$r0,$r0,0x19,0x0
+ 3f4:	01080000 	0x01080000
+ 3f8:	003d0154 	0x003d0154
+ 3fc:	00d58c09 	bstrpick.d	$r9,$r0,0x15,0x23
+ 400:	0001671c 	0x0001671c
+ 404:	54010800 	bl	264(0x108) # 50c <__stack_size-0xfaf4>
+ 408:	00003a01 	revb.2w	$r1,$r16
+ 40c:	6905040a 	bltu	$r0,$r10,66820(0x10504) # 10910 <__stack_size+0x910>
+ 410:	0b00746e 	0x0b00746e
+ 414:	0000b604 	0x0000b604
+ 418:	06010200 	cacop	0x0,$r16,64(0x40)
+ 41c:	00000100 	0x00000100
+ 420:	0000c803 	0x0000c803
+ 424:	05010100 	0x05010100
+ 428:	000000a9 	0x000000a9
+ 42c:	1c00d4f0 	pcaddu12i	$r16,1703(0x6a7)
+ 430:	00000074 	0x00000074
+ 434:	01679c01 	0x01679c01
+ 438:	73040000 	0x73040000
+ 43c:	15010100 	lu12i.w	$r0,-522232(0x80808)
+ 440:	000000b0 	0x000000b0
+ 444:	000003fc 	0x000003fc
+ 448:	000003f2 	0x000003f2
+ 44c:	0100630c 	0x0100630c
+ 450:	00b60603 	bstrins.d	$r3,$r16,0x36,0x1
+ 454:	04410000 	csrrd	$r0,0x1040
+ 458:	043f0000 	csrrd	$r0,0xfc0
+ 45c:	480d0000 	bceqz	$fcc0,3328(0xd00) # 115c <__stack_size-0xeea4>
+ 460:	05000000 	0x05000000
+ 464:	000000fd 	0x000000fd
+ 468:	a9100601 	0xa9100601
+ 46c:	12000000 	addu16i.d	$r0,$r0,-32768(0x8000)
+ 470:	06000001 	cacop	0x1,$r0,0
+ 474:	d5300e00 	0xd5300e00
+ 478:	00081c00 	bytepick.w	$r0,$r0,$r7,0x0
+ 47c:	01410000 	0x01410000
+ 480:	fd050000 	0xfd050000
+ 484:	01000000 	0x01000000
+ 488:	00a91006 	bstrins.d	$r6,$r0,0x29,0x4
+ 48c:	01310000 	0x01310000
+ 490:	00060000 	alsl.wu	$r0,$r0,$r0,0x1
+ 494:	00d53809 	bstrpick.d	$r9,$r0,0x15,0xe
+ 498:	0001671c 	0x0001671c
+ 49c:	54010800 	bl	264(0x108) # 5a4 <__stack_size-0xfa5c>
+ 4a0:	00003d01 	revb.d	$r1,$r8
+ 4a4:	00d52007 	bstrpick.d	$r7,$r0,0x15,0x8
+ 4a8:	0001671c 	0x0001671c
+ 4ac:	00015500 	asrtle.d	$r8,$r21
+ 4b0:	54010800 	bl	264(0x108) # 5b8 <__stack_size-0xfa48>
+ 4b4:	00008702 	0x00008702
+ 4b8:	00d54009 	bstrpick.d	$r9,$r0,0x15,0x10
+ 4bc:	0001671c 	0x0001671c
+ 4c0:	54010800 	bl	264(0x108) # 5c8 <__stack_size-0xfa38>
+ 4c4:	00008702 	0x00008702
+ 4c8:	fd0f0000 	0xfd0f0000
+ 4cc:	fd000000 	0xfd000000
+ 4d0:	01000000 	0x01000000
+ 4d4:	77001006 	0x77001006
+ 4d8:	04000001 	csrrd	$r1,0x0
+ 4dc:	00030700 	0x00030700
+ 4e0:	18010400 	pcaddi	$r0,2080(0x820)
+ 4e4:	0c000000 	0x0c000000
+ 4e8:	00000124 	0x00000124
+ 4ec:	0000009f 	0x0000009f
+ 4f0:	1c00d5a0 	pcaddu12i	$r0,1709(0x6ad)
+ 4f4:	000000ec 	0x000000ec
+ 4f8:	000002ed 	0x000002ed
+ 4fc:	0b070402 	0x0b070402
+ 500:	02000000 	slti	$r0,$r0,0
+ 504:	00060704 	alsl.wu	$r4,$r24,$r1,0x1
+ 508:	db030000 	0xdb030000
+ 50c:	01000000 	0x01000000
+ 510:	01490501 	0x01490501
+ 514:	d5a00000 	0xd5a00000
+ 518:	00ec1c00 	bstrpick.d	$r0,$r0,0x2c,0x7
+ 51c:	9c010000 	0x9c010000
+ 520:	00000149 	0x00000149
+ 524:	01007604 	0x01007604
+ 528:	01501401 	0x01501401
+ 52c:	04600000 	csrrd	$r0,0x1800
+ 530:	04540000 	csrrd	$r0,0x1500
+ 534:	77040000 	0x77040000
+ 538:	1a010100 	pcalau12i	$r0,2056(0x808)
+ 53c:	00000149 	0x00000149
+ 540:	000004ba 	0x000004ba
+ 544:	000004b0 	0x000004b0
+ 548:	0000e005 	0x0000e005
+ 54c:	20010100 	ll.w	$r0,$r8,256(0x100)
+ 550:	00000149 	0x00000149
+ 554:	00000508 	0x00000508
+ 558:	000004fe 	0x000004fe
+ 55c:	00013605 	0x00013605
+ 560:	29010100 	st.b	$r0,$r8,64(0x40)
+ 564:	00000149 	0x00000149
+ 568:	00000556 	0x00000556
+ 56c:	0000054c 	0x0000054c
+ 570:	01006906 	0x01006906
+ 574:	01490603 	0x01490603
+ 578:	05a70000 	0x05a70000
+ 57c:	059b0000 	0x059b0000
+ 580:	6a060000 	bltu	$r0,$r0,-129536(0x20600) # fffe0b80 <_stack+0xe3ee0b84>
+ 584:	08030100 	0x08030100
+ 588:	00000149 	0x00000149
+ 58c:	00000604 	0x00000604
+ 590:	000005fa 	0x000005fa
+ 594:	01006306 	0x01006306
+ 598:	01490604 	0x01490604
+ 59c:	06530000 	0x06530000
+ 5a0:	06510000 	0x06510000
+ 5a4:	62070000 	blt	$r0,$r0,-129280(0x20700) # fffe0ca4 <_stack+0xe3ee0ca8>
+ 5a8:	01006675 	0x01006675
+ 5ac:	01570705 	0x01570705
+ 5b0:	91030000 	0x91030000
+ 5b4:	30087fb0 	0x30087fb0
+ 5b8:	01000001 	0x01000001
+ 5bc:	002c1006 	alsl.d	$r6,$r0,$r4,0x1
+ 5c0:	06760000 	0x06760000
+ 5c4:	06660000 	0x06660000
+ 5c8:	60090000 	blt	$r0,$r0,2304(0x900) # ec8 <__stack_size-0xf138>
+ 5cc:	201c00d6 	ll.w	$r22,$r6,7168(0x1c00)
+ 5d0:	23000000 	sc.d	$r0,$r0,0
+ 5d4:	0a000001 	0x0a000001
+ 5d8:	000000fd 	0x000000fd
+ 5dc:	49020a01 	0x49020a01
+ 5e0:	12000001 	addu16i.d	$r1,$r0,-32768(0x8000)
+ 5e4:	0b000001 	0x0b000001
+ 5e8:	d6700c00 	0xd6700c00
+ 5ec:	016e1c00 	0x016e1c00
+ 5f0:	010d0000 	fmaxa.d	$f0,$f0,$f0
+ 5f4:	2d080254 	0x2d080254
+ 5f8:	080e0000 	0x080e0000
+ 5fc:	301c00d6 	0x301c00d6
+ 600:	0a000000 	0x0a000000
+ 604:	000000fd 	0x000000fd
+ 608:	49020a01 	0x49020a01
+ 60c:	3e000001 	0x3e000001
+ 610:	0b000001 	0x0b000001
+ 614:	d6380f00 	0xd6380f00
+ 618:	016e1c00 	0x016e1c00
+ 61c:	00000000 	0x00000000
+ 620:	69050410 	bltu	$r0,$r16,66820(0x10504) # 10b24 <__stack_size+0xb24>
+ 624:	0200746e 	slti	$r14,$r3,29(0x1d)
+ 628:	013b0504 	0x013b0504
+ 62c:	67110000 	bge	$r0,$r0,-61184(0x31100) # ffff172c <_stack+0xe3ef1730>
+ 630:	67000001 	bge	$r0,$r1,-65536(0x30000) # ffff0630 <_stack+0xe3ef0634>
+ 634:	12000001 	addu16i.d	$r1,$r0,-32768(0x8000)
+ 638:	00000025 	0x00000025
+ 63c:	0102003f 	0x0102003f
+ 640:	00010006 	0x00010006
+ 644:	00fd1300 	bstrpick.d	$r0,$r24,0x3d,0x4
+ 648:	00fd0000 	bstrpick.d	$r0,$r0,0x3d,0x0
+ 64c:	0a010000 	0x0a010000
+ 650:	02450002 	sltui	$r2,$r0,320(0x140)
+ 654:	00040000 	alsl.w	$r0,$r0,$r0,0x1
+ 658:	00000425 	0x00000425
+ 65c:	00180104 	sra.w	$r4,$r8,$r0
+ 660:	760c0000 	0x760c0000
+ 664:	9f000001 	0x9f000001
+ 668:	90000000 	0x90000000
+ 66c:	401c00d6 	beqz	$r6,-2614272(0x581c00) # ffd8226c <_stack+0xe3c82270>
+ 670:	d9000001 	0xd9000001
+ 674:	02000003 	slti	$r3,$r0,0
+ 678:	000b0704 	0x000b0704
+ 67c:	04020000 	csrrd	$r0,0x80
+ 680:	00000607 	0x00000607
+ 684:	01650300 	0x01650300
+ 688:	03020000 	lu52i.d	$r0,$r0,128(0x80)
+ 68c:	00002c17 	ctz.d	$r23,$r0
+ 690:	05040400 	0x05040400
+ 694:	00746e69 	bstrins.w	$r9,$r19,0x14,0x1b
+ 698:	00015c05 	0x00015c05
+ 69c:	20021000 	ll.w	$r0,$r0,528(0x210)
+ 6a0:	00008808 	0x00008808
+ 6a4:	019f0600 	0x019f0600
+ 6a8:	21020000 	sc.w	$r0,$r0,512(0x200)
+ 6ac:	0000330b 	revb.2h	$r11,$r24
+ 6b0:	ad060000 	0xad060000
+ 6b4:	02000001 	slti	$r1,$r0,0
+ 6b8:	00330b22 	0x00330b22
+ 6bc:	06040000 	cacop	0x0,$r0,256(0x100)
+ 6c0:	0000018e 	0x0000018e
+ 6c4:	330b2302 	0x330b2302
+ 6c8:	08000000 	0x08000000
+ 6cc:	00016e06 	0x00016e06
+ 6d0:	0b240200 	0x0b240200
+ 6d4:	00000033 	0x00000033
+ 6d8:	7d07000c 	0x7d07000c
+ 6dc:	01000001 	0x01000001
+ 6e0:	002c0f3c 	alsl.d	$r28,$r25,$r3,0x1
+ 6e4:	d7a00000 	0xd7a00000
+ 6e8:	00301c00 	0x00301c00
+ 6ec:	9c010000 	0x9c010000
+ 6f0:	000000da 	0x000000da
+ 6f4:	01006e08 	0x01006e08
+ 6f8:	002c133e 	alsl.d	$r30,$r25,$r4,0x1
+ 6fc:	06de0000 	0x06de0000
+ 700:	06d60000 	0x06d60000
+ 704:	2e090000 	0x2e090000
+ 708:	a0000002 	0xa0000002
+ 70c:	031c00d7 	lu52i.d	$r23,$r6,1792(0x700)
+ 710:	000000a8 	0x000000a8
+ 714:	0a093f01 	0x0a093f01
+ 718:	000000a8 	0x000000a8
+ 71c:	00023b0b 	0x00023b0b
+ 720:	00072000 	alsl.wu	$r0,$r0,$r8,0x3
+ 724:	00071e00 	alsl.wu	$r0,$r16,$r7,0x3
+ 728:	00000000 	0x00000000
+ 72c:	0001a607 	0x0001a607
+ 730:	0f330100 	0x0f330100
+ 734:	0000002c 	0x0000002c
+ 738:	1c00d770 	pcaddu12i	$r16,1723(0x6bb)
+ 73c:	00000024 	0x00000024
+ 740:	012c9c01 	0x012c9c01
+ 744:	6e080000 	bgeu	$r0,$r0,-129024(0x20800) # fffe0f44 <_stack+0xe3ee0f48>
+ 748:	13350100 	addu16i.d	$r0,$r8,-12992(0xcd40)
+ 74c:	0000002c 	0x0000002c
+ 750:	0000073b 	0x0000073b
+ 754:	00000733 	0x00000733
+ 758:	00022e09 	0x00022e09
+ 75c:	00d77000 	bstrpick.d	$r0,$r0,0x17,0x1c
+ 760:	0090031c 	bstrins.d	$r28,$r24,0x10,0x0
+ 764:	36010000 	0x36010000
+ 768:	00900a09 	bstrins.d	$r9,$r16,0x10,0x2
+ 76c:	3b0b0000 	0x3b0b0000
+ 770:	76000002 	0x76000002
+ 774:	74000007 	xvseq.b	$xr7,$xr0,$xr0
+ 778:	00000007 	0x00000007
+ 77c:	840c0000 	0x840c0000
+ 780:	01000001 	0x01000001
+ 784:	002c0f2c 	alsl.d	$r12,$r25,$r3,0x1
+ 788:	01470000 	0x01470000
+ 78c:	6e0d0000 	bgeu	$r0,$r0,-127744(0x20d00) # fffe148c <_stack+0xe3ee1490>
+ 790:	132e0100 	addu16i.d	$r0,$r8,-13440(0xcb80)
+ 794:	0000002c 	0x0000002c
+ 798:	01b50700 	0x01b50700
+ 79c:	20010000 	ll.w	$r0,$r0,256(0x100)
+ 7a0:	00002c0f 	ctz.d	$r15,$r0
+ 7a4:	00d6d000 	bstrpick.d	$r0,$r0,0x16,0x34
+ 7a8:	0000841c 	0x0000841c
+ 7ac:	bb9c0100 	0xbb9c0100
+ 7b0:	0e000001 	0x0e000001
+ 7b4:	006c6573 	bstrins.w	$r19,$r11,0xc,0x19
+ 7b8:	3f212001 	0x3f212001
+ 7bc:	8d000000 	0x8d000000
+ 7c0:	89000007 	0x89000007
+ 7c4:	0f000007 	0x0f000007
+ 7c8:	00706d74 	bstrins.w	$r20,$r11,0x10,0x1b
+ 7cc:	bb362001 	0xbb362001
+ 7d0:	01000001 	0x01000001
+ 7d4:	006e0855 	bstrins.w	$r21,$r2,0xe,0x2
+ 7d8:	2c132201 	vld	$vr1,$r16,1224(0x4c8)
+ 7dc:	b2000000 	0xb2000000
+ 7e0:	ae000007 	0xae000007
+ 7e4:	09000007 	0x09000007
+ 7e8:	0000022e 	0x0000022e
+ 7ec:	1c00d6d0 	pcaddu12i	$r16,1718(0x6b6)
+ 7f0:	00007803 	0x00007803
+ 7f4:	09230100 	vfmadd.d	$vr0,$vr8,$vr0,$vr6
+ 7f8:	0000780a 	0x0000780a
+ 7fc:	023b0b00 	slti	$r0,$r24,-318(0xec2)
+ 800:	07d30000 	0x07d30000
+ 804:	07d10000 	0x07d10000
+ 808:	00000000 	0x00000000
+ 80c:	46041000 	bnez	$r0,132112(0x20410) # 20c1c <__stack_size+0x10c1c>
+ 810:	11000000 	addu16i.d	$r0,$r0,16384(0x4000)
+ 814:	00000144 	0x00000144
+ 818:	2c0f1601 	vld	$vr1,$r16,965(0x3c5)
+ 81c:	c0000000 	0xc0000000
+ 820:	081c00d6 	fmadd.s	$f22,$f6,$f0,$f24
+ 824:	01000000 	0x01000000
+ 828:	0001ee9c 	0x0001ee9c
+ 82c:	006e0800 	bstrins.w	$r0,$r0,0xe,0x2
+ 830:	2c131801 	vld	$vr1,$r0,1222(0x4c6)
+ 834:	e8000000 	0xe8000000
+ 838:	e6000007 	0xe6000007
+ 83c:	00000007 	0x00000007
+ 840:	00015211 	0x00015211
+ 844:	0f110100 	0x0f110100
+ 848:	0000002c 	0x0000002c
+ 84c:	1c00d690 	pcaddu12i	$r16,1716(0x6b4)
+ 850:	0000001c 	0x0000001c
+ 854:	022e9c01 	slti	$r1,$r0,-1113(0xba7)
+ 858:	2e090000 	0x2e090000
+ 85c:	90000002 	0x90000002
+ 860:	021c00d6 	slti	$r22,$r6,1792(0x700)
+ 864:	00000060 	0x00000060
+ 868:	0a0d1301 	0x0a0d1301
+ 86c:	00000060 	0x00000060
+ 870:	00023b0b 	0x00023b0b
+ 874:	0007fd00 	alsl.wu	$r0,$r8,$r31,0x4
+ 878:	0007fb00 	alsl.wu	$r0,$r24,$r30,0x4
+ 87c:	00000000 	0x00000000
+ 880:	00015112 	0x00015112
+ 884:	0f040100 	0x0f040100
+ 888:	0000002c 	0x0000002c
+ 88c:	01961301 	0x01961301
+ 890:	06010000 	cacop	0x0,$r0,64(0x40)
+ 894:	00002c13 	ctz.d	$r19,$r0
+ 898:	84000000 	0x84000000
+ 89c:	04000000 	csrrd	$r0,0x0
+ 8a0:	00056700 	alsl.w	$r0,$r24,$r25,0x3
+ 8a4:	18010400 	pcaddi	$r0,2080(0x820)
+ 8a8:	0c000000 	0x0c000000
+ 8ac:	000001c3 	0x000001c3
+ 8b0:	0000009f 	0x0000009f
+ 8b4:	1c00d7d0 	pcaddu12i	$r16,1726(0x6be)
+ 8b8:	00000050 	0x00000050
+ 8bc:	00000504 	0x00000504
+ 8c0:	0b070402 	0x0b070402
+ 8c4:	02000000 	slti	$r0,$r0,0
+ 8c8:	00060704 	alsl.wu	$r4,$r24,$r1,0x1
+ 8cc:	d0030000 	0xd0030000
+ 8d0:	01000001 	0x01000001
+ 8d4:	002c1601 	alsl.d	$r1,$r16,$r5,0x1
+ 8d8:	03050000 	lu52i.d	$r0,$r0,320(0x140)
+ 8dc:	1c0805ac 	pcaddu12i	$r12,16429(0x402d)
+ 8e0:	0001ca04 	0x0001ca04
+ 8e4:	06070100 	cacop	0x0,$r8,448(0x1c0)
+ 8e8:	1c00d810 	pcaddu12i	$r16,1728(0x6c0)
+ 8ec:	00000010 	0x00000010
+ 8f0:	006a9c01 	bstrpick.w	$r1,$r0,0xa,0x7
+ 8f4:	d5050000 	0xd5050000
+ 8f8:	01000001 	0x01000001
+ 8fc:	00251907 	crc.w.w.w	$r7,$r8,$r6
+ 900:	54010000 	bl	256(0x100) # a00 <__stack_size-0xf600>
+ 904:	01cb0600 	0x01cb0600
+ 908:	03010000 	lu52i.d	$r0,$r0,64(0x40)
+ 90c:	00008005 	0x00008005
+ 910:	00d7d000 	bstrpick.d	$r0,$r0,0x17,0x34
+ 914:	0000341c 	revb.4h	$r28,$r0
+ 918:	079c0100 	0x079c0100
+ 91c:	6e690504 	bgeu	$r8,$r4,-104188(0x26904) # fffe7220 <_stack+0xe3ee7224>
+ 920:	Address 0x0000000000000920 is out of bounds.
+
 
 Disassembly of section .debug_abbrev:
 
@@ -15401,291 +15423,306 @@ Disassembly of section .debug_abbrev:
  130:	00240200 	crc.w.b.w	$r0,$r16,$r0
  134:	0b3e0b0b 	0x0b3e0b0b
  138:	00000e03 	0x00000e03
- 13c:	3f012e03 	0x3f012e03
- 140:	3a0e0319 	0x3a0e0319
- 144:	390b3b0b 	0x390b3b0b
- 148:	010b200b 	fmin.d	$f11,$f0,$f8
- 14c:	04000013 	csrrd	$r19,0x0
- 150:	08030005 	0x08030005
- 154:	0b3b0b3a 	0x0b3b0b3a
- 158:	13490b39 	addu16i.d	$r25,$r25,-11710(0xd242)
- 15c:	24050000 	ldptr.w	$r0,$r0,1280(0x500)
- 160:	3e0b0b00 	0x3e0b0b00
- 164:	0008030b 	bytepick.w	$r11,$r24,$r0,0x0
- 168:	012e0600 	0x012e0600
- 16c:	0e03193f 	0x0e03193f
- 170:	0b3b0b3a 	0x0b3b0b3a
- 174:	19270b39 	pcaddi	$r25,-444327(0x93859)
- 178:	01111349 	fscaleb.d	$f9,$f26,$f4
- 17c:	18400612 	pcaddi	$r18,131120(0x20030)
- 180:	01194297 	0x01194297
- 184:	07000013 	0x07000013
- 188:	08030005 	0x08030005
- 18c:	0b3b0b3a 	0x0b3b0b3a
- 190:	13490b39 	addu16i.d	$r25,$r25,-11710(0xd242)
- 194:	42b71702 	beqz	$r24,702228(0xab714) # ab8a8 <__stack_size+0x9b8a8>
- 198:	08000017 	0x08000017
- 19c:	193f012e 	pcaddi	$r14,-395255(0x9f809)
- 1a0:	0b3a0e03 	0x0b3a0e03
- 1a4:	0b390b3b 	0x0b390b3b
- 1a8:	193c1349 	pcaddi	$r9,-401254(0x9e09a)
- 1ac:	00001301 	clo.w	$r1,$r24
- 1b0:	00001809 	cto.w	$r9,$r0
- 1b4:	011d0a00 	0x011d0a00
- 1b8:	01521331 	0x01521331
- 1bc:	550b42b8 	bl	-85914816(0xae10b40) # fae10cfc <_stack+0xded10d00>
- 1c0:	590b5817 	beq	$r0,$r23,68440(0x10b58) # 10d18 <__stack_size+0xd18>
- 1c4:	000b570b 	0x000b570b
- 1c8:	00050b00 	alsl.w	$r0,$r24,$r2,0x3
- 1cc:	17021331 	lu32i.d	$r17,-520039(0x81099)
- 1d0:	001742b7 	sll.w	$r23,$r21,$r16
- 1d4:	012e0c00 	0x012e0c00
- 1d8:	01111331 	fscaleb.d	$f17,$f25,$f4
- 1dc:	18400612 	pcaddi	$r18,131120(0x20030)
- 1e0:	00194297 	srl.d	$r23,$r20,$r16
- 1e4:	00050d00 	alsl.w	$r0,$r8,$r3,0x3
- 1e8:	18021331 	pcaddi	$r17,4249(0x1099)
- 1ec:	01000000 	0x01000000
- 1f0:	0e250111 	0x0e250111
- 1f4:	0e030b13 	0x0e030b13
- 1f8:	01110e1b 	fscaleb.d	$f27,$f16,$f3
- 1fc:	17100612 	lu32i.d	$r18,-491472(0x88030)
- 200:	24020000 	ldptr.w	$r0,$r0,512(0x200)
- 204:	3e0b0b00 	0x3e0b0b00
- 208:	000e030b 	bytepick.d	$r11,$r24,$r0,0x4
- 20c:	012e0300 	0x012e0300
- 210:	0e03193f 	0x0e03193f
- 214:	0b3b0b3a 	0x0b3b0b3a
- 218:	19270b39 	pcaddi	$r25,-444327(0x93859)
- 21c:	01111349 	fscaleb.d	$f9,$f26,$f4
- 220:	18400612 	pcaddi	$r18,131120(0x20030)
- 224:	01194297 	0x01194297
- 228:	04000013 	csrrd	$r19,0x0
- 22c:	08030005 	0x08030005
- 230:	0b3b0b3a 	0x0b3b0b3a
- 234:	13490b39 	addu16i.d	$r25,$r25,-11710(0xd242)
- 238:	42b71702 	beqz	$r24,702228(0xab714) # ab94c <__stack_size+0x9b94c>
- 23c:	05000017 	0x05000017
- 240:	193f012e 	pcaddi	$r14,-395255(0x9f809)
- 244:	0b3a0e03 	0x0b3a0e03
- 248:	0b390b3b 	0x0b390b3b
- 24c:	193c1349 	pcaddi	$r9,-401254(0x9e09a)
- 250:	00001301 	clo.w	$r1,$r24
- 254:	00001806 	cto.w	$r6,$r0
- 258:	82890700 	0x82890700
- 25c:	01110101 	fscaleb.d	$f1,$f8,$f0
- 260:	13011331 	addu16i.d	$r17,$r25,-16316(0xc044)
- 264:	8a080000 	0x8a080000
- 268:	02000182 	slti	$r2,$r12,0
- 26c:	18429118 	pcaddi	$r24,136328(0x21488)
- 270:	89090000 	0x89090000
- 274:	11010182 	addu16i.d	$r2,$r12,16448(0x4040)
- 278:	00133101 	maskeqz	$r1,$r8,$r12
- 27c:	00240a00 	crc.w.b.w	$r0,$r16,$r2
- 280:	0b3e0b0b 	0x0b3e0b0b
- 284:	00000803 	0x00000803
- 288:	0b000f0b 	0x0b000f0b
- 28c:	0013490b 	maskeqz	$r11,$r8,$r18
- 290:	00340c00 	0x00340c00
- 294:	0b3a0803 	0x0b3a0803
- 298:	0b390b3b 	0x0b390b3b
- 29c:	17021349 	lu32i.d	$r9,-520038(0x8109a)
- 2a0:	001742b7 	sll.w	$r23,$r21,$r16
- 2a4:	010b0d00 	fmin.d	$f0,$f8,$f3
- 2a8:	00001755 	clz.w	$r21,$r26
- 2ac:	11010b0e 	addu16i.d	$r14,$r24,16450(0x4042)
- 2b0:	01061201 	0x01061201
- 2b4:	0f000013 	0x0f000013
- 2b8:	193f002e 	pcaddi	$r14,-395263(0x9f801)
- 2bc:	0e6e193c 	0x0e6e193c
- 2c0:	0b3a0e03 	0x0b3a0e03
- 2c4:	0b390b3b 	0x0b390b3b
- 2c8:	01000000 	0x01000000
- 2cc:	0e250111 	0x0e250111
- 2d0:	0e030b13 	0x0e030b13
- 2d4:	01110e1b 	fscaleb.d	$f27,$f16,$f3
- 2d8:	17100612 	lu32i.d	$r18,-491472(0x88030)
- 2dc:	24020000 	ldptr.w	$r0,$r0,512(0x200)
- 2e0:	3e0b0b00 	0x3e0b0b00
- 2e4:	000e030b 	bytepick.d	$r11,$r24,$r0,0x4
- 2e8:	012e0300 	0x012e0300
- 2ec:	0e03193f 	0x0e03193f
- 2f0:	0b3b0b3a 	0x0b3b0b3a
- 2f4:	19270b39 	pcaddi	$r25,-444327(0x93859)
- 2f8:	01111349 	fscaleb.d	$f9,$f26,$f4
- 2fc:	18400612 	pcaddi	$r18,131120(0x20030)
- 300:	01194297 	0x01194297
- 304:	04000013 	csrrd	$r19,0x0
- 308:	08030005 	0x08030005
- 30c:	0b3b0b3a 	0x0b3b0b3a
- 310:	13490b39 	addu16i.d	$r25,$r25,-11710(0xd242)
- 314:	42b71702 	beqz	$r24,702228(0xab714) # aba28 <__stack_size+0x9ba28>
- 318:	05000017 	0x05000017
- 31c:	0e030005 	0x0e030005
- 320:	0b3b0b3a 	0x0b3b0b3a
- 324:	13490b39 	addu16i.d	$r25,$r25,-11710(0xd242)
- 328:	42b71702 	beqz	$r24,702228(0xab714) # aba3c <__stack_size+0x9ba3c>
- 32c:	06000017 	cacop	0x17,$r0,0
- 330:	08030034 	0x08030034
- 334:	0b3b0b3a 	0x0b3b0b3a
- 338:	13490b39 	addu16i.d	$r25,$r25,-11710(0xd242)
- 33c:	42b71702 	beqz	$r24,702228(0xab714) # aba50 <__stack_size+0x9ba50>
- 340:	07000017 	0x07000017
- 344:	08030034 	0x08030034
+ 13c:	03001603 	lu52i.d	$r3,$r16,5(0x5)
+ 140:	3b0b3a0e 	0x3b0b3a0e
+ 144:	490b390b 	bcnez	$fcc0,2951992(0x2d0b38) # 2d0c7c <__stack_size+0x2c0c7c>
+ 148:	04000013 	csrrd	$r19,0x0
+ 14c:	193f012e 	pcaddi	$r14,-395255(0x9f809)
+ 150:	0b3a0e03 	0x0b3a0e03
+ 154:	0b390b3b 	0x0b390b3b
+ 158:	01111927 	fscaleb.d	$f7,$f9,$f6
+ 15c:	18400612 	pcaddi	$r18,131120(0x20030)
+ 160:	01194297 	0x01194297
+ 164:	05000013 	0x05000013
+ 168:	08030005 	0x08030005
+ 16c:	0b3b0b3a 	0x0b3b0b3a
+ 170:	13490b39 	addu16i.d	$r25,$r25,-11710(0xd242)
+ 174:	00001802 	cto.w	$r2,$r0
+ 178:	0b002406 	0x0b002406
+ 17c:	030b3e0b 	lu52i.d	$r11,$r16,719(0x2cf)
+ 180:	07000008 	0x07000008
+ 184:	193f012e 	pcaddi	$r14,-395255(0x9f809)
+ 188:	0b3a0e03 	0x0b3a0e03
+ 18c:	0b390b3b 	0x0b390b3b
+ 190:	13010b20 	addu16i.d	$r0,$r25,-16318(0xc042)
+ 194:	05080000 	0x05080000
+ 198:	3a080300 	0x3a080300
+ 19c:	390b3b0b 	0x390b3b0b
+ 1a0:	0013490b 	maskeqz	$r11,$r8,$r18
+ 1a4:	012e0900 	0x012e0900
+ 1a8:	0e03193f 	0x0e03193f
+ 1ac:	0b3b0b3a 	0x0b3b0b3a
+ 1b0:	19270b39 	pcaddi	$r25,-444327(0x93859)
+ 1b4:	01111349 	fscaleb.d	$f9,$f26,$f4
+ 1b8:	18400612 	pcaddi	$r18,131120(0x20030)
+ 1bc:	01194297 	0x01194297
+ 1c0:	0a000013 	0x0a000013
+ 1c4:	08030005 	0x08030005
+ 1c8:	0b3b0b3a 	0x0b3b0b3a
+ 1cc:	13490b39 	addu16i.d	$r25,$r25,-11710(0xd242)
+ 1d0:	42b71702 	beqz	$r24,702228(0xab714) # ab8e4 <__stack_size+0x9b8e4>
+ 1d4:	0b000017 	0x0b000017
+ 1d8:	193f012e 	pcaddi	$r14,-395255(0x9f809)
+ 1dc:	0b3a0e03 	0x0b3a0e03
+ 1e0:	0b390b3b 	0x0b390b3b
+ 1e4:	193c1349 	pcaddi	$r9,-401254(0x9e09a)
+ 1e8:	00001301 	clo.w	$r1,$r24
+ 1ec:	0000180c 	cto.w	$r12,$r0
+ 1f0:	011d0d00 	0x011d0d00
+ 1f4:	01521331 	0x01521331
+ 1f8:	550b42b8 	bl	-85914816(0xae10b40) # fae10d38 <_stack+0xded10d3c>
+ 1fc:	590b5817 	beq	$r0,$r23,68440(0x10b58) # 10d54 <__stack_size+0xd54>
+ 200:	000b570b 	0x000b570b
+ 204:	00050e00 	alsl.w	$r0,$r16,$r3,0x3
+ 208:	17021331 	lu32i.d	$r17,-520039(0x81099)
+ 20c:	001742b7 	sll.w	$r23,$r21,$r16
+ 210:	012e0f00 	0x012e0f00
+ 214:	01111331 	fscaleb.d	$f17,$f25,$f4
+ 218:	18400612 	pcaddi	$r18,131120(0x20030)
+ 21c:	00194297 	srl.d	$r23,$r20,$r16
+ 220:	00051000 	alsl.w	$r0,$r0,$r4,0x3
+ 224:	18021331 	pcaddi	$r17,4249(0x1099)
+ 228:	01000000 	0x01000000
+ 22c:	0e250111 	0x0e250111
+ 230:	0e030b13 	0x0e030b13
+ 234:	01110e1b 	fscaleb.d	$f27,$f16,$f3
+ 238:	17100612 	lu32i.d	$r18,-491472(0x88030)
+ 23c:	24020000 	ldptr.w	$r0,$r0,512(0x200)
+ 240:	3e0b0b00 	0x3e0b0b00
+ 244:	000e030b 	bytepick.d	$r11,$r24,$r0,0x4
+ 248:	012e0300 	0x012e0300
+ 24c:	0e03193f 	0x0e03193f
+ 250:	0b3b0b3a 	0x0b3b0b3a
+ 254:	19270b39 	pcaddi	$r25,-444327(0x93859)
+ 258:	01111349 	fscaleb.d	$f9,$f26,$f4
+ 25c:	18400612 	pcaddi	$r18,131120(0x20030)
+ 260:	01194297 	0x01194297
+ 264:	04000013 	csrrd	$r19,0x0
+ 268:	08030005 	0x08030005
+ 26c:	0b3b0b3a 	0x0b3b0b3a
+ 270:	13490b39 	addu16i.d	$r25,$r25,-11710(0xd242)
+ 274:	42b71702 	beqz	$r24,702228(0xab714) # ab988 <__stack_size+0x9b988>
+ 278:	05000017 	0x05000017
+ 27c:	193f012e 	pcaddi	$r14,-395255(0x9f809)
+ 280:	0b3a0e03 	0x0b3a0e03
+ 284:	0b390b3b 	0x0b390b3b
+ 288:	193c1349 	pcaddi	$r9,-401254(0x9e09a)
+ 28c:	00001301 	clo.w	$r1,$r24
+ 290:	00001806 	cto.w	$r6,$r0
+ 294:	82890700 	0x82890700
+ 298:	01110101 	fscaleb.d	$f1,$f8,$f0
+ 29c:	13011331 	addu16i.d	$r17,$r25,-16316(0xc044)
+ 2a0:	8a080000 	0x8a080000
+ 2a4:	02000182 	slti	$r2,$r12,0
+ 2a8:	18429118 	pcaddi	$r24,136328(0x21488)
+ 2ac:	89090000 	0x89090000
+ 2b0:	11010182 	addu16i.d	$r2,$r12,16448(0x4040)
+ 2b4:	00133101 	maskeqz	$r1,$r8,$r12
+ 2b8:	00240a00 	crc.w.b.w	$r0,$r16,$r2
+ 2bc:	0b3e0b0b 	0x0b3e0b0b
+ 2c0:	00000803 	0x00000803
+ 2c4:	0b000f0b 	0x0b000f0b
+ 2c8:	0013490b 	maskeqz	$r11,$r8,$r18
+ 2cc:	00340c00 	0x00340c00
+ 2d0:	0b3a0803 	0x0b3a0803
+ 2d4:	0b390b3b 	0x0b390b3b
+ 2d8:	17021349 	lu32i.d	$r9,-520038(0x8109a)
+ 2dc:	001742b7 	sll.w	$r23,$r21,$r16
+ 2e0:	010b0d00 	fmin.d	$f0,$f8,$f3
+ 2e4:	00001755 	clz.w	$r21,$r26
+ 2e8:	11010b0e 	addu16i.d	$r14,$r24,16450(0x4042)
+ 2ec:	01061201 	0x01061201
+ 2f0:	0f000013 	0x0f000013
+ 2f4:	193f002e 	pcaddi	$r14,-395263(0x9f801)
+ 2f8:	0e6e193c 	0x0e6e193c
+ 2fc:	0b3a0e03 	0x0b3a0e03
+ 300:	0b390b3b 	0x0b390b3b
+ 304:	01000000 	0x01000000
+ 308:	0e250111 	0x0e250111
+ 30c:	0e030b13 	0x0e030b13
+ 310:	01110e1b 	fscaleb.d	$f27,$f16,$f3
+ 314:	17100612 	lu32i.d	$r18,-491472(0x88030)
+ 318:	24020000 	ldptr.w	$r0,$r0,512(0x200)
+ 31c:	3e0b0b00 	0x3e0b0b00
+ 320:	000e030b 	bytepick.d	$r11,$r24,$r0,0x4
+ 324:	012e0300 	0x012e0300
+ 328:	0e03193f 	0x0e03193f
+ 32c:	0b3b0b3a 	0x0b3b0b3a
+ 330:	19270b39 	pcaddi	$r25,-444327(0x93859)
+ 334:	01111349 	fscaleb.d	$f9,$f26,$f4
+ 338:	18400612 	pcaddi	$r18,131120(0x20030)
+ 33c:	01194297 	0x01194297
+ 340:	04000013 	csrrd	$r19,0x0
+ 344:	08030005 	0x08030005
  348:	0b3b0b3a 	0x0b3b0b3a
  34c:	13490b39 	addu16i.d	$r25,$r25,-11710(0xd242)
- 350:	00001802 	cto.w	$r2,$r0
- 354:	03003408 	lu52i.d	$r8,$r0,13(0xd)
- 358:	3b0b3a0e 	0x3b0b3a0e
- 35c:	490b390b 	bcnez	$fcc0,2951992(0x2d0b38) # 2d0e94 <__stack_size+0x2c0e94>
- 360:	b7170213 	0xb7170213
- 364:	00001742 	clz.w	$r2,$r26
- 368:	11010b09 	addu16i.d	$r9,$r24,16450(0x4042)
- 36c:	01061201 	0x01061201
- 370:	0a000013 	0x0a000013
- 374:	193f012e 	pcaddi	$r14,-395255(0x9f809)
- 378:	0b3a0e03 	0x0b3a0e03
- 37c:	0b390b3b 	0x0b390b3b
- 380:	193c1349 	pcaddi	$r9,-401254(0x9e09a)
- 384:	00001301 	clo.w	$r1,$r24
- 388:	0000180b 	cto.w	$r11,$r0
- 38c:	82890c00 	0x82890c00
- 390:	01110101 	fscaleb.d	$f1,$f8,$f0
- 394:	00001331 	clo.w	$r17,$r25
- 398:	01828a0d 	0x01828a0d
- 39c:	91180200 	0x91180200
- 3a0:	00001842 	cto.w	$r2,$r2
- 3a4:	11010b0e 	addu16i.d	$r14,$r24,16450(0x4042)
- 3a8:	00061201 	alsl.wu	$r1,$r16,$r4,0x1
- 3ac:	82890f00 	0x82890f00
- 3b0:	01110001 	fscaleb.d	$f1,$f0,$f0
- 3b4:	00001331 	clo.w	$r17,$r25
- 3b8:	0b002410 	0x0b002410
- 3bc:	030b3e0b 	lu52i.d	$r11,$r16,719(0x2cf)
- 3c0:	11000008 	addu16i.d	$r8,$r0,16384(0x4000)
- 3c4:	13490101 	addu16i.d	$r1,$r8,-11712(0xd240)
- 3c8:	00001301 	clo.w	$r1,$r24
- 3cc:	49002112 	bcnez	$fcc0,-3604448(0x490020) # ffc903ec <_stack+0xe3b903f0>
- 3d0:	000b2f13 	0x000b2f13
- 3d4:	002e1300 	0x002e1300
- 3d8:	193c193f 	pcaddi	$r31,-401207(0x9e0c9)
- 3dc:	0e030e6e 	0x0e030e6e
- 3e0:	0b3b0b3a 	0x0b3b0b3a
- 3e4:	00000b39 	0x00000b39
- 3e8:	01110100 	fscaleb.d	$f0,$f8,$f0
- 3ec:	0b130e25 	0x0b130e25
- 3f0:	0e1b0e03 	0x0e1b0e03
- 3f4:	06120111 	cacop	0x11,$r8,1152(0x480)
- 3f8:	00001710 	clz.w	$r16,$r24
- 3fc:	0b002402 	0x0b002402
- 400:	030b3e0b 	lu52i.d	$r11,$r16,719(0x2cf)
- 404:	0300000e 	lu52i.d	$r14,$r0,0
- 408:	0e030016 	0x0e030016
- 40c:	0b3b0b3a 	0x0b3b0b3a
- 410:	13490b39 	addu16i.d	$r25,$r25,-11710(0xd242)
- 414:	24040000 	ldptr.w	$r0,$r0,1024(0x400)
- 418:	3e0b0b00 	0x3e0b0b00
- 41c:	0008030b 	bytepick.w	$r11,$r24,$r0,0x0
- 420:	01130500 	fcopysign.d	$f0,$f8,$f1
- 424:	0b0b0e03 	0x0b0b0e03
- 428:	0b3b0b3a 	0x0b3b0b3a
- 42c:	13010b39 	addu16i.d	$r25,$r25,-16318(0xc042)
- 430:	0d060000 	0x0d060000
- 434:	3a0e0300 	0x3a0e0300
- 438:	390b3b0b 	0x390b3b0b
- 43c:	3813490b 	0x3813490b
- 440:	0700000b 	0x0700000b
- 444:	193f012e 	pcaddi	$r14,-395255(0x9f809)
- 448:	0b3a0e03 	0x0b3a0e03
- 44c:	0b390b3b 	0x0b390b3b
- 450:	13491927 	addu16i.d	$r7,$r9,-11706(0xd246)
- 454:	06120111 	cacop	0x11,$r8,1152(0x480)
- 458:	42971840 	beqz	$r2,169752(0x29718) # 29b70 <__stack_size+0x19b70>
- 45c:	00130119 	maskeqz	$r25,$r8,$r0
- 460:	00340800 	0x00340800
- 464:	0b3a0803 	0x0b3a0803
- 468:	0b390b3b 	0x0b390b3b
- 46c:	17021349 	lu32i.d	$r9,-520038(0x8109a)
- 470:	001742b7 	sll.w	$r23,$r21,$r16
- 474:	011d0900 	0x011d0900
- 478:	01521331 	0x01521331
- 47c:	550b42b8 	bl	-85914816(0xae10b40) # fae10fbc <_stack+0xded10fc0>
- 480:	590b5817 	beq	$r0,$r23,68440(0x10b58) # 10fd8 <__stack_size+0xfd8>
- 484:	000b570b 	0x000b570b
- 488:	010b0a00 	fmin.d	$f0,$f16,$f2
- 48c:	00001755 	clz.w	$r21,$r26
- 490:	3100340b 	0x3100340b
- 494:	b7170213 	0xb7170213
- 498:	00001742 	clz.w	$r2,$r26
- 49c:	3f012e0c 	0x3f012e0c
- 4a0:	3a0e0319 	0x3a0e0319
- 4a4:	390b3b0b 	0x390b3b0b
- 4a8:	0113490b 	fcopysign.d	$f11,$f8,$f18
- 4ac:	0d000013 	fsel	$f19,$f0,$f0,$fcc0
- 4b0:	08030034 	0x08030034
- 4b4:	0b3b0b3a 	0x0b3b0b3a
- 4b8:	13490b39 	addu16i.d	$r25,$r25,-11710(0xd242)
- 4bc:	050e0000 	0x050e0000
- 4c0:	3a080300 	0x3a080300
- 4c4:	390b3b0b 	0x390b3b0b
- 4c8:	0213490b 	slti	$r11,$r8,1234(0x4d2)
- 4cc:	1742b717 	lu32i.d	$r23,-387656(0xa15b8)
- 4d0:	050f0000 	0x050f0000
- 4d4:	3a080300 	0x3a080300
- 4d8:	390b3b0b 	0x390b3b0b
- 4dc:	0213490b 	slti	$r11,$r8,1234(0x4d2)
- 4e0:	10000018 	addu16i.d	$r24,$r0,0
- 4e4:	0b0b000f 	0x0b0b000f
- 4e8:	00001349 	clo.w	$r9,$r26
- 4ec:	3f012e11 	0x3f012e11
- 4f0:	3a0e0319 	0x3a0e0319
- 4f4:	390b3b0b 	0x390b3b0b
- 4f8:	1113490b 	addu16i.d	$r11,$r8,17618(0x44d2)
- 4fc:	40061201 	beqz	$r16,263696(0x40610) # 40b0c <__stack_size+0x30b0c>
- 500:	19429718 	pcaddi	$r24,-387912(0xa14b8)
- 504:	00001301 	clo.w	$r1,$r24
- 508:	3f012e12 	0x3f012e12
- 50c:	3a0e0319 	0x3a0e0319
- 510:	390b3b0b 	0x390b3b0b
- 514:	2013490b 	ll.w	$r11,$r8,4936(0x1348)
- 518:	1300000b 	addu16i.d	$r11,$r0,-16384(0xc000)
- 51c:	0e030034 	0x0e030034
- 520:	0b3b0b3a 	0x0b3b0b3a
- 524:	13490b39 	addu16i.d	$r25,$r25,-11710(0xd242)
- 528:	01000000 	0x01000000
- 52c:	0e250111 	0x0e250111
- 530:	0e030b13 	0x0e030b13
- 534:	01110e1b 	fscaleb.d	$f27,$f16,$f3
- 538:	17100612 	lu32i.d	$r18,-491472(0x88030)
- 53c:	24020000 	ldptr.w	$r0,$r0,512(0x200)
- 540:	3e0b0b00 	0x3e0b0b00
- 544:	000e030b 	bytepick.d	$r11,$r24,$r0,0x4
- 548:	00340300 	0x00340300
- 54c:	0b3a0e03 	0x0b3a0e03
- 550:	0b390b3b 	0x0b390b3b
- 554:	18021349 	pcaddi	$r9,4250(0x109a)
- 558:	2e040000 	0x2e040000
- 55c:	03193f01 	lu52i.d	$r1,$r24,1615(0x64f)
- 560:	3b0b3a0e 	0x3b0b3a0e
- 564:	270b390b 	stptr.d	$r11,$r8,2872(0xb38)
- 568:	12011119 	addu16i.d	$r25,$r8,-32700(0x8044)
- 56c:	97184006 	0x97184006
- 570:	13011942 	addu16i.d	$r2,$r10,-16314(0xc046)
- 574:	05050000 	0x05050000
- 578:	3a0e0300 	0x3a0e0300
- 57c:	390b3b0b 	0x390b3b0b
- 580:	0213490b 	slti	$r11,$r8,1234(0x4d2)
- 584:	06000018 	cacop	0x18,$r0,0
- 588:	193f002e 	pcaddi	$r14,-395263(0x9f801)
- 58c:	0b3a0e03 	0x0b3a0e03
- 590:	0b390b3b 	0x0b390b3b
- 594:	13491927 	addu16i.d	$r7,$r9,-11706(0xd246)
- 598:	06120111 	cacop	0x11,$r8,1152(0x480)
- 59c:	42971840 	beqz	$r2,169752(0x29718) # 29cb4 <__stack_size+0x19cb4>
- 5a0:	07000019 	0x07000019
- 5a4:	0b0b0024 	0x0b0b0024
- 5a8:	08030b3e 	0x08030b3e
- 5ac:	Address 0x00000000000005ac is out of bounds.
+ 350:	42b71702 	beqz	$r24,702228(0xab714) # aba64 <__stack_size+0x9ba64>
+ 354:	05000017 	0x05000017
+ 358:	0e030005 	0x0e030005
+ 35c:	0b3b0b3a 	0x0b3b0b3a
+ 360:	13490b39 	addu16i.d	$r25,$r25,-11710(0xd242)
+ 364:	42b71702 	beqz	$r24,702228(0xab714) # aba78 <__stack_size+0x9ba78>
+ 368:	06000017 	cacop	0x17,$r0,0
+ 36c:	08030034 	0x08030034
+ 370:	0b3b0b3a 	0x0b3b0b3a
+ 374:	13490b39 	addu16i.d	$r25,$r25,-11710(0xd242)
+ 378:	42b71702 	beqz	$r24,702228(0xab714) # aba8c <__stack_size+0x9ba8c>
+ 37c:	07000017 	0x07000017
+ 380:	08030034 	0x08030034
+ 384:	0b3b0b3a 	0x0b3b0b3a
+ 388:	13490b39 	addu16i.d	$r25,$r25,-11710(0xd242)
+ 38c:	00001802 	cto.w	$r2,$r0
+ 390:	03003408 	lu52i.d	$r8,$r0,13(0xd)
+ 394:	3b0b3a0e 	0x3b0b3a0e
+ 398:	490b390b 	bcnez	$fcc0,2951992(0x2d0b38) # 2d0ed0 <__stack_size+0x2c0ed0>
+ 39c:	b7170213 	0xb7170213
+ 3a0:	00001742 	clz.w	$r2,$r26
+ 3a4:	11010b09 	addu16i.d	$r9,$r24,16450(0x4042)
+ 3a8:	01061201 	0x01061201
+ 3ac:	0a000013 	0x0a000013
+ 3b0:	193f012e 	pcaddi	$r14,-395255(0x9f809)
+ 3b4:	0b3a0e03 	0x0b3a0e03
+ 3b8:	0b390b3b 	0x0b390b3b
+ 3bc:	193c1349 	pcaddi	$r9,-401254(0x9e09a)
+ 3c0:	00001301 	clo.w	$r1,$r24
+ 3c4:	0000180b 	cto.w	$r11,$r0
+ 3c8:	82890c00 	0x82890c00
+ 3cc:	01110101 	fscaleb.d	$f1,$f8,$f0
+ 3d0:	00001331 	clo.w	$r17,$r25
+ 3d4:	01828a0d 	0x01828a0d
+ 3d8:	91180200 	0x91180200
+ 3dc:	00001842 	cto.w	$r2,$r2
+ 3e0:	11010b0e 	addu16i.d	$r14,$r24,16450(0x4042)
+ 3e4:	00061201 	alsl.wu	$r1,$r16,$r4,0x1
+ 3e8:	82890f00 	0x82890f00
+ 3ec:	01110001 	fscaleb.d	$f1,$f0,$f0
+ 3f0:	00001331 	clo.w	$r17,$r25
+ 3f4:	0b002410 	0x0b002410
+ 3f8:	030b3e0b 	lu52i.d	$r11,$r16,719(0x2cf)
+ 3fc:	11000008 	addu16i.d	$r8,$r0,16384(0x4000)
+ 400:	13490101 	addu16i.d	$r1,$r8,-11712(0xd240)
+ 404:	00001301 	clo.w	$r1,$r24
+ 408:	49002112 	bcnez	$fcc0,-3604448(0x490020) # ffc90428 <_stack+0xe3b9042c>
+ 40c:	000b2f13 	0x000b2f13
+ 410:	002e1300 	0x002e1300
+ 414:	193c193f 	pcaddi	$r31,-401207(0x9e0c9)
+ 418:	0e030e6e 	0x0e030e6e
+ 41c:	0b3b0b3a 	0x0b3b0b3a
+ 420:	00000b39 	0x00000b39
+ 424:	01110100 	fscaleb.d	$f0,$f8,$f0
+ 428:	0b130e25 	0x0b130e25
+ 42c:	0e1b0e03 	0x0e1b0e03
+ 430:	06120111 	cacop	0x11,$r8,1152(0x480)
+ 434:	00001710 	clz.w	$r16,$r24
+ 438:	0b002402 	0x0b002402
+ 43c:	030b3e0b 	lu52i.d	$r11,$r16,719(0x2cf)
+ 440:	0300000e 	lu52i.d	$r14,$r0,0
+ 444:	0e030016 	0x0e030016
+ 448:	0b3b0b3a 	0x0b3b0b3a
+ 44c:	13490b39 	addu16i.d	$r25,$r25,-11710(0xd242)
+ 450:	24040000 	ldptr.w	$r0,$r0,1024(0x400)
+ 454:	3e0b0b00 	0x3e0b0b00
+ 458:	0008030b 	bytepick.w	$r11,$r24,$r0,0x0
+ 45c:	01130500 	fcopysign.d	$f0,$f8,$f1
+ 460:	0b0b0e03 	0x0b0b0e03
+ 464:	0b3b0b3a 	0x0b3b0b3a
+ 468:	13010b39 	addu16i.d	$r25,$r25,-16318(0xc042)
+ 46c:	0d060000 	0x0d060000
+ 470:	3a0e0300 	0x3a0e0300
+ 474:	390b3b0b 	0x390b3b0b
+ 478:	3813490b 	0x3813490b
+ 47c:	0700000b 	0x0700000b
+ 480:	193f012e 	pcaddi	$r14,-395255(0x9f809)
+ 484:	0b3a0e03 	0x0b3a0e03
+ 488:	0b390b3b 	0x0b390b3b
+ 48c:	13491927 	addu16i.d	$r7,$r9,-11706(0xd246)
+ 490:	06120111 	cacop	0x11,$r8,1152(0x480)
+ 494:	42971840 	beqz	$r2,169752(0x29718) # 29bac <__stack_size+0x19bac>
+ 498:	00130119 	maskeqz	$r25,$r8,$r0
+ 49c:	00340800 	0x00340800
+ 4a0:	0b3a0803 	0x0b3a0803
+ 4a4:	0b390b3b 	0x0b390b3b
+ 4a8:	17021349 	lu32i.d	$r9,-520038(0x8109a)
+ 4ac:	001742b7 	sll.w	$r23,$r21,$r16
+ 4b0:	011d0900 	0x011d0900
+ 4b4:	01521331 	0x01521331
+ 4b8:	550b42b8 	bl	-85914816(0xae10b40) # fae10ff8 <_stack+0xded10ffc>
+ 4bc:	590b5817 	beq	$r0,$r23,68440(0x10b58) # 11014 <__stack_size+0x1014>
+ 4c0:	000b570b 	0x000b570b
+ 4c4:	010b0a00 	fmin.d	$f0,$f16,$f2
+ 4c8:	00001755 	clz.w	$r21,$r26
+ 4cc:	3100340b 	0x3100340b
+ 4d0:	b7170213 	0xb7170213
+ 4d4:	00001742 	clz.w	$r2,$r26
+ 4d8:	3f012e0c 	0x3f012e0c
+ 4dc:	3a0e0319 	0x3a0e0319
+ 4e0:	390b3b0b 	0x390b3b0b
+ 4e4:	0113490b 	fcopysign.d	$f11,$f8,$f18
+ 4e8:	0d000013 	fsel	$f19,$f0,$f0,$fcc0
+ 4ec:	08030034 	0x08030034
+ 4f0:	0b3b0b3a 	0x0b3b0b3a
+ 4f4:	13490b39 	addu16i.d	$r25,$r25,-11710(0xd242)
+ 4f8:	050e0000 	0x050e0000
+ 4fc:	3a080300 	0x3a080300
+ 500:	390b3b0b 	0x390b3b0b
+ 504:	0213490b 	slti	$r11,$r8,1234(0x4d2)
+ 508:	1742b717 	lu32i.d	$r23,-387656(0xa15b8)
+ 50c:	050f0000 	0x050f0000
+ 510:	3a080300 	0x3a080300
+ 514:	390b3b0b 	0x390b3b0b
+ 518:	0213490b 	slti	$r11,$r8,1234(0x4d2)
+ 51c:	10000018 	addu16i.d	$r24,$r0,0
+ 520:	0b0b000f 	0x0b0b000f
+ 524:	00001349 	clo.w	$r9,$r26
+ 528:	3f012e11 	0x3f012e11
+ 52c:	3a0e0319 	0x3a0e0319
+ 530:	390b3b0b 	0x390b3b0b
+ 534:	1113490b 	addu16i.d	$r11,$r8,17618(0x44d2)
+ 538:	40061201 	beqz	$r16,263696(0x40610) # 40b48 <__stack_size+0x30b48>
+ 53c:	19429718 	pcaddi	$r24,-387912(0xa14b8)
+ 540:	00001301 	clo.w	$r1,$r24
+ 544:	3f012e12 	0x3f012e12
+ 548:	3a0e0319 	0x3a0e0319
+ 54c:	390b3b0b 	0x390b3b0b
+ 550:	2013490b 	ll.w	$r11,$r8,4936(0x1348)
+ 554:	1300000b 	addu16i.d	$r11,$r0,-16384(0xc000)
+ 558:	0e030034 	0x0e030034
+ 55c:	0b3b0b3a 	0x0b3b0b3a
+ 560:	13490b39 	addu16i.d	$r25,$r25,-11710(0xd242)
+ 564:	01000000 	0x01000000
+ 568:	0e250111 	0x0e250111
+ 56c:	0e030b13 	0x0e030b13
+ 570:	01110e1b 	fscaleb.d	$f27,$f16,$f3
+ 574:	17100612 	lu32i.d	$r18,-491472(0x88030)
+ 578:	24020000 	ldptr.w	$r0,$r0,512(0x200)
+ 57c:	3e0b0b00 	0x3e0b0b00
+ 580:	000e030b 	bytepick.d	$r11,$r24,$r0,0x4
+ 584:	00340300 	0x00340300
+ 588:	0b3a0e03 	0x0b3a0e03
+ 58c:	0b390b3b 	0x0b390b3b
+ 590:	18021349 	pcaddi	$r9,4250(0x109a)
+ 594:	2e040000 	0x2e040000
+ 598:	03193f01 	lu52i.d	$r1,$r24,1615(0x64f)
+ 59c:	3b0b3a0e 	0x3b0b3a0e
+ 5a0:	270b390b 	stptr.d	$r11,$r8,2872(0xb38)
+ 5a4:	12011119 	addu16i.d	$r25,$r8,-32700(0x8044)
+ 5a8:	97184006 	0x97184006
+ 5ac:	13011942 	addu16i.d	$r2,$r10,-16314(0xc046)
+ 5b0:	05050000 	0x05050000
+ 5b4:	3a0e0300 	0x3a0e0300
+ 5b8:	390b3b0b 	0x390b3b0b
+ 5bc:	0213490b 	slti	$r11,$r8,1234(0x4d2)
+ 5c0:	06000018 	cacop	0x18,$r0,0
+ 5c4:	193f002e 	pcaddi	$r14,-395263(0x9f801)
+ 5c8:	0b3a0e03 	0x0b3a0e03
+ 5cc:	0b390b3b 	0x0b390b3b
+ 5d0:	13491927 	addu16i.d	$r7,$r9,-11706(0xd246)
+ 5d4:	06120111 	cacop	0x11,$r8,1152(0x480)
+ 5d8:	42971840 	beqz	$r2,169752(0x29718) # 29cf0 <__stack_size+0x19cf0>
+ 5dc:	07000019 	0x07000019
+ 5e0:	0b0b0024 	0x0b0b0024
+ 5e4:	08030b3e 	0x08030b3e
+ 5e8:	Address 0x00000000000005e8 is out of bounds.
 
 
 Disassembly of section .debug_loc:
@@ -16179,34 +16216,34 @@ Disassembly of section .debug_aranges:
   28:	00040000 	alsl.w	$r0,$r0,$r0,0x1
   2c:	00000000 	0x00000000
   30:	1c00d470 	pcaddu12i	$r16,1699(0x6a3)
-  34:	00000054 	0x00000054
+  34:	00000080 	0x00000080
 	...
   40:	0000001c 	0x0000001c
-  44:	03340002 	lu52i.d	$r2,$r0,-768(0xd00)
+  44:	03630002 	andi	$r2,$r0,0x8c0
   48:	00040000 	alsl.w	$r0,$r0,$r0,0x1
   4c:	00000000 	0x00000000
-  50:	1c00d4d0 	pcaddu12i	$r16,1702(0x6a6)
+  50:	1c00d4f0 	pcaddu12i	$r16,1703(0x6a7)
   54:	000000ac 	0x000000ac
 	...
   60:	0000001c 	0x0000001c
-  64:	04a80002 	csrrd	$r2,0x2a00
+  64:	04d70002 	csrrd	$r2,0x35c0
   68:	00040000 	alsl.w	$r0,$r0,$r0,0x1
   6c:	00000000 	0x00000000
-  70:	1c00d580 	pcaddu12i	$r0,1708(0x6ac)
+  70:	1c00d5a0 	pcaddu12i	$r0,1709(0x6ad)
   74:	000000ec 	0x000000ec
 	...
   80:	0000001c 	0x0000001c
-  84:	06230002 	cacop	0x2,$r0,-1856(0x8c0)
+  84:	06520002 	0x06520002
   88:	00040000 	alsl.w	$r0,$r0,$r0,0x1
   8c:	00000000 	0x00000000
-  90:	1c00d670 	pcaddu12i	$r16,1715(0x6b3)
+  90:	1c00d690 	pcaddu12i	$r16,1716(0x6b4)
   94:	00000140 	0x00000140
 	...
   a0:	0000001c 	0x0000001c
-  a4:	086c0002 	fmsub.d	$f2,$f0,$f0,$f24
+  a4:	089b0002 	fnmadd.s	$f2,$f0,$f0,$f22
   a8:	00040000 	alsl.w	$r0,$r0,$r0,0x1
   ac:	00000000 	0x00000000
-  b0:	1c00d7b0 	pcaddu12i	$r16,1725(0x6bd)
+  b0:	1c00d7d0 	pcaddu12i	$r16,1726(0x6be)
   b4:	00000050 	0x00000050
 	...
 
@@ -16359,226 +16396,245 @@ Disassembly of section .debug_line:
  19c:	05510605 	0x05510605
  1a0:	02831505 	addi.w	$r5,$r8,197(0xc5)
  1a4:	01010004 	fadd.d	$f4,$f0,$f0
- 1a8:	0000005d 	0x0000005d
- 1ac:	00200002 	div.w	$r2,$r0,$r0
+ 1a8:	000000a9 	0x000000a9
+ 1ac:	00390002 	0x00390002
  1b0:	01010000 	fadd.d	$f0,$f0,$f0
  1b4:	000d0efb 	bytepick.d	$r27,$r23,$r3,0x2
  1b8:	01010101 	fadd.d	$f1,$f8,$f0
  1bc:	01000000 	0x01000000
- 1c0:	00010000 	asrtle.d	$r0,$r0
- 1c4:	63747570 	blt	$r11,$r16,-35724(0x37474) # ffff7638 <_stack+0xe3ef763c>
- 1c8:	2e726168 	0x2e726168
- 1cc:	00000063 	0x00000063
- 1d0:	01050000 	fmul.d	$f0,$f0,$f0
- 1d4:	70020500 	vsle.b	$vr0,$vr8,$vr1
- 1d8:	131c00d4 	addu16i.d	$r20,$r6,-14592(0xc700)
- 1dc:	16060513 	lu32i.d	$r19,12328(0x3028)
- 1e0:	05140505 	0x05140505
- 1e4:	79030601 	0x79030601
- 1e8:	89050501 	0x89050501
- 1ec:	060105f2 	cacop	0x12,$r15,65(0x41)
- 1f0:	4a13060d 	0x4a13060d
- 1f4:	053f0806 	0x053f0806
- 1f8:	01051305 	fmul.d	$f5,$f24,$f4
- 1fc:	05051106 	0x05051106
- 200:	f9010583 	0xf9010583
- 204:	01000c02 	0x01000c02
- 208:	00009401 	0x00009401
- 20c:	1d000200 	pcaddu12i	$r0,-524272(0x80010)
- 210:	01000000 	0x01000000
- 214:	0d0efb01 	0x0d0efb01
- 218:	01010100 	fadd.d	$f0,$f8,$f0
- 21c:	00000001 	0x00000001
- 220:	01000001 	0x01000001
- 224:	74757000 	xvmax.wu	$xr0,$xr0,$xr28
- 228:	00632e73 	bstrins.w	$r19,$r19,0x3,0xb
- 22c:	00000000 	0x00000000
- 230:	05000105 	0x05000105
- 234:	00d4d002 	bstrpick.d	$r2,$r0,0x14,0x34
- 238:	1313131c 	addu16i.d	$r28,$r24,-15164(0xc4c4)
- 23c:	09051006 	0x09051006
- 240:	06053e08 	cacop	0x8,$r16,335(0x14f)
- 244:	8404054a 	0x8404054a
- 248:	83060205 	0x83060205
- 24c:	05010683 	0x05010683
- 250:	06050e09 	cacop	0x9,$r16,323(0x143)
- 254:	0602054a 	cacop	0xa,$r10,129(0x81)
- 258:	0603054c 	cacop	0xc,$r10,193(0xc1)
- 25c:	48040514 	bcnez	$fcc0,-3144700(0x500404) # ffd00660 <_stack+0xe3c00664>
- 260:	02001005 	slti	$r5,$r0,4(0x4)
- 264:	4a060104 	bcnez	$fcc0,1181184(0x120600) # 120864 <__stack_size+0x110864>
- 268:	02000205 	slti	$r5,$r16,0
- 26c:	00830104 	bstrins.d	$r4,$r8,0x3,0x0
- 270:	83010402 	0x83010402
- 274:	01040200 	0x01040200
- 278:	09050106 	0x09050106
- 27c:	01040200 	0x01040200
- 280:	0006050e 	alsl.wu	$r14,$r8,$r1,0x1
- 284:	4a010402 	bceqz	$fcc0,655620(0xa0104) # a0388 <__stack_size+0x90388>
- 288:	50060105 	b	68421120(0x4140600) # 4140888 <__stack_size+0x4130888>
- 28c:	06821306 	0x06821306
- 290:	0613e808 	cacop	0x8,$r0,1274(0x4fa)
- 294:	4b068311 	0x4b068311
- 298:	13068383 	addu16i.d	$r3,$r28,-15968(0xc1a0)
- 29c:	01001002 	0x01001002
- 2a0:	0000e801 	0x0000e801
- 2a4:	22000200 	ll.d	$r0,$r16,0
- 2a8:	01000000 	0x01000000
- 2ac:	0d0efb01 	0x0d0efb01
- 2b0:	01010100 	fadd.d	$f0,$f8,$f0
- 2b4:	00000001 	0x00000001
- 2b8:	01000001 	0x01000001
- 2bc:	69727000 	bltu	$r0,$r0,94832(0x17270) # 1752c <__stack_size+0x752c>
- 2c0:	6162746e 	blt	$r3,$r14,90740(0x16274) # 16534 <__stack_size+0x6534>
- 2c4:	632e6573 	blt	$r11,$r19,-53660(0x32e64) # ffff3128 <_stack+0xe3ef312c>
- 2c8:	00000000 	0x00000000
- 2cc:	00010500 	asrtle.d	$r8,$r1
- 2d0:	d5800205 	0xd5800205
- 2d4:	05131c00 	0x05131c00
- 2d8:	13131302 	addu16i.d	$r2,$r24,-15164(0xc4c4)
- 2dc:	01051313 	fmul.d	$f19,$f24,$f4
- 2e0:	3c080d06 	0x3c080d06
- 2e4:	054f0405 	0x054f0405
- 2e8:	0402000a 	csrrd	$r10,0x80
- 2ec:	07054a01 	0x07054a01
- 2f0:	02054f06 	slti	$r6,$r24,339(0x153)
- 2f4:	054a1406 	0x054a1406
- 2f8:	0205f507 	slti	$r7,$r8,381(0x17d)
- 2fc:	03040200 	lu52i.d	$r0,$r16,256(0x100)
- 300:	0e054906 	0x0e054906
- 304:	03040200 	lu52i.d	$r0,$r16,256(0x100)
- 308:	08050106 	0x08050106
- 30c:	03040200 	lu52i.d	$r0,$r16,256(0x100)
- 310:	000205ba 	0x000205ba
- 314:	06030402 	cacop	0x2,$r0,193(0xc1)
- 318:	0007054b 	alsl.wu	$r11,$r10,$r1,0x3
- 31c:	06030402 	cacop	0x2,$r0,193(0xc1)
- 320:	0402004a 	csrxchg	$r10,$r2,0x80
- 324:	0205ba03 	slti	$r3,$r16,366(0x16e)
- 328:	03040200 	lu52i.d	$r0,$r16,256(0x100)
- 32c:	05520647 	0x05520647
- 330:	4a010607 	0x4a010607
- 334:	064d0305 	0x064d0305
- 338:	060e0581 	cacop	0x1,$r12,897(0x381)
- 33c:	ba0a0501 	0xba0a0501
- 340:	01040200 	0x01040200
- 344:	0003054a 	0x0003054a
- 348:	06010402 	cacop	0x2,$r0,65(0x41)
- 34c:	0402004b 	csrxchg	$r11,$r2,0x80
- 350:	00ba0601 	bstrins.d	$r1,$r16,0x3a,0x1
- 354:	4a040402 	bceqz	$fcc0,656388(0xa0404) # a0758 <__stack_size+0x90758>
- 358:	04040200 	csrxchg	$r0,$r16,0x100
- 35c:	0002054a 	0x0002054a
- 360:	0f040402 	0x0f040402
- 364:	05500105 	0x05500105
- 368:	087a0307 	0x087a0307
- 36c:	02054aac 	slti	$r12,$r21,338(0x152)
- 370:	4a4a7403 	bceqz	$fcc0,936564(0xe4a74) # e4de4 <__stack_size+0xd4de4>
- 374:	13068106 	addu16i.d	$r6,$r8,-15968(0xc1a0)
- 378:	05490a05 	0x05490a05
- 37c:	064b0602 	0x064b0602
- 380:	0306ba01 	lu52i.d	$r1,$r16,430(0x1ae)
- 384:	0106010c 	0x0106010c
- 388:	01000c02 	0x01000c02
- 38c:	00012701 	0x00012701
- 390:	32000200 	0x32000200
- 394:	01000000 	0x01000000
- 398:	0d0efb01 	0x0d0efb01
- 39c:	01010100 	fadd.d	$f0,$f8,$f0
- 3a0:	00000001 	0x00000001
- 3a4:	01000001 	0x01000001
- 3a8:	692f2e2e 	bltu	$r17,$r14,77612(0x12f2c) # 132d4 <__stack_size+0x32d4>
- 3ac:	756c636e 	0x756c636e
- 3b0:	00006564 	rdtimeh.w	$r4,$r11
- 3b4:	656d6974 	bge	$r11,$r20,93544(0x16d68) # 1711c <__stack_size+0x711c>
- 3b8:	0000632e 	rdtimel.w	$r14,$r25
- 3bc:	69740000 	bltu	$r0,$r0,95232(0x17400) # 177bc <__stack_size+0x77bc>
- 3c0:	682e656d 	bltu	$r11,$r13,11876(0x2e64) # 3224 <__stack_size-0xcddc>
- 3c4:	00000100 	0x00000100
- 3c8:	00010500 	asrtle.d	$r8,$r1
- 3cc:	d6700205 	0xd6700205
- 3d0:	11031c00 	addu16i.d	$r0,$r0,16583(0x40c7)
- 3d4:	13050501 	addu16i.d	$r1,$r8,-16063(0xc141)
- 3d8:	71030f05 	vssrarn.h.w	$vr5,$vr24,$vr3
- 3dc:	14050501 	lu12i.w	$r1,10280(0x2828)
- 3e0:	06010513 	cacop	0x13,$r8,65(0x41)
- 3e4:	05010b03 	0x05010b03
- 3e8:	82750305 	0x82750305
- 3ec:	01068906 	fdiv.s	$f6,$f8,$f2
- 3f0:	06180105 	cacop	0x5,$r8,1536(0x600)
- 3f4:	0505e708 	0x0505e708
- 3f8:	054e1313 	0x054e1313
- 3fc:	06130601 	cacop	0x1,$r16,1217(0x4c1)
- 400:	130505bd 	addu16i.d	$r29,$r13,-16063(0xc141)
- 404:	030f0513 	lu52i.d	$r19,$r8,961(0x3c1)
- 408:	05050161 	0x05050161
- 40c:	01051314 	fmul.d	$f20,$f24,$f4
- 410:	011a0306 	0x011a0306
- 414:	66030505 	bge	$r8,$r5,-130300(0x20304) # fffe0718 <_stack+0xe3ee071c>
- 418:	06890682 	0x06890682
- 41c:	16030601 	lu32i.d	$r1,6192(0x1830)
- 420:	06150501 	cacop	0x1,$r8,1345(0x541)
- 424:	83160501 	0x83160501
- 428:	054b2705 	0x054b2705
- 42c:	36054916 	0x36054916
- 430:	4c2705b9 	jirl	$r25,$r13,9988(0x2704)
- 434:	05492805 	0x05492805
- 438:	3605bb27 	0x3605bb27
- 43c:	bb1205ba 	0xbb1205ba
- 440:	01054949 	fmul.d	$f9,$f10,$f18
- 444:	0336054f 	lu52i.d	$r15,$r10,-639(0xd81)
- 448:	1205827a 	addu16i.d	$r26,$r19,-32416(0x8160)
- 44c:	060505ba 	cacop	0x1a,$r13,321(0x141)
- 450:	1413134b 	lu12i.w	$r11,39066(0x989a)
- 454:	13060105 	addu16i.d	$r5,$r8,-16000(0xc180)
- 458:	020a0306 	slti	$r6,$r24,640(0x280)
- 45c:	05050124 	0x05050124
- 460:	0f051313 	0x0f051313
- 464:	05014e03 	0x05014e03
- 468:	05131405 	0x05131405
- 46c:	2d030601 	0x2d030601
- 470:	03050501 	lu52i.d	$r1,$r8,321(0x141)
- 474:	89068253 	0x89068253
- 478:	03060106 	lu52i.d	$r6,$r8,384(0x180)
- 47c:	05130129 	0x05130129
- 480:	05110606 	0x05110606
- 484:	06824c01 	0x06824c01
- 488:	05054008 	0x05054008
- 48c:	0f051313 	0x0f051313
- 490:	05014503 	0x05014503
- 494:	05131405 	0x05131405
- 498:	36030601 	0x36030601
- 49c:	03050501 	lu52i.d	$r1,$r8,321(0x141)
- 4a0:	8906824a 	0x8906824a
- 4a4:	03060106 	lu52i.d	$r6,$r8,384(0x180)
- 4a8:	05130132 	0x05130132
- 4ac:	05110606 	0x05110606
- 4b0:	02f24c01 	addi.d	$r1,$r0,-877(0xc93)
- 4b4:	0101000c 	fadd.d	$f12,$f0,$f0
- 4b8:	0000005a 	0x0000005a
- 4bc:	001d0002 	mulh.wu	$r2,$r0,$r0
- 4c0:	01010000 	fadd.d	$f0,$f0,$f0
- 4c4:	000d0efb 	bytepick.d	$r27,$r23,$r3,0x2
- 4c8:	01010101 	fadd.d	$f1,$f8,$f0
- 4cc:	01000000 	0x01000000
- 4d0:	00010000 	asrtle.d	$r0,$r0
- 4d4:	646e6172 	bge	$r11,$r18,28256(0x6e60) # 7334 <__stack_size-0x8ccc>
- 4d8:	0000632e 	rdtimel.w	$r14,$r25
- 4dc:	05000000 	0x05000000
- 4e0:	02050010 	slti	$r16,$r0,320(0x140)
- 4e4:	1c00d7b0 	pcaddu12i	$r16,1725(0x6bd)
- 4e8:	13050514 	addu16i.d	$r20,$r8,-16063(0xc141)
- 4ec:	01061105 	0x01061105
- 4f0:	74081e05 	xvslt.bu	$xr5,$xr16,$xr7
- 4f4:	05bb2705 	0x05bb2705
- 4f8:	0505490a 	0x0505490a
- 4fc:	01054b06 	fmul.d	$f6,$f24,$f18
- 500:	1f051306 	pcaddu18i	$r6,-513896(0x82898)
- 504:	053d0806 	0x053d0806
- 508:	0a051305 	0x0a051305
- 50c:	01050106 	fmul.d	$f6,$f8,$f0
- 510:	000402bb 	alsl.w	$r27,$r21,$r0,0x1
- 514:	Address 0x0000000000000514 is out of bounds.
+ 1c0:	2e010000 	0x2e010000
+ 1c4:	2f2e2e2f 	0x2f2e2e2f
+ 1c8:	6c636e69 	bgeu	$r19,$r9,25452(0x636c) # 6534 <__stack_size-0x9acc>
+ 1cc:	00656475 	bstrins.w	$r21,$r3,0x5,0x19
+ 1d0:	74757000 	xvmax.wu	$xr0,$xr0,$xr28
+ 1d4:	72616863 	0x72616863
+ 1d8:	0000632e 	rdtimel.w	$r14,$r25
+ 1dc:	6f630000 	bgeu	$r0,$r0,-40192(0x36300) # ffff64dc <_stack+0xe3ef64e0>
+ 1e0:	6e6f6d6d 	bgeu	$r11,$r13,-102548(0x26f6c) # fffe714c <_stack+0xe3ee7150>
+ 1e4:	0100682e 	0x0100682e
+ 1e8:	05000000 	0x05000000
+ 1ec:	02050001 	slti	$r1,$r0,320(0x140)
+ 1f0:	1c00d470 	pcaddu12i	$r16,1699(0x6a3)
+ 1f4:	06051313 	cacop	0x13,$r24,324(0x144)
+ 1f8:	14050516 	lu12i.w	$r22,10280(0x2828)
+ 1fc:	03060105 	lu52i.d	$r5,$r8,384(0x180)
+ 200:	05050179 	0x05050179
+ 204:	0105f289 	0x0105f289
+ 208:	13060d06 	addu16i.d	$r6,$r8,-15997(0xc183)
+ 20c:	3f08064a 	0x3f08064a
+ 210:	05130505 	0x05130505
+ 214:	05110601 	0x05110601
+ 218:	01058305 	0x01058305
+ 21c:	770806f9 	0x770806f9
+ 220:	05130505 	0x05130505
+ 224:	0501060d 	0x0501060d
+ 228:	04020037 	csrwr	$r23,0x80
+ 22c:	05820601 	0x05820601
+ 230:	0402000d 	csrrd	$r13,0x80
+ 234:	05010601 	0x05010601
+ 238:	04020031 	csrwr	$r17,0x80
+ 23c:	0b054a01 	0x0b054a01
+ 240:	01040200 	0x01040200
+ 244:	0605054a 	cacop	0xa,$r10,321(0x141)
+ 248:	062a054b 	cacop	0xb,$r10,-1407(0xa81)
+ 24c:	83010501 	0x83010501
+ 250:	01000402 	0x01000402
+ 254:	00009401 	0x00009401
+ 258:	1d000200 	pcaddu12i	$r0,-524272(0x80010)
+ 25c:	01000000 	0x01000000
+ 260:	0d0efb01 	0x0d0efb01
+ 264:	01010100 	fadd.d	$f0,$f8,$f0
+ 268:	00000001 	0x00000001
+ 26c:	01000001 	0x01000001
+ 270:	74757000 	xvmax.wu	$xr0,$xr0,$xr28
+ 274:	00632e73 	bstrins.w	$r19,$r19,0x3,0xb
+ 278:	00000000 	0x00000000
+ 27c:	05000105 	0x05000105
+ 280:	00d4f002 	bstrpick.d	$r2,$r0,0x14,0x3c
+ 284:	1313131c 	addu16i.d	$r28,$r24,-15164(0xc4c4)
+ 288:	09051006 	0x09051006
+ 28c:	06053e08 	cacop	0x8,$r16,335(0x14f)
+ 290:	8404054a 	0x8404054a
+ 294:	83060205 	0x83060205
+ 298:	05010683 	0x05010683
+ 29c:	06050e09 	cacop	0x9,$r16,323(0x143)
+ 2a0:	0602054a 	cacop	0xa,$r10,129(0x81)
+ 2a4:	0603054c 	cacop	0xc,$r10,193(0xc1)
+ 2a8:	48040514 	bcnez	$fcc0,-3144700(0x500404) # ffd006ac <_stack+0xe3c006b0>
+ 2ac:	02001005 	slti	$r5,$r0,4(0x4)
+ 2b0:	4a060104 	bcnez	$fcc0,1181184(0x120600) # 1208b0 <__stack_size+0x1108b0>
+ 2b4:	02000205 	slti	$r5,$r16,0
+ 2b8:	00830104 	bstrins.d	$r4,$r8,0x3,0x0
+ 2bc:	83010402 	0x83010402
+ 2c0:	01040200 	0x01040200
+ 2c4:	09050106 	0x09050106
+ 2c8:	01040200 	0x01040200
+ 2cc:	0006050e 	alsl.wu	$r14,$r8,$r1,0x1
+ 2d0:	4a010402 	bceqz	$fcc0,655620(0xa0104) # a03d4 <__stack_size+0x903d4>
+ 2d4:	50060105 	b	68421120(0x4140600) # 41408d4 <__stack_size+0x41308d4>
+ 2d8:	06821306 	0x06821306
+ 2dc:	0613e808 	cacop	0x8,$r0,1274(0x4fa)
+ 2e0:	4b068311 	0x4b068311
+ 2e4:	13068383 	addu16i.d	$r3,$r28,-15968(0xc1a0)
+ 2e8:	01001002 	0x01001002
+ 2ec:	0000e801 	0x0000e801
+ 2f0:	22000200 	ll.d	$r0,$r16,0
+ 2f4:	01000000 	0x01000000
+ 2f8:	0d0efb01 	0x0d0efb01
+ 2fc:	01010100 	fadd.d	$f0,$f8,$f0
+ 300:	00000001 	0x00000001
+ 304:	01000001 	0x01000001
+ 308:	69727000 	bltu	$r0,$r0,94832(0x17270) # 17578 <__stack_size+0x7578>
+ 30c:	6162746e 	blt	$r3,$r14,90740(0x16274) # 16580 <__stack_size+0x6580>
+ 310:	632e6573 	blt	$r11,$r19,-53660(0x32e64) # ffff3174 <_stack+0xe3ef3178>
+ 314:	00000000 	0x00000000
+ 318:	00010500 	asrtle.d	$r8,$r1
+ 31c:	d5a00205 	0xd5a00205
+ 320:	05131c00 	0x05131c00
+ 324:	13131302 	addu16i.d	$r2,$r24,-15164(0xc4c4)
+ 328:	01051313 	fmul.d	$f19,$f24,$f4
+ 32c:	3c080d06 	0x3c080d06
+ 330:	054f0405 	0x054f0405
+ 334:	0402000a 	csrrd	$r10,0x80
+ 338:	07054a01 	0x07054a01
+ 33c:	02054f06 	slti	$r6,$r24,339(0x153)
+ 340:	054a1406 	0x054a1406
+ 344:	0205f507 	slti	$r7,$r8,381(0x17d)
+ 348:	03040200 	lu52i.d	$r0,$r16,256(0x100)
+ 34c:	0e054906 	0x0e054906
+ 350:	03040200 	lu52i.d	$r0,$r16,256(0x100)
+ 354:	08050106 	0x08050106
+ 358:	03040200 	lu52i.d	$r0,$r16,256(0x100)
+ 35c:	000205ba 	0x000205ba
+ 360:	06030402 	cacop	0x2,$r0,193(0xc1)
+ 364:	0007054b 	alsl.wu	$r11,$r10,$r1,0x3
+ 368:	06030402 	cacop	0x2,$r0,193(0xc1)
+ 36c:	0402004a 	csrxchg	$r10,$r2,0x80
+ 370:	0205ba03 	slti	$r3,$r16,366(0x16e)
+ 374:	03040200 	lu52i.d	$r0,$r16,256(0x100)
+ 378:	05520647 	0x05520647
+ 37c:	4a010607 	0x4a010607
+ 380:	064d0305 	0x064d0305
+ 384:	060e0581 	cacop	0x1,$r12,897(0x381)
+ 388:	ba0a0501 	0xba0a0501
+ 38c:	01040200 	0x01040200
+ 390:	0003054a 	0x0003054a
+ 394:	06010402 	cacop	0x2,$r0,65(0x41)
+ 398:	0402004b 	csrxchg	$r11,$r2,0x80
+ 39c:	00ba0601 	bstrins.d	$r1,$r16,0x3a,0x1
+ 3a0:	4a040402 	bceqz	$fcc0,656388(0xa0404) # a07a4 <__stack_size+0x907a4>
+ 3a4:	04040200 	csrxchg	$r0,$r16,0x100
+ 3a8:	0002054a 	0x0002054a
+ 3ac:	0f040402 	0x0f040402
+ 3b0:	05500105 	0x05500105
+ 3b4:	087a0307 	0x087a0307
+ 3b8:	02054aac 	slti	$r12,$r21,338(0x152)
+ 3bc:	4a4a7403 	bceqz	$fcc0,936564(0xe4a74) # e4e30 <__stack_size+0xd4e30>
+ 3c0:	13068106 	addu16i.d	$r6,$r8,-15968(0xc1a0)
+ 3c4:	05490a05 	0x05490a05
+ 3c8:	064b0602 	0x064b0602
+ 3cc:	0306ba01 	lu52i.d	$r1,$r16,430(0x1ae)
+ 3d0:	0106010c 	0x0106010c
+ 3d4:	01000c02 	0x01000c02
+ 3d8:	00012701 	0x00012701
+ 3dc:	32000200 	0x32000200
+ 3e0:	01000000 	0x01000000
+ 3e4:	0d0efb01 	0x0d0efb01
+ 3e8:	01010100 	fadd.d	$f0,$f8,$f0
+ 3ec:	00000001 	0x00000001
+ 3f0:	01000001 	0x01000001
+ 3f4:	692f2e2e 	bltu	$r17,$r14,77612(0x12f2c) # 13320 <__stack_size+0x3320>
+ 3f8:	756c636e 	0x756c636e
+ 3fc:	00006564 	rdtimeh.w	$r4,$r11
+ 400:	656d6974 	bge	$r11,$r20,93544(0x16d68) # 17168 <__stack_size+0x7168>
+ 404:	0000632e 	rdtimel.w	$r14,$r25
+ 408:	69740000 	bltu	$r0,$r0,95232(0x17400) # 17808 <__stack_size+0x7808>
+ 40c:	682e656d 	bltu	$r11,$r13,11876(0x2e64) # 3270 <__stack_size-0xcd90>
+ 410:	00000100 	0x00000100
+ 414:	00010500 	asrtle.d	$r8,$r1
+ 418:	d6900205 	0xd6900205
+ 41c:	11031c00 	addu16i.d	$r0,$r0,16583(0x40c7)
+ 420:	13050501 	addu16i.d	$r1,$r8,-16063(0xc141)
+ 424:	71030f05 	vssrarn.h.w	$vr5,$vr24,$vr3
+ 428:	14050501 	lu12i.w	$r1,10280(0x2828)
+ 42c:	06010513 	cacop	0x13,$r8,65(0x41)
+ 430:	05010b03 	0x05010b03
+ 434:	82750305 	0x82750305
+ 438:	01068906 	fdiv.s	$f6,$f8,$f2
+ 43c:	06180105 	cacop	0x5,$r8,1536(0x600)
+ 440:	0505e708 	0x0505e708
+ 444:	054e1313 	0x054e1313
+ 448:	06130601 	cacop	0x1,$r16,1217(0x4c1)
+ 44c:	130505bd 	addu16i.d	$r29,$r13,-16063(0xc141)
+ 450:	030f0513 	lu52i.d	$r19,$r8,961(0x3c1)
+ 454:	05050161 	0x05050161
+ 458:	01051314 	fmul.d	$f20,$f24,$f4
+ 45c:	011a0306 	0x011a0306
+ 460:	66030505 	bge	$r8,$r5,-130300(0x20304) # fffe0764 <_stack+0xe3ee0768>
+ 464:	06890682 	0x06890682
+ 468:	16030601 	lu32i.d	$r1,6192(0x1830)
+ 46c:	06150501 	cacop	0x1,$r8,1345(0x541)
+ 470:	83160501 	0x83160501
+ 474:	054b2705 	0x054b2705
+ 478:	36054916 	0x36054916
+ 47c:	4c2705b9 	jirl	$r25,$r13,9988(0x2704)
+ 480:	05492805 	0x05492805
+ 484:	3605bb27 	0x3605bb27
+ 488:	bb1205ba 	0xbb1205ba
+ 48c:	01054949 	fmul.d	$f9,$f10,$f18
+ 490:	0336054f 	lu52i.d	$r15,$r10,-639(0xd81)
+ 494:	1205827a 	addu16i.d	$r26,$r19,-32416(0x8160)
+ 498:	060505ba 	cacop	0x1a,$r13,321(0x141)
+ 49c:	1413134b 	lu12i.w	$r11,39066(0x989a)
+ 4a0:	13060105 	addu16i.d	$r5,$r8,-16000(0xc180)
+ 4a4:	020a0306 	slti	$r6,$r24,640(0x280)
+ 4a8:	05050124 	0x05050124
+ 4ac:	0f051313 	0x0f051313
+ 4b0:	05014e03 	0x05014e03
+ 4b4:	05131405 	0x05131405
+ 4b8:	2d030601 	0x2d030601
+ 4bc:	03050501 	lu52i.d	$r1,$r8,321(0x141)
+ 4c0:	89068253 	0x89068253
+ 4c4:	03060106 	lu52i.d	$r6,$r8,384(0x180)
+ 4c8:	05130129 	0x05130129
+ 4cc:	05110606 	0x05110606
+ 4d0:	06824c01 	0x06824c01
+ 4d4:	05054008 	0x05054008
+ 4d8:	0f051313 	0x0f051313
+ 4dc:	05014503 	0x05014503
+ 4e0:	05131405 	0x05131405
+ 4e4:	36030601 	0x36030601
+ 4e8:	03050501 	lu52i.d	$r1,$r8,321(0x141)
+ 4ec:	8906824a 	0x8906824a
+ 4f0:	03060106 	lu52i.d	$r6,$r8,384(0x180)
+ 4f4:	05130132 	0x05130132
+ 4f8:	05110606 	0x05110606
+ 4fc:	02f24c01 	addi.d	$r1,$r0,-877(0xc93)
+ 500:	0101000c 	fadd.d	$f12,$f0,$f0
+ 504:	0000005a 	0x0000005a
+ 508:	001d0002 	mulh.wu	$r2,$r0,$r0
+ 50c:	01010000 	fadd.d	$f0,$f0,$f0
+ 510:	000d0efb 	bytepick.d	$r27,$r23,$r3,0x2
+ 514:	01010101 	fadd.d	$f1,$f8,$f0
+ 518:	01000000 	0x01000000
+ 51c:	00010000 	asrtle.d	$r0,$r0
+ 520:	646e6172 	bge	$r11,$r18,28256(0x6e60) # 7380 <__stack_size-0x8c80>
+ 524:	0000632e 	rdtimel.w	$r14,$r25
+ 528:	05000000 	0x05000000
+ 52c:	02050010 	slti	$r16,$r0,320(0x140)
+ 530:	1c00d7d0 	pcaddu12i	$r16,1726(0x6be)
+ 534:	13050514 	addu16i.d	$r20,$r8,-16063(0xc141)
+ 538:	01061105 	0x01061105
+ 53c:	74081e05 	xvslt.bu	$xr5,$xr16,$xr7
+ 540:	05bb2705 	0x05bb2705
+ 544:	0505490a 	0x0505490a
+ 548:	01054b06 	fmul.d	$f6,$f24,$f18
+ 54c:	1f051306 	pcaddu18i	$r6,-513896(0x82898)
+ 550:	053d0806 	0x053d0806
+ 554:	0a051305 	0x0a051305
+ 558:	01050106 	fmul.d	$f6,$f8,$f0
+ 55c:	000402bb 	alsl.w	$r27,$r21,$r0,0x1
+ 560:	Address 0x0000000000000560 is out of bounds.
 
 
 Disassembly of section .debug_str:
@@ -16623,81 +16679,87 @@ Disassembly of section .debug_str:
   90:	69746c69 	bltu	$r3,$r9,95340(0x1746c) # 174fc <__stack_size+0x74fc>
   94:	662d206e 	bge	$r3,$r14,-119520(0x22d20) # fffe2db4 <_stack+0xe3ee2db8>
   98:	702d6f6e 	0x702d6f6e
-  9c:	70006369 	vseq.b	$vr9,$vr27,$vr24
-  a0:	746e6972 	0x746e6972
-  a4:	65736162 	bge	$r11,$r2,95072(0x17360) # 17404 <__stack_size+0x7404>
-  a8:	74757000 	xvmax.wu	$xr0,$xr0,$xr28
-  ac:	69727473 	bltu	$r3,$r19,94836(0x17274) # 17320 <__stack_size+0x7320>
-  b0:	7000676e 	vseq.b	$vr14,$vr27,$vr25
-  b4:	746e6972 	0x746e6972
-  b8:	00632e66 	bstrins.w	$r6,$r19,0x3,0xb
-  bc:	6d6f682f 	bgeu	$r1,$r15,94056(0x16f68) # 17024 <__stack_size+0x7024>
-  c0:	33312f65 	xvstelm.w	$xr5,$r27,300(0x12c),0x4
-  c4:	69672f32 	bltu	$r25,$r18,91948(0x1672c) # 167f0 <__stack_size+0x67f0>
-  c8:	65725f74 	bge	$r27,$r20,94812(0x1725c) # 17324 <__stack_size+0x7324>
-  cc:	65702f70 	bge	$r27,$r16,94252(0x1702c) # 170f8 <__stack_size+0x70f8>
-  d0:	732f6672 	0x732f6672
-  d4:	2f74666f 	0x2f74666f
-  d8:	66726570 	bge	$r11,$r16,-101788(0x27264) # fffe733c <_stack+0xe3ee7340>
-  dc:	6e75665f 	bgeu	$r18,$r31,-101020(0x27564) # fffe7640 <_stack+0xe3ee7644>
-  e0:	696c2f63 	bltu	$r27,$r3,93228(0x16c2c) # 16d0c <__stack_size+0x6d0c>
-  e4:	72700062 	0x72700062
-  e8:	66746e69 	bge	$r19,$r9,-101268(0x2746c) # fffe7554 <_stack+0xe3ee7558>
-  ec:	74677400 	xvavg.wu	$xr0,$xr0,$xr29
+  9c:	2f006369 	0x2f006369
+  a0:	65646f63 	bge	$r27,$r3,91244(0x1646c) # 1650c <__stack_size+0x650c>
+  a4:	6770662f 	bge	$r17,$r15,-36764(0x37064) # ffff7108 <_stack+0xe3ef710c>
+  a8:	736e2f61 	vssrarni.du.q	$vr1,$vr27,0xb
+  ac:	63637363 	blt	$r27,$r3,-40080(0x36370) # ffff641c <_stack+0xe3ef6420>
+  b0:	6165742d 	blt	$r1,$r13,91508(0x16574) # 16624 <__stack_size+0x6624>
+  b4:	6f732f6d 	bgeu	$r27,$r13,-36052(0x3732c) # ffff73e0 <_stack+0xe3ef73e4>
+  b8:	61777466 	blt	$r3,$r6,96116(0x17774) # 1782c <__stack_size+0x782c>
+  bc:	702f6572 	vaddwev.d.wu	$vr18,$vr11,$vr25
+  c0:	2f667265 	0x2f667265
+  c4:	0062696c 	bstrins.w	$r12,$r11,0x2,0x1a
+  c8:	73747570 	0x73747570
+  cc:	6e697274 	bgeu	$r19,$r20,-104080(0x26970) # fffe6a3c <_stack+0xe3ee6a40>
+  d0:	72700067 	0x72700067
+  d4:	66746e69 	bge	$r19,$r9,-101268(0x2746c) # fffe7540 <_stack+0xe3ee7544>
+  d8:	7000632e 	vseq.b	$vr14,$vr25,$vr24
+  dc:	746e6972 	0x746e6972
+  e0:	65736162 	bge	$r11,$r2,95072(0x17360) # 17440 <__stack_size+0x7440>
+  e4:	69727000 	bltu	$r0,$r0,94832(0x17270) # 17354 <__stack_size+0x7354>
+  e8:	0066746e 	bstrins.w	$r14,$r3,0x6,0x1d
+  ec:	74726175 	xvmin.b	$xr21,$xr11,$xr24
   f0:	7475705f 	xvmax.wu	$xr31,$xr2,$xr28
   f4:	72616863 	0x72616863
-  f8:	74757000 	xvmax.wu	$xr0,$xr0,$xr28
-  fc:	72616863 	0x72616863
- 100:	7000632e 	vseq.b	$vr14,$vr25,$vr24
- 104:	2e737475 	0x2e737475
- 108:	75700063 	0x75700063
- 10c:	70007374 	vseq.b	$vr20,$vr27,$vr28
- 110:	746e6972 	0x746e6972
- 114:	65736162 	bge	$r11,$r2,95072(0x17360) # 17474 <__stack_size+0x7474>
- 118:	7600632e 	0x7600632e
- 11c:	65756c61 	bge	$r3,$r1,95596(0x1756c) # 17688 <__stack_size+0x7688>
- 120:	67697300 	bge	$r24,$r0,-38544(0x36970) # ffff6a90 <_stack+0xe3ef6a94>
- 124:	6f6c006e 	bgeu	$r3,$r14,-37888(0x36c00) # ffff6d24 <_stack+0xe3ef6d28>
- 128:	6920676e 	bltu	$r27,$r14,73828(0x12064) # 1218c <__stack_size+0x218c>
- 12c:	6700746e 	bge	$r3,$r14,-65420(0x30074) # ffff01a0 <_stack+0xe3ef01a4>
- 130:	635f7465 	blt	$r3,$r5,-41100(0x35f74) # ffff60a4 <_stack+0xe3ef60a8>
- 134:	746e756f 	0x746e756f
- 138:	00796d5f 	bstrins.w	$r31,$r10,0x19,0x1b
- 13c:	7465675f 	xvavg.w	$xr31,$xr26,$xr25
- 140:	756f635f 	0x756f635f
- 144:	7400746e 	xvseq.b	$xr14,$xr3,$xr29
- 148:	73656d69 	vssrani.wu.d	$vr9,$vr11,0x1b
- 14c:	00636570 	bstrins.w	$r16,$r11,0x3,0x19
- 150:	6f6c635f 	bgeu	$r26,$r31,-37792(0x36c60) # ffff6db0 <_stack+0xe3ef6db4>
- 154:	745f6b63 	0x745f6b63
- 158:	5f767400 	bne	$r0,$r0,-35212(0x37674) # ffff77cc <_stack+0xe3ef77d0>
- 15c:	6365736d 	blt	$r27,$r13,-39568(0x36570) # ffff66cc <_stack+0xe3ef66d0>
- 160:	6d697400 	bgeu	$r0,$r0,92532(0x16974) # 16ad4 <__stack_size+0x6ad4>
- 164:	00632e65 	bstrins.w	$r5,$r19,0x3,0xb
- 168:	5f746567 	bne	$r11,$r7,-35740(0x37464) # ffff75cc <_stack+0xe3ef75d0>
- 16c:	67007375 	bge	$r27,$r21,-65424(0x30070) # ffff01dc <_stack+0xe3ef01e0>
- 170:	635f7465 	blt	$r3,$r5,-41100(0x35f74) # ffff60e4 <_stack+0xe3ef60e8>
- 174:	6b636f6c 	bltu	$r27,$r12,-40084(0x3636c) # ffff64e0 <_stack+0xe3ef64e4>
- 178:	5f767400 	bne	$r0,$r0,-35212(0x37674) # ffff77ec <_stack+0xe3ef77f0>
- 17c:	63657375 	blt	$r27,$r21,-39568(0x36570) # ffff66ec <_stack+0xe3ef66f0>
- 180:	6f635f00 	bgeu	$r24,$r0,-40100(0x3635c) # ffff64dc <_stack+0xe3ef64e0>
- 184:	6176746e 	blt	$r3,$r14,95860(0x17674) # 177f8 <__stack_size+0x77f8>
- 188:	7674006c 	0x7674006c
- 18c:	6365735f 	blt	$r26,$r31,-39568(0x36570) # ffff66fc <_stack+0xe3ef6700>
- 190:	74656700 	xvavg.w	$xr0,$xr24,$xr25
- 194:	00736e5f 	bstrins.w	$r31,$r18,0x13,0x1b
- 198:	6e5f7674 	bgeu	$r19,$r20,-106636(0x25f74) # fffe610c <_stack+0xe3ee6110>
- 19c:	00636573 	bstrins.w	$r19,$r11,0x3,0x19
- 1a0:	636f6c63 	blt	$r3,$r3,-37012(0x36f6c) # ffff710c <_stack+0xe3ef7110>
- 1a4:	65675f6b 	bge	$r27,$r11,91996(0x1675c) # 16900 <__stack_size+0x6900>
- 1a8:	6d697474 	bgeu	$r3,$r20,92532(0x16974) # 16b1c <__stack_size+0x6b1c>
- 1ac:	61720065 	blt	$r3,$r5,94720(0x17200) # 173ac <__stack_size+0x73ac>
- 1b0:	632e646e 	blt	$r3,$r14,-53660(0x32e64) # ffff3014 <_stack+0xe3ef3018>
- 1b4:	61727300 	blt	$r24,$r0,94832(0x17270) # 17424 <__stack_size+0x7424>
- 1b8:	6e00646e 	bgeu	$r3,$r14,-130972(0x20064) # fffe021c <_stack+0xe3ee0220>
- 1bc:	00747865 	bstrins.w	$r5,$r3,0x14,0x1e
- 1c0:	64656573 	bge	$r11,$r19,25956(0x6564) # 6724 <__stack_size-0x98dc>
-	...
+  f8:	74677400 	xvavg.wu	$xr0,$xr0,$xr29
+  fc:	7475705f 	xvmax.wu	$xr31,$xr2,$xr28
+ 100:	72616863 	0x72616863
+ 104:	6e697500 	bgeu	$r8,$r0,-104076(0x26974) # fffe6a78 <_stack+0xe3ee6a7c>
+ 108:	5f323374 	bne	$r27,$r20,-52688(0x33230) # ffff3338 <_stack+0xe3ef333c>
+ 10c:	75700074 	0x75700074
+ 110:	61686374 	blt	$r27,$r20,92256(0x16860) # 16970 <__stack_size+0x6970>
+ 114:	00632e72 	bstrins.w	$r18,$r19,0x3,0xb
+ 118:	73747570 	0x73747570
+ 11c:	7000632e 	vseq.b	$vr14,$vr25,$vr24
+ 120:	00737475 	bstrins.w	$r21,$r3,0x13,0x1d
+ 124:	6e697270 	bgeu	$r19,$r16,-104080(0x26970) # fffe6a94 <_stack+0xe3ee6a98>
+ 128:	73616274 	vssrani.w.d	$vr20,$vr19,0x18
+ 12c:	00632e65 	bstrins.w	$r5,$r19,0x3,0xb
+ 130:	756c6176 	0x756c6176
+ 134:	69730065 	bltu	$r3,$r5,94976(0x17300) # 17434 <__stack_size+0x7434>
+ 138:	6c006e67 	bgeu	$r19,$r7,108(0x6c) # 1a4 <__stack_size-0xfe5c>
+ 13c:	20676e6f 	ll.w	$r15,$r19,26476(0x676c)
+ 140:	00746e69 	bstrins.w	$r9,$r19,0x14,0x1b
+ 144:	5f746567 	bne	$r11,$r7,-35740(0x37464) # ffff75a8 <_stack+0xe3ef75ac>
+ 148:	6e756f63 	bgeu	$r27,$r3,-101012(0x2756c) # fffe76b4 <_stack+0xe3ee76b8>
+ 14c:	796d5f74 	0x796d5f74
+ 150:	65675f00 	bge	$r24,$r0,91996(0x1675c) # 168ac <__stack_size+0x68ac>
+ 154:	6f635f74 	bgeu	$r27,$r20,-40100(0x3635c) # ffff64b0 <_stack+0xe3ef64b4>
+ 158:	00746e75 	bstrins.w	$r21,$r19,0x14,0x1b
+ 15c:	656d6974 	bge	$r11,$r20,93544(0x16d68) # 16ec4 <__stack_size+0x6ec4>
+ 160:	63657073 	blt	$r3,$r19,-39568(0x36570) # ffff66d0 <_stack+0xe3ef66d4>
+ 164:	6c635f00 	bgeu	$r24,$r0,25436(0x635c) # 64c0 <__stack_size-0x9b40>
+ 168:	5f6b636f 	bne	$r27,$r15,-38048(0x36b60) # ffff6cc8 <_stack+0xe3ef6ccc>
+ 16c:	76740074 	0x76740074
+ 170:	65736d5f 	bge	$r10,$r31,95084(0x1736c) # 174dc <__stack_size+0x74dc>
+ 174:	69740063 	bltu	$r3,$r3,95232(0x17400) # 17574 <__stack_size+0x7574>
+ 178:	632e656d 	blt	$r11,$r13,-53660(0x32e64) # ffff2fdc <_stack+0xe3ef2fe0>
+ 17c:	74656700 	xvavg.w	$xr0,$xr24,$xr25
+ 180:	0073755f 	bstrins.w	$r31,$r10,0x13,0x1d
+ 184:	5f746567 	bne	$r11,$r7,-35740(0x37464) # ffff75e8 <_stack+0xe3ef75ec>
+ 188:	636f6c63 	blt	$r3,$r3,-37012(0x36f6c) # ffff70f4 <_stack+0xe3ef70f8>
+ 18c:	7674006b 	0x7674006b
+ 190:	6573755f 	bge	$r10,$r31,95092(0x17374) # 17504 <__stack_size+0x7504>
+ 194:	635f0063 	blt	$r3,$r3,-41216(0x35f00) # ffff6094 <_stack+0xe3ef6098>
+ 198:	76746e6f 	0x76746e6f
+ 19c:	74006c61 	xvseq.b	$xr1,$xr3,$xr27
+ 1a0:	65735f76 	bge	$r27,$r22,95068(0x1735c) # 174fc <__stack_size+0x74fc>
+ 1a4:	65670063 	bge	$r3,$r3,91904(0x16700) # 168a4 <__stack_size+0x68a4>
+ 1a8:	736e5f74 	vssrarni.du.q	$vr20,$vr27,0x17
+ 1ac:	5f767400 	bne	$r0,$r0,-35212(0x37674) # ffff7820 <_stack+0xe3ef7824>
+ 1b0:	6365736e 	blt	$r27,$r14,-39568(0x36570) # ffff6720 <_stack+0xe3ef6724>
+ 1b4:	6f6c6300 	bgeu	$r24,$r0,-37792(0x36c60) # ffff6e14 <_stack+0xe3ef6e18>
+ 1b8:	675f6b63 	bge	$r27,$r3,-41112(0x35f68) # ffff6120 <_stack+0xe3ef6124>
+ 1bc:	69747465 	bltu	$r3,$r5,95348(0x17474) # 17630 <__stack_size+0x7630>
+ 1c0:	7200656d 	0x7200656d
+ 1c4:	2e646e61 	0x2e646e61
+ 1c8:	72730063 	0x72730063
+ 1cc:	00646e61 	bstrins.w	$r1,$r19,0x4,0x1b
+ 1d0:	7478656e 	0x7478656e
+ 1d4:	65657300 	bge	$r24,$r0,91504(0x16570) # 16744 <__stack_size+0x6744>
+ 1d8:	Address 0x00000000000001d8 is out of bounds.
+
 
 Disassembly of section .debug_frame:
 
@@ -16739,94 +16801,98 @@ Disassembly of section .debug_frame:
   88:	d9540199 	0xd9540199
   8c:	00000e44 	0x00000e44
   90:	0000000c 	0x0000000c
-  94:	ffffffff 	0xffffffff
-  98:	7c010001 	0x7c010001
-  9c:	00030d01 	0x00030d01
-  a0:	00000024 	0x00000024
-  a4:	00000090 	0x00000090
-  a8:	1c00d4d0 	pcaddu12i	$r16,1702(0x6a6)
-  ac:	00000074 	0x00000074
-  b0:	50100e44 	b	-116387828(0x910100c) # f91010bc <_stack+0xdd0010c0>
-  b4:	02970181 	addi.w	$r1,$r12,1472(0x5c0)
-  b8:	04990398 	csrxchg	$r24,$r28,0x2640
-  bc:	44c14802 	bnez	$r0,573768(0x8c148) # 8c204 <__stack_size+0x7c204>
-  c0:	44d844d7 	bnez	$r6,-2303932(0x5cd844) # ffdcd904 <_stack+0xe3ccd908>
-  c4:	000e48d9 	bytepick.d	$r25,$r6,$r18,0x4
-  c8:	00000018 	0x00000018
-  cc:	00000090 	0x00000090
-  d0:	1c00d550 	pcaddu12i	$r16,1706(0x6aa)
-  d4:	0000002c 	0x0000002c
-  d8:	44100e44 	bnez	$r18,1052684(0x10100c) # 1010e4 <__stack_size+0xf10e4>
-  dc:	c1580181 	0xc1580181
-  e0:	00000e48 	0x00000e48
-  e4:	0000000c 	0x0000000c
-  e8:	ffffffff 	0xffffffff
-  ec:	7c010001 	0x7c010001
-  f0:	00030d01 	0x00030d01
-  f4:	00000028 	0x00000028
-  f8:	000000e4 	0x000000e4
-  fc:	1c00d580 	pcaddu12i	$r0,1708(0x6ac)
- 100:	000000ec 	0x000000ec
- 104:	50600e44 	b	-116367348(0x910600c) # f9106110 <_stack+0xdd006114>
- 108:	01810297 	0x01810297
- 10c:	04990398 	csrxchg	$r24,$r28,0x2640
- 110:	c10a8c02 	0xc10a8c02
- 114:	d844d744 	0xd844d744
- 118:	0e48d944 	0x0e48d944
- 11c:	000b4400 	0x000b4400
- 120:	0000000c 	0x0000000c
- 124:	ffffffff 	0xffffffff
- 128:	7c010001 	0x7c010001
- 12c:	00030d01 	0x00030d01
- 130:	00000018 	0x00000018
- 134:	00000120 	0x00000120
- 138:	1c00d670 	pcaddu12i	$r16,1715(0x6b3)
- 13c:	0000001c 	0x0000001c
- 140:	44100e44 	bnez	$r18,1052684(0x10100c) # 10114c <__stack_size+0xf114c>
- 144:	d94c0199 	0xd94c0199
- 148:	00000e44 	0x00000e44
- 14c:	0000000c 	0x0000000c
- 150:	00000120 	0x00000120
- 154:	1c00d690 	pcaddu12i	$r16,1716(0x6b4)
- 158:	00000004 	0x00000004
+  94:	00000048 	0x00000048
+  98:	1c00d4d0 	pcaddu12i	$r16,1702(0x6a6)
+  9c:	00000020 	0x00000020
+  a0:	0000000c 	0x0000000c
+  a4:	ffffffff 	0xffffffff
+  a8:	7c010001 	0x7c010001
+  ac:	00030d01 	0x00030d01
+  b0:	00000024 	0x00000024
+  b4:	000000a0 	0x000000a0
+  b8:	1c00d4f0 	pcaddu12i	$r16,1703(0x6a7)
+  bc:	00000074 	0x00000074
+  c0:	50100e44 	b	-116387828(0x910100c) # f91010cc <_stack+0xdd0010d0>
+  c4:	02970181 	addi.w	$r1,$r12,1472(0x5c0)
+  c8:	04990398 	csrxchg	$r24,$r28,0x2640
+  cc:	44c14802 	bnez	$r0,573768(0x8c148) # 8c214 <__stack_size+0x7c214>
+  d0:	44d844d7 	bnez	$r6,-2303932(0x5cd844) # ffdcd914 <_stack+0xe3ccd918>
+  d4:	000e48d9 	bytepick.d	$r25,$r6,$r18,0x4
+  d8:	00000018 	0x00000018
+  dc:	000000a0 	0x000000a0
+  e0:	1c00d570 	pcaddu12i	$r16,1707(0x6ab)
+  e4:	0000002c 	0x0000002c
+  e8:	44100e44 	bnez	$r18,1052684(0x10100c) # 1010f4 <__stack_size+0xf10f4>
+  ec:	c1580181 	0xc1580181
+  f0:	00000e48 	0x00000e48
+  f4:	0000000c 	0x0000000c
+  f8:	ffffffff 	0xffffffff
+  fc:	7c010001 	0x7c010001
+ 100:	00030d01 	0x00030d01
+ 104:	00000028 	0x00000028
+ 108:	000000f4 	0x000000f4
+ 10c:	1c00d5a0 	pcaddu12i	$r0,1709(0x6ad)
+ 110:	000000ec 	0x000000ec
+ 114:	50600e44 	b	-116367348(0x910600c) # f9106120 <_stack+0xdd006124>
+ 118:	01810297 	0x01810297
+ 11c:	04990398 	csrxchg	$r24,$r28,0x2640
+ 120:	c10a8c02 	0xc10a8c02
+ 124:	d844d744 	0xd844d744
+ 128:	0e48d944 	0x0e48d944
+ 12c:	000b4400 	0x000b4400
+ 130:	0000000c 	0x0000000c
+ 134:	ffffffff 	0xffffffff
+ 138:	7c010001 	0x7c010001
+ 13c:	00030d01 	0x00030d01
+ 140:	00000018 	0x00000018
+ 144:	00000130 	0x00000130
+ 148:	1c00d690 	pcaddu12i	$r16,1716(0x6b4)
+ 14c:	0000001c 	0x0000001c
+ 150:	44100e44 	bnez	$r18,1052684(0x10100c) # 10115c <__stack_size+0xf115c>
+ 154:	d94c0199 	0xd94c0199
+ 158:	00000e44 	0x00000e44
  15c:	0000000c 	0x0000000c
- 160:	00000120 	0x00000120
- 164:	1c00d6a0 	pcaddu12i	$r0,1717(0x6b5)
- 168:	00000008 	0x00000008
- 16c:	00000018 	0x00000018
- 170:	00000120 	0x00000120
- 174:	1c00d6b0 	pcaddu12i	$r16,1717(0x6b5)
- 178:	00000084 	0x00000084
- 17c:	44100e44 	bnez	$r18,1052684(0x10100c) # 101188 <__stack_size+0xf1188>
- 180:	60020199 	blt	$r12,$r25,512(0x200) # 380 <__stack_size-0xfc80>
- 184:	000e58d9 	bytepick.d	$r25,$r6,$r22,0x4
- 188:	0000000c 	0x0000000c
- 18c:	00000120 	0x00000120
- 190:	1c00d740 	pcaddu12i	$r0,1722(0x6ba)
- 194:	00000004 	0x00000004
- 198:	00000018 	0x00000018
- 19c:	00000120 	0x00000120
- 1a0:	1c00d750 	pcaddu12i	$r16,1722(0x6ba)
- 1a4:	00000024 	0x00000024
- 1a8:	44100e44 	bnez	$r18,1052684(0x10100c) # 1011b4 <__stack_size+0xf11b4>
- 1ac:	d9500199 	0xd9500199
- 1b0:	00000e48 	0x00000e48
- 1b4:	00000018 	0x00000018
- 1b8:	00000120 	0x00000120
- 1bc:	1c00d780 	pcaddu12i	$r0,1724(0x6bc)
- 1c0:	00000030 	0x00000030
- 1c4:	44100e44 	bnez	$r18,1052684(0x10100c) # 1011d0 <__stack_size+0xf11d0>
- 1c8:	d9500199 	0xd9500199
- 1cc:	00000e54 	0x00000e54
- 1d0:	0000000c 	0x0000000c
- 1d4:	ffffffff 	0xffffffff
- 1d8:	7c010001 	0x7c010001
- 1dc:	00030d01 	0x00030d01
+ 160:	00000130 	0x00000130
+ 164:	1c00d6b0 	pcaddu12i	$r16,1717(0x6b5)
+ 168:	00000004 	0x00000004
+ 16c:	0000000c 	0x0000000c
+ 170:	00000130 	0x00000130
+ 174:	1c00d6c0 	pcaddu12i	$r0,1718(0x6b6)
+ 178:	00000008 	0x00000008
+ 17c:	00000018 	0x00000018
+ 180:	00000130 	0x00000130
+ 184:	1c00d6d0 	pcaddu12i	$r16,1718(0x6b6)
+ 188:	00000084 	0x00000084
+ 18c:	44100e44 	bnez	$r18,1052684(0x10100c) # 101198 <__stack_size+0xf1198>
+ 190:	60020199 	blt	$r12,$r25,512(0x200) # 390 <__stack_size-0xfc70>
+ 194:	000e58d9 	bytepick.d	$r25,$r6,$r22,0x4
+ 198:	0000000c 	0x0000000c
+ 19c:	00000130 	0x00000130
+ 1a0:	1c00d760 	pcaddu12i	$r0,1723(0x6bb)
+ 1a4:	00000004 	0x00000004
+ 1a8:	00000018 	0x00000018
+ 1ac:	00000130 	0x00000130
+ 1b0:	1c00d770 	pcaddu12i	$r16,1723(0x6bb)
+ 1b4:	00000024 	0x00000024
+ 1b8:	44100e44 	bnez	$r18,1052684(0x10100c) # 1011c4 <__stack_size+0xf11c4>
+ 1bc:	d9500199 	0xd9500199
+ 1c0:	00000e48 	0x00000e48
+ 1c4:	00000018 	0x00000018
+ 1c8:	00000130 	0x00000130
+ 1cc:	1c00d7a0 	pcaddu12i	$r0,1725(0x6bd)
+ 1d0:	00000030 	0x00000030
+ 1d4:	44100e44 	bnez	$r18,1052684(0x10100c) # 1011e0 <__stack_size+0xf11e0>
+ 1d8:	d9500199 	0xd9500199
+ 1dc:	00000e54 	0x00000e54
  1e0:	0000000c 	0x0000000c
- 1e4:	000001d0 	0x000001d0
- 1e8:	1c00d7b0 	pcaddu12i	$r16,1725(0x6bd)
- 1ec:	00000034 	0x00000034
+ 1e4:	ffffffff 	0xffffffff
+ 1e8:	7c010001 	0x7c010001
+ 1ec:	00030d01 	0x00030d01
  1f0:	0000000c 	0x0000000c
- 1f4:	000001d0 	0x000001d0
- 1f8:	1c00d7f0 	pcaddu12i	$r16,1727(0x6bf)
- 1fc:	00000010 	0x00000010
+ 1f4:	000001e0 	0x000001e0
+ 1f8:	1c00d7d0 	pcaddu12i	$r16,1726(0x6be)
+ 1fc:	00000034 	0x00000034
+ 200:	0000000c 	0x0000000c
+ 204:	000001e0 	0x000001e0
+ 208:	1c00d810 	pcaddu12i	$r16,1728(0x6c0)
+ 20c:	00000010 	0x00000010
