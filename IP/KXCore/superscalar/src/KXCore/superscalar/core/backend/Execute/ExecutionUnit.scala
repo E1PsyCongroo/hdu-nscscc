@@ -241,6 +241,154 @@ class MemExeUnit(implicit params: CoreParameters) extends ExecutionUnit {
   dontTouch(stage2Data)
 }
 
+class MemExeUnitWithCache(implicit params: CoreParameters) extends ExecutionUnit {
+  import params._
+  import commonParams.{dataWidth, vaddrWidth, paddrWidth}
+  import backendParams._
+  import LSUType._
+  override def fu_types: UInt = FUType.FUT_MEM.asUInt
+  override def nReaders       = 2
+
+  iss_uop_ext.ready(2) := true.B
+
+  val io_dtlb_req  = IO(Output(new TLBReq()(commonParams)))
+  val io_dtlb_resp = IO(Input(new TLBResp()(commonParams)))
+  val io_axi       = IO(new AXIBundle(params.axiParams))
+  val io_dcache_flush = IO(Input(new Bundle {
+    val stage1 = Bool()
+    val stage2 = Bool()
+  }))
+
+  // 实例化DCache
+  val dcache = Module(new DCache()(commonParams, dcacheParams, axiParams))
+
+  // 连接DCache的AXI接口到外部
+  io_axi <> dcache.io.axi
+  dcache.io.flush := io_dcache_flush
+
+  val isWrite = Seq(LSU_STB, LSU_STH, LSU_STW).map(_.asUInt === stage1Uop.bits.lsuCmd).reduce(_ || _)
+  io_dtlb_req.asid    := 0.U
+  io_dtlb_req.isWrite := isWrite
+  io_dtlb_req.plv     := 0.U
+  io_dtlb_req.vaddr   := Mux(isWrite, stage1Regs.bits(1), stage1Regs.bits(0)) + stage1Uop.bits.imm
+
+  val stage1Data = Wire(DecoupledIO(new Bundle {
+    val uop       = new MicroOp
+    val isWrite   = Bool()
+    val writeData = UInt(dataWidth.W)
+    val paddr     = UInt(paddrWidth.W)
+    val vaddr     = UInt(vaddrWidth.W)
+    val wmask     = UInt(4.W)
+  }))
+  stage1Data.valid          := stage1Uop.valid && stage1Regs.valid
+  stage1Uop.ready           := stage1Data.ready
+  stage1Regs.ready          := stage1Data.ready
+  stage1Data.bits.uop       := stage1Uop.bits
+  stage1Data.bits.isWrite   := isWrite
+  stage1Data.bits.writeData := stage1Regs.bits(0)
+  stage1Data.bits.paddr     := io_dtlb_resp.paddr
+  stage1Data.bits.vaddr     := io_dtlb_req.vaddr
+  stage1Data.bits.wmask := MuxLookup(stage1Uop.bits.lsuCmd, 0.U)(
+    Seq(
+      LSU_STB.asUInt -> ("b0001".U << stage1Data.bits.paddr(1, 0)),
+      LSU_STH.asUInt -> ("b0011".U << stage1Data.bits.paddr(1)),
+      LSU_STW.asUInt -> "b1111".U,
+    ),
+  )
+
+  // DCache状态机 - 简化版本，因为DCache内部已经处理了复杂的状态转换
+  val sIdle :: sWaitDCacheStage0 :: sWaitDCacheStage1 :: sWaitDCacheStage2 :: Nil = Enum(4)
+  val state = RegInit(sIdle)
+  val nextState = WireDefault(sIdle)
+
+  nextState := MuxLookup(state, sIdle)(
+    Seq(
+      sIdle -> Mux(
+        stage1Data.valid && !io_kill,
+        Mux(dcache.io.req.stage0.ready, sWaitDCacheStage0, sIdle),
+        sIdle
+      ),
+      sWaitDCacheStage0 -> Mux(
+        io_kill,
+        sIdle,
+        Mux(dcache.io.req.stage1.ready, sWaitDCacheStage1, sWaitDCacheStage0)
+      ),
+      sWaitDCacheStage1 -> Mux(
+        io_kill,
+        sIdle,
+        Mux(dcache.io.resp.stage2.valid, sWaitDCacheStage2, sWaitDCacheStage1)
+      ),
+      sWaitDCacheStage2 -> Mux(
+        dcache.io.resp.stage2.fire,
+        sIdle,
+        sWaitDCacheStage2
+      )
+    )
+  )
+  state := nextState
+
+  stage1Data.ready := (state === sIdle) && dcache.io.req.stage0.ready
+
+  // 连接DCache Stage0 (地址请求)
+  dcache.io.req.stage0.valid := (state === sIdle) && stage1Data.valid && !io_kill
+  dcache.io.req.stage0.bits.vaddr := stage1Data.bits.vaddr
+
+  // 连接DCache Stage1 (详细请求)
+  dcache.io.req.stage1.valid := (state === sWaitDCacheStage0) && !io_kill
+  dcache.io.req.stage1.bits.vaddr := stage1Data.bits.vaddr
+  dcache.io.req.stage1.bits.paddr := stage1Data.bits.paddr
+  dcache.io.req.stage1.bits.cached := true.B // 默认使用缓存，可以根据地址范围判断
+  dcache.io.req.stage1.bits.cacop := 0.U // 普通读写操作
+  dcache.io.req.stage1.bits.isWrite := stage1Data.bits.isWrite
+  dcache.io.req.stage1.bits.writeData := stage1Data.bits.writeData
+  dcache.io.req.stage1.bits.writeMask := stage1Data.bits.wmask
+
+  // 保存stage1的数据到stage2
+  val stage2Data = RegEnable(stage1Data.bits, state === sWaitDCacheStage0 && dcache.io.req.stage1.fire)
+  val io_mem_resp = IO(Output(Valid(new ExeUnitResp)))
+
+  // DCache Stage2响应处理
+  dcache.io.resp.stage2.ready := true.B
+
+  // 读数据处理 - 根据指令类型进行符号扩展或零扩展
+  val dcache_rdata = dcache.io.resp.stage2.bits.data
+  val loffset = WireDefault(stage2Data.paddr(1, 0) << 3.U)
+  val lshift = dcache_rdata >> loffset
+  val rdata = MuxCase(
+    lshift,
+    Seq(
+      LSU_LDB  -> Fill(24, lshift(7)) ## lshift(7, 0),
+      LSU_LDH  -> Fill(16, lshift(15)) ## lshift(15, 0),
+      LSU_LDHU -> Fill(16, 0.U(1.W)) ## lshift(15, 0),
+      LSU_LDBU -> Fill(24, 0.U(1.W)) ## lshift(7, 0),
+    ).map { case (key, data) => (stage2Data.uop.lsuCmd === key.asUInt, data) },
+  )
+
+  // 输出响应
+  io_mem_resp.valid := !io_kill && (state === sWaitDCacheStage2) && dcache.io.resp.stage2.valid
+  io_mem_resp.bits.brInfo.valid         := false.B
+  io_mem_resp.bits.brInfo.bits          := DontCare
+  io_mem_resp.bits.uop                  := stage2Data.uop
+  io_mem_resp.bits.uop.debug.load       := VecInit(Seq(LSU_LDB, LSU_LDBU, LSU_LDH, LSU_LDHU, LSU_LDW).map(_.asUInt === stage2Data.uop.lsuCmd)).asUInt
+  io_mem_resp.bits.uop.debug.loadVaddr  := stage2Data.vaddr
+  io_mem_resp.bits.uop.debug.loadPaddr  := stage2Data.paddr
+  io_mem_resp.bits.uop.debug.loadData   := rdata
+  io_mem_resp.bits.uop.debug.store      := VecInit(Seq(LSU_STB, LSU_STH, LSU_STW).map(_.asUInt === stage2Data.uop.lsuCmd)).asUInt
+  io_mem_resp.bits.uop.debug.storeVaddr := stage2Data.vaddr
+  io_mem_resp.bits.uop.debug.storePaddr := stage2Data.paddr
+  io_mem_resp.bits.uop.debug.storeData  := stage2Data.writeData
+  io_mem_resp.bits.data                 := rdata
+
+  // 调试信号
+  dontTouch(state)
+  dontTouch(nextState)
+  dontTouch(stage1Uop)
+  dontTouch(stage1Regs)
+  dontTouch(stage1Data)
+  dontTouch(stage2Data)
+  dontTouch(dcache_rdata)
+}
+
 class UniqueExeUnit(
     val hasCSR: Boolean = false,
     val hasMul: Boolean = false,
