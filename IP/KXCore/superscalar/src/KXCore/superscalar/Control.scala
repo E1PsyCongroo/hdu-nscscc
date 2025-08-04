@@ -38,6 +38,20 @@ object ALUType extends ChiselEnum {
   def shiftArith(cmd: UInt)   = cmd(0)
 }
 
+object LSUType extends ChiselEnum {
+  val LSU_STB  = Value("b000".U)
+  val LSU_STH  = Value("b001".U)
+  val LSU_STW  = Value("b010".U)
+  val LSU_LDW  = Value("b011".U)
+  val LSU_LDB  = Value("b100".U)
+  val LSU_LDH  = Value("b101".U)
+  val LSU_LDBU = Value("b110".U)
+  val LSU_LDHU = Value("b111".U)
+
+  def isUnsinged(cmd: UInt) = cmd(1)
+  def isStore(cmd: UInt)    = !cmd(2) && !(cmd(0) && cmd(1))
+}
+
 // RS1 Operand Select Signal
 object OP1Type extends ChiselEnum {
   val OP1_RS1  = Value // Register Source #1

@@ -98,7 +98,7 @@ case class CoreParameters(
       Seq(
         // IssueParams(2, 1, 12, IQType.IQT_MEM.asUInt),
         // IssueParams(2, 1, 12, IQType.IQT_UNQ.asUInt),
-        IssueParams(2, 0, 0, IQType.IQT_MEM.asUInt),
+        IssueParams(2, 1, 12, IQType.IQT_MEM.asUInt),
         IssueParams(2, 0, 0, IQType.IQT_UNQ.asUInt),
         IssueParams(2, 2, 20, IQType.IQT_INT.asUInt),
       ),

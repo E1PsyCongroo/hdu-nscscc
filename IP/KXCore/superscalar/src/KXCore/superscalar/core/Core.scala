@@ -4,6 +4,7 @@ import chisel3._
 import chisel3.util._
 import KXCore.common.peripheral._
 import KXCore.common.Privilege._
+import KXCore.common.utils._
 import KXCore.superscalar._
 import KXCore.superscalar.core.frontend._
 import KXCore.superscalar.core.backend._
@@ -35,7 +36,7 @@ class CoreIO(implicit params: CoreParameters) extends Bundle {
 }
 
 class Core(implicit params: CoreParameters) extends Module {
-  import params.{commonParams}
+  import params.{commonParams, axiParams}
   val io = IO(new CoreIO)
 
   val tlb      = Module(new TLB)
@@ -58,7 +59,8 @@ class Core(implicit params: CoreParameters) extends Module {
   tlb.io.transReq0.plv     := PLV.PLV_0.asUInt
   tlb.io.cmd_in            := DontCare
 
-  io.axi                        <> frontend.io.axi
+  AXIInterconnect(axiParams, Seq(backend.io.axi, frontend.io.axi), Seq(io.axi), Seq(Seq(AddressSet(0, -1))), Seq(false))
+
   frontend.io.icacheReq.valid   := false.B
   frontend.io.icacheReq.bits    := DontCare
   frontend.io.itlbResp          := tlb.io.transResp0
@@ -69,9 +71,6 @@ class Core(implicit params: CoreParameters) extends Module {
   frontend.io.commit.valid      := backend.io.commit.valid
   frontend.io.commit.bits       := backend.io.commit.bits
 
-  backend.io.axi               := DontCare
-  backend.io.axi.r.valid       := false.B
-  backend.io.axi.b.valid       := false.B
   backend.io.dtlbResp          := tlb.io.transResp1
   backend.io.fetchPacket.valid := frontend.io.fetchPacket.valid
   backend.io.fetchPacket.bits  := frontend.io.fetchPacket.bits
@@ -84,7 +83,6 @@ class Core(implicit params: CoreParameters) extends Module {
   io.debug0   := 0.U.asTypeOf(new DebugInfo)
 
   if (params.debug) {
-
     dontTouch(backend.io.debug)
     val difftestInstrCommit = Module(new DifftestInstrCommit)
     val difftestGRegState   = Module(new DifftestGRegState)
@@ -133,17 +131,17 @@ class Core(implicit params: CoreParameters) extends Module {
     difftestStoreEvent.io.clock      := clock.asBool
     difftestStoreEvent.io.coreid     := 0.U
     difftestStoreEvent.io.index      := 0.U
-    difftestStoreEvent.io.valid      := 0.U
-    difftestStoreEvent.io.storePAddr := 0.U
-    difftestStoreEvent.io.storeVAddr := 0.U
-    difftestStoreEvent.io.storeData  := 0.U
+    difftestStoreEvent.io.valid      := RegNext(backend.io.debug.commit_uops(commit_idx).bits.debug.store & Fill(8, backend.io.commit.valid), 0.U)
+    difftestStoreEvent.io.storePAddr := RegNext(backend.io.debug.commit_uops(commit_idx).bits.debug.storePaddr, 0.U)
+    difftestStoreEvent.io.storeVAddr := RegNext(backend.io.debug.commit_uops(commit_idx).bits.debug.storeVaddr, 0.U)
+    difftestStoreEvent.io.storeData  := RegNext(backend.io.debug.commit_uops(commit_idx).bits.debug.storeData, 0.U)
 
     difftestLoadEvent.io.clock  := clock.asBool
     difftestLoadEvent.io.coreid := 0.U
     difftestLoadEvent.io.index  := 0.U
-    difftestLoadEvent.io.valid  := 0.U
-    difftestLoadEvent.io.paddr  := 0.U
-    difftestLoadEvent.io.vaddr  := 0.U
+    difftestLoadEvent.io.valid  := RegNext(backend.io.debug.commit_uops(commit_idx).bits.debug.load & Fill(8, backend.io.commit.valid), 0.U)
+    difftestLoadEvent.io.paddr  := RegNext(backend.io.debug.commit_uops(commit_idx).bits.debug.loadVaddr, 0.U)
+    difftestLoadEvent.io.vaddr  := RegNext(backend.io.debug.commit_uops(commit_idx).bits.debug.loadPaddr, 0.U)
 
     difftestGRegState.io.clock  := clock.asBool
     difftestGRegState.io.coreid := 0.U

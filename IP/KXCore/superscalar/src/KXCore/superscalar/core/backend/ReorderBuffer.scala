@@ -16,10 +16,11 @@ class RoBEntry(implicit params: CoreParameters) extends Bundle {
   import params.{commonParams, frontendParams, backendParams}
   import frontendParams.{ftqIdxWidth}
   import backendParams.{coreWidth, robRowNum, robIdxWidth, retireWidth, lregWidth, pregWidth, wbPortNum}
-  val valids = Vec(coreWidth, Bool())
-  val uop    = Vec(coreWidth, new MicroOp)
-  val ftqIdx = UInt(ftqIdxWidth.W)
-  val brInfo = Valid(new BrUpdateInfo)
+  val valids   = Vec(coreWidth, Bool())
+  val uop      = Vec(coreWidth, new MicroOp)
+  val ftqIdx   = UInt(ftqIdxWidth.W)
+  val brInfo   = Valid(new BrUpdateInfo)
+  val redirect = Valid(UInt(commonParams.vaddrWidth.W))
 }
 
 class ReorderBuffer(implicit params: CoreParameters) extends Module {
@@ -30,13 +31,15 @@ class ReorderBuffer(implicit params: CoreParameters) extends Module {
     val alloc = Vec(
       coreWidth,
       new Bundle {
-        val ready = Input(Bool())
+        val valid = Input(Bool())
         val uop   = Input(new MicroOp)
         val idx   = Output(UInt(robIdxWidth.W))
-        val valid = Output(Bool())
+        val ready = Output(Bool())
       },
     )
+    val empty  = Output(Bool())
     val write  = Vec(wbPortNum, Flipped(Valid(new RoBWrite)))
+    val getPC  = Flipped(new GetPCFromFtqIO)
     val commit = new RoBEntry
   })
 
@@ -72,6 +75,7 @@ class ReorderBuffer(implicit params: CoreParameters) extends Module {
     val ldst      = UInt(lregWidth.W)
     val pdst      = UInt(pregWidth.W)
     val stalePdst = UInt(pregWidth.W)
+    val flush     = Bool()
   }
   def compact_to_uop(compact: RoBCompactUop, uop: MicroOp): MicroOp = {
     val out = WireInit(uop)
@@ -79,6 +83,7 @@ class ReorderBuffer(implicit params: CoreParameters) extends Module {
     out.ldst      := compact.ldst
     out.pdst      := compact.pdst
     out.stalePdst := compact.stalePdst
+    out.flush     := compact.flush
     out
   }
   def uop_to_compact(uop: MicroOp): RoBCompactUop = {
@@ -87,6 +92,7 @@ class ReorderBuffer(implicit params: CoreParameters) extends Module {
     out.ldst      := uop.ldst
     out.pdst      := uop.pdst
     out.stalePdst := uop.stalePdst
+    out.flush     := uop.flush
     out
   }
 
@@ -117,9 +123,8 @@ class ReorderBuffer(implicit params: CoreParameters) extends Module {
       assert(rob_val(rob_tail) === false.B, "[rob] overwriting a valid entry.")
     }
 
-    val isFirst = if (w == 0) true.B else !VecInit((0 until w).map(i => io.alloc(i).valid)).reduce(_ || _)
     io.alloc(w).idx   := Mux((coreWidth == 1).B, rob_tail, Cat(rob_tail, w.U(log2Ceil(coreWidth).W)))
-    io.alloc(w).valid := !full && (!io.alloc(w).uop.isUnique || (empty && isFirst))
+    io.alloc(w).ready := !full
 
     // -----------------------------------------------
     // Writeback
@@ -143,7 +148,6 @@ class ReorderBuffer(implicit params: CoreParameters) extends Module {
           rob_brInfo.bits := wb_brInfo.bits
         }
       }
-
     }
 
     // // -----------------------------------------------------
@@ -164,7 +168,6 @@ class ReorderBuffer(implicit params: CoreParameters) extends Module {
 
     // -----------------------------------------------
     // Commit
-
     can_commit(w) := rob_val(rob_head) && !rob_bsy(rob_head)
 
     io.commit.valids(w) := will_commit(w)
@@ -202,9 +205,20 @@ class ReorderBuffer(implicit params: CoreParameters) extends Module {
     will_commit(w) := can_commit(w) && !block_commit
     commit_count = Mux(will_commit(w), commit_count + 1.U, commit_count)
     block_commit = (io.commit.brInfo.valid && io.commit.brInfo.bits.mispredict) ||
+      (can_commit(w) && io.commit.uop(w).flush) || (rob_head_vals(w) && !will_commit(w)) ||
       (if (retireWidth != coreWidth) { commit_count === retireWidth.U }
        else false.B) || block_commit
   }
+
+  io.getPC.ftqIdx := io.commit.ftqIdx
+
+  val mispred        = (io.commit.brInfo.valid && io.commit.brInfo.bits.mispredict)
+  val flushs         = (io.commit.valids zip io.commit.uop).map { case (v, uop) => (v && uop.flush) }
+  val flushIdx       = OHToUInt(flushs)
+  val alignedFetchPC = params.fetchAlign(io.getPC.info.entry.fetchPC)
+  val flushPC        = (alignedFetchPC | Cat(io.commit.uop(flushIdx).idx, Fill(log2Ceil(commonParams.instBytes), 0.U))) + 4.U
+  io.commit.redirect.valid := mispred | flushs.reduce(_ || _)
+  io.commit.redirect.bits  := Mux(mispred, io.commit.brInfo.bits.target, flushPC)
 
   // -----------------------------------------------
   // ROB Head Logic
@@ -220,7 +234,7 @@ class ReorderBuffer(implicit params: CoreParameters) extends Module {
   // -----------------------------------------------
   // ROB Tail Logic
 
-  when(!full && io.alloc.map(_.ready).reduce(_ || _)) {
+  when(!full && io.alloc.map(_.valid).reduce(_ || _)) {
     rob_tail := WrapInc(rob_tail, robRowNum)
   }
 
@@ -230,10 +244,12 @@ class ReorderBuffer(implicit params: CoreParameters) extends Module {
   full  := (rob_head === rob_tail) && (rob_head_vals.reduce(_ || _))
   empty := (rob_head === rob_tail) && (rob_head_vals.asUInt === 0.U)
 
+  io.empty := empty
+
   // -----------------------------------------------
   // Flush Logic
 
-  flush := io.commit.valids.reduce(_ || _) && io.commit.brInfo.valid && io.commit.brInfo.bits.mispredict
+  flush := io.commit.valids.reduce(_ || _) && io.commit.redirect.valid
 
   when(flush) {
     rob_head := 0.U

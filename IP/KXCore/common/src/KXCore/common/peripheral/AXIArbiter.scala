@@ -109,62 +109,62 @@ object AXIInterconnect {
   }
 }
 
-object AXIArbiter {
-  type Policy = (Int, UInt, Bool) => UInt
+// object AXIArbiter {
+//   type Policy = (Int, UInt, Bool) => UInt
 
-  val lowestIndexFirst: Policy  = (width, valids, select) => ~(scanLeftOr(valids) << 1)(width - 1, 0)
-  val highestIndexFirst: Policy = (width, valids, select) => ~((scanRightOr(valids) >> 1).pad(width))
+//   val lowestIndexFirst: Policy  = (width, valids, select) => ~(scanLeftOr(valids) << 1)(width - 1, 0)
+//   val highestIndexFirst: Policy = (width, valids, select) => ~((scanRightOr(valids) >> 1).pad(width))
 
-  def apply[T <: Data](policy: Policy)(sink: IrrevocableIO[T], sources: IrrevocableIO[T]*): Unit = {
-    if (sources.isEmpty) {
-      sink.valid := false.B
-    } else {
-      returnWinner(policy)(sink, sources: _*)
-    }
-  }
+//   def apply[T <: Data](policy: Policy)(sink: IrrevocableIO[T], sources: IrrevocableIO[T]*): Unit = {
+//     if (sources.isEmpty) {
+//       sink.valid := false.B
+//     } else {
+//       returnWinner(policy)(sink, sources: _*)
+//     }
+//   }
 
-  def returnWinner[T <: Data](policy: Policy)(sink: IrrevocableIO[T], sources: IrrevocableIO[T]*) = {
-    require(!sources.isEmpty)
+//   def returnWinner[T <: Data](policy: Policy)(sink: IrrevocableIO[T], sources: IrrevocableIO[T]*) = {
+//     require(!sources.isEmpty)
 
-    // The arbiter is irrevocable; when !idle, repeat last request
-    val idle = RegInit(true.B)
+//     // The arbiter is irrevocable; when !idle, repeat last request
+//     val idle = RegInit(true.B)
 
-    // Who wants access to the sink?
-    val valids   = sources.map(_.valid)
-    val anyValid = valids.reduce(_ || _)
-    // Arbitrate amongst the requests
-    val readys = VecInit(policy(valids.length, Cat(valids.reverse), idle).asBools)
-    // Which request wins arbitration?
-    val winner = VecInit((readys.zip(valids)).map { case (r, v) => r && v })
+//     // Who wants access to the sink?
+//     val valids   = sources.map(_.valid)
+//     val anyValid = valids.reduce(_ || _)
+//     // Arbitrate amongst the requests
+//     val readys = VecInit(policy(valids.length, Cat(valids.reverse), idle).asBools)
+//     // Which request wins arbitration?
+//     val winner = VecInit((readys.zip(valids)).map { case (r, v) => r && v })
 
-    // Confirm the policy works properly
-    require(readys.size == valids.size)
-    // Never two winners
-    val prefixOR = winner.scanLeft(false.B)(_ || _).init
-    assert((prefixOR.zip(winner)).map { case (p, w) => !p || !w }.reduce { _ && _ })
-    // If there was any request, there is a winner
-    assert(!anyValid || winner.reduce(_ || _))
+//     // Confirm the policy works properly
+//     require(readys.size == valids.size)
+//     // Never two winners
+//     val prefixOR = winner.scanLeft(false.B)(_ || _).init
+//     assert((prefixOR.zip(winner)).map { case (p, w) => !p || !w }.reduce { _ && _ })
+//     // If there was any request, there is a winner
+//     assert(!anyValid || winner.reduce(_ || _))
 
-    // The one-hot source granted access in the previous cycle
-    val state    = RegInit(VecInit.fill(sources.size)(false.B))
-    val muxState = Mux(idle, winner, state)
-    state := muxState
+//     // The one-hot source granted access in the previous cycle
+//     val state    = RegInit(VecInit.fill(sources.size)(false.B))
+//     val muxState = Mux(idle, winner, state)
+//     state := muxState
 
-    // Determine when we go idle
-    idle := Mux(sink.fire, true.B, Mux(anyValid, false.B, idle))
+//     // Determine when we go idle
+//     idle := Mux(sink.fire, true.B, Mux(anyValid, false.B, idle))
 
-    if (sources.size > 1) {
-      // 没有发出请求的 source 可以置位 ready，使用 readys 可以缩短路径，降低延迟
-      val allowed = Mux(idle, readys, state)
-      (sources.zip(allowed)).foreach { case (s, r) =>
-        s.ready := sink.ready && r
-      }
-    } else {
-      sources(0).ready := sink.ready
-    }
+//     if (sources.size > 1) {
+//       // 没有发出请求的 source 可以置位 ready，使用 readys 可以缩短路径，降低延迟
+//       val allowed = Mux(idle, readys, state)
+//       (sources.zip(allowed)).foreach { case (s, r) =>
+//         s.ready := sink.ready && r
+//       }
+//     } else {
+//       sources(0).ready := sink.ready
+//     }
 
-    sink.valid := Mux(idle, anyValid, Mux1H(state, valids))
-    sink.bits :<= Mux1H(muxState, sources.map(_.bits))
-    muxState
-  }
-}
+//     sink.valid := Mux(idle, anyValid, Mux1H(state, valids))
+//     sink.bits :<= Mux1H(muxState, sources.map(_.bits))
+//     muxState
+//   }
+// }

@@ -19,8 +19,6 @@ abstract class FunctionalUnit(val isAluUnit: Boolean = false)(implicit params: C
   })
 }
 
-/** Functional unit that wraps RocketChips ALU
-  */
 class ALUUnit(implicit params: CoreParameters) extends FunctionalUnit(isAluUnit = true) {
   import params.{commonParams, frontendParams, fetchBytes}
   import commonParams.{instBytes, instWidth, dataWidth, vaddrWidth}
@@ -92,29 +90,31 @@ class MultiplyUnit(implicit params: CoreParameters) extends FunctionalUnit {
   import params.{commonParams, frontendParams}
   import commonParams.{dataWidth}
 
-  val uop = io.req.bits.uop
+  val uop        = io.req.bits.uop
   val multiplier = Module(new WallaceMultiplier(params.commonParams.dataWidth, params.backendParams.multiplierPipelineDepth))
 
   /* ------ State Machine ------ */
   val sIdle :: sRunning :: sKilled :: sDone :: Nil = Enum(4)
-  val state = RegInit(sIdle)
-  state := MuxLookup(state, sIdle)(Seq(
-    sIdle    -> Mux(io.req.valid && multiplier.io.out.ready, sRunning, sIdle),
-    sRunning -> Mux(io.kill, sKilled, sRunning),
-    sKilled  -> Mux(multiplier.io.out.valid, sIdle, sKilled),
-    sDone    -> Mux(io.resp.ready, sDone, sIdle),
-  ))
+  val state                                        = RegInit(sIdle)
+  state := MuxLookup(state, sIdle)(
+    Seq(
+      sIdle    -> Mux(io.req.valid && multiplier.io.out.ready, sRunning, sIdle),
+      sRunning -> Mux(io.kill, sKilled, sRunning),
+      sKilled  -> Mux(multiplier.io.out.valid, sIdle, sKilled),
+      sDone    -> Mux(io.resp.ready, sDone, sIdle),
+    ),
+  )
 
-  io.req.ready := state === sIdle
-  io.resp.valid := state === sDone && !io.kill
+  io.req.ready           := state === sIdle
+  io.resp.valid          := state === sDone && !io.kill
   multiplier.io.in.valid := io.req.valid && state === sIdle
   /* ------ State Machine ------ */
-  
-  multiplier.io.in.bits.signed := (uop.aluCmd === ALUType.ALU_MUL.asUInt || uop.aluCmd === ALUType.ALU_MULH.asUInt)
-  multiplier.io.in.bits.multiplier := io.req.bits.rs1_data
+
+  multiplier.io.in.bits.signed       := (uop.aluCmd === ALUType.ALU_MUL.asUInt || uop.aluCmd === ALUType.ALU_MULH.asUInt)
+  multiplier.io.in.bits.multiplier   := io.req.bits.rs1_data
   multiplier.io.in.bits.multiplicand := io.req.bits.rs2_data
-  
-  io.resp.bits.uop := io.req.bits.uop
+
+  io.resp.bits.uop  := io.req.bits.uop
   io.resp.bits.data := Mux(uop.aluCmd === ALUType.ALU_MUL.asUInt, multiplier.io.out.bits.result_hi, multiplier.io.out.bits.result_lo)
 }
 
@@ -125,22 +125,24 @@ class DivUnit(implicit params: CoreParameters) extends FunctionalUnit {
 
   /* ------ State Machine ------ */
   val sIdle :: sRunning :: sKilled :: sDone :: Nil = Enum(4)
-  val state = RegInit(sIdle)
-  state := MuxLookup(state, sIdle)(Seq(
-    sIdle    -> Mux(io.req.valid && divider.io.out.ready, sRunning, sIdle),
-    sRunning -> Mux(io.kill, sKilled, sRunning),
-    sKilled  -> Mux(divider.io.out.valid, sIdle, sKilled),
-    sDone    -> Mux(io.resp.ready, sDone, sIdle),
-  ))
+  val state                                        = RegInit(sIdle)
+  state := MuxLookup(state, sIdle)(
+    Seq(
+      sIdle    -> Mux(io.req.valid && divider.io.out.ready, sRunning, sIdle),
+      sRunning -> Mux(io.kill, sKilled, sRunning),
+      sKilled  -> Mux(divider.io.out.valid, sIdle, sKilled),
+      sDone    -> Mux(io.resp.ready, sDone, sIdle),
+    ),
+  )
 
-  io.req.ready := state === sIdle
-  io.resp.valid := state === sDone && !io.kill
+  io.req.ready        := state === sIdle
+  io.resp.valid       := state === sDone && !io.kill
   divider.io.in.valid := io.req.valid && state === sIdle
   /* ------ State Machine ------ */
 
   divider.io.in.bits.dividend := io.req.bits.rs1_data
-  divider.io.in.bits.divisor := io.req.bits.rs2_data
-  divider.io.in.bits.signed := uop.aluCmd === ALUType.ALU_DIV.asUInt || uop.aluCmd === ALUType.ALU_MOD.asUInt
+  divider.io.in.bits.divisor  := io.req.bits.rs2_data
+  divider.io.in.bits.signed   := uop.aluCmd === ALUType.ALU_DIV.asUInt || uop.aluCmd === ALUType.ALU_MOD.asUInt
 
   io.resp.bits.uop := io.req.bits.uop
   io.resp.bits.data := Mux(

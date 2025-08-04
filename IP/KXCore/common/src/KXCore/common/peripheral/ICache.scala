@@ -159,7 +159,7 @@ class ICacheStage1(implicit
   val isIdxInv = cacop === CACOP_IDX_INV.asUInt
   val isHitInv = cacop === CACOP_HIT_INV.asUInt
 
-  val sHandleReq :: sSendBusReq :: sReadBusResp :: sWriteBack :: sSendReadResp :: Nil = Enum(5)
+  val sHandleReq :: sSendBusReq :: sReadBusResp :: sIgnoreBusResp :: sWriteBack :: sSendReadResp :: Nil = Enum(6)
 
   val state     = RegInit(sHandleReq)
   val nextState = WireDefault(sHandleReq)
@@ -167,12 +167,29 @@ class ICacheStage1(implicit
 
   nextState := MuxLookup(state, sHandleReq)(
     Seq(
-      sHandleReq  -> Mux(io.req.valid && isRead && (!hit || !cached), sSendBusReq, sHandleReq),
-      sSendBusReq -> Mux(io.axi.ar.ready, sReadBusResp, sSendBusReq),
+      sHandleReq -> Mux(io.req.valid && isRead && (!hit || !cached), sSendBusReq, sHandleReq),
+      sSendBusReq -> Mux(
+        io.req.valid,
+        Mux(io.axi.ar.ready, sReadBusResp, sSendBusReq),
+        Mux(io.axi.ar.ready, sIgnoreBusResp, sHandleReq),
+      ),
       sReadBusResp -> Mux(
-        io.axi.r.valid && io.axi.r.bits.last.asBool,
-        Mux(io.req.valid, Mux(cached, sWriteBack, sSendReadResp), sHandleReq),
-        sReadBusResp,
+        io.req.valid,
+        Mux(
+          io.axi.r.valid && io.axi.r.bits.last.asBool && io.axi.r.bits.id === cacheParams.id.U,
+          Mux(cached, sWriteBack, sSendReadResp),
+          sReadBusResp,
+        ),
+        Mux(
+          io.axi.r.valid && io.axi.r.bits.last.asBool && io.axi.r.bits.id === cacheParams.id.U,
+          sHandleReq,
+          sIgnoreBusResp,
+        ),
+      ),
+      sIgnoreBusResp -> Mux(
+        io.axi.r.valid && io.axi.r.bits.last.asBool && io.axi.r.bits.id === cacheParams.id.U,
+        sHandleReq,
+        sIgnoreBusResp,
       ),
       sWriteBack    -> Mux(io.req.valid, sSendReadResp, sHandleReq),
       sSendReadResp -> Mux(!io.req.valid || io.resp.ready, sHandleReq, sSendBusReq),
@@ -184,11 +201,20 @@ class ICacheStage1(implicit
   val matched = PriorityEncoder(matches)
   hit := matches.reduce(_ || _) && wayValid(matched)
 
-  val random        = if (nWays == 1) 0.U else GaloisLFSR.maxPeriod(wayWidth)
-  val replacedSel   = RegEnable(Mux(wayValid.contains(false.B), PriorityEncoder(wayValid.map(!_)), random), io.axi.ar.fire)
-  val lineData      = Reg(Vec(burstLen, UInt(axiParams.dataBits.W)))
-  val (burstCnt, _) = Counter(0 until burstLen, io.axi.r.valid, io.axi.ar.fire)
-  lineData(burstCnt) := Mux(io.axi.r.valid, io.axi.r.bits.data, lineData(burstCnt))
+  val random      = if (nWays == 1) 0.U else GaloisLFSR.maxPeriod(wayWidth)
+  val replacedSel = RegEnable(Mux(wayValid.contains(false.B), PriorityEncoder(wayValid.map(!_)), random), io.axi.ar.fire)
+  val lineData    = Reg(Vec(burstLen, UInt(axiParams.dataBits.W)))
+  val (burstCnt, _) =
+    Counter(
+      0 until burstLen,
+      io.axi.r.valid && io.axi.r.bits.id === cacheParams.id.U,
+      io.axi.ar.fire && io.axi.r.bits.id === cacheParams.id.U,
+    )
+  lineData(burstCnt) := Mux(
+    io.axi.r.valid && io.axi.r.bits.id === cacheParams.id.U,
+    io.axi.r.bits.data,
+    lineData(burstCnt),
+  )
 
   io.req.ready := MuxLookup(state, false.B)(
     Seq(
@@ -242,7 +268,7 @@ class ICacheStage1(implicit
   io.axi.ar.bits.cache := 0.U
   io.axi.ar.bits.prot  := 0.U
 
-  io.axi.r.ready := state === sReadBusResp
+  io.axi.r.ready := (state === sReadBusResp) || (state === sIgnoreBusResp)
 
   io.axi.aw.valid := false.B
   io.axi.aw.bits  := DontCare

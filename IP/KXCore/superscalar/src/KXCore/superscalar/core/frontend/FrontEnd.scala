@@ -23,6 +23,7 @@ class FrontEndIO(implicit params: CoreParameters) extends Bundle {
   val commit = Flipped(Valid(new Bundle {
     val ftqIdx   = UInt(log2Ceil(frontendParams.ftqNum).W)
     val brUpdate = Valid(new BrUpdateInfo)
+    val redirect = Valid(UInt(commonParams.vaddrWidth.W))
   }))
 }
 
@@ -47,8 +48,8 @@ class FrontEnd(implicit params: CoreParameters) extends Module {
   val stage1Redirect  = Wire(UInt(vaddrWidth.W))
   val stage2Redirect  = Wire(Valid(UInt(vaddrWidth.W)))
   val backendRedirect = Wire(Valid(UInt(vaddrWidth.W)))
-  backendRedirect.valid := io.commit.valid && io.commit.bits.brUpdate.valid && io.commit.bits.brUpdate.bits.mispredict
-  backendRedirect.bits  := io.commit.bits.brUpdate.bits.target
+  backendRedirect.valid := io.commit.valid && io.commit.bits.redirect.valid
+  backendRedirect.bits  := io.commit.bits.redirect.bits
 
   flush.stage1 := backendRedirect.valid || stage2Redirect.valid
   flush.stage2 := backendRedirect.valid
@@ -121,9 +122,10 @@ class FrontEnd(implicit params: CoreParameters) extends Module {
   icache.io.req.stage1.valid       := icacheArb.io.out.valid
   icacheArb.io.out.ready           := icache.io.req.stage1.ready
   icache.io.req.stage1.bits.vaddr  := icacheArb.io.out.bits.vaddr
-  io.itlbReq                       := DontCare
   io.itlbReq.vaddr                 := stage0to1Ext.bits.fetchPC
   io.itlbReq.isWrite               := false.B
+  io.itlbReq.asid                  := 0.U
+  io.itlbReq.plv                   := 0.U
   icache.io.req.stage1.bits.paddr  := io.itlbResp.paddr
   icache.io.req.stage1.bits.cacop  := icacheArb.io.out.bits.cacop
   icache.io.req.stage1.bits.cached := io.itlbResp.mat(0)

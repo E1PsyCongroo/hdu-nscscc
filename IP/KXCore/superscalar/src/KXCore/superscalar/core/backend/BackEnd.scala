@@ -21,6 +21,7 @@ class BackEndIO(implicit params: CoreParameters) extends Bundle {
   val commit = Valid(new Bundle {
     val ftqIdx   = UInt(log2Ceil(frontendParams.ftqNum).W)
     val brUpdate = Valid(new BrUpdateInfo)
+    val redirect = Valid(UInt(commonParams.vaddrWidth.W))
   })
   val debug = Output(new Bundle {
     val regs        = Vec(backendParams.lregNum, UInt(commonParams.dataWidth.W))
@@ -32,6 +33,8 @@ class BackEnd(implicit params: CoreParameters) extends Module {
   import params.{commonParams, frontendParams, backendParams}
   import backendParams.{coreWidth, issueParams, pregNum, memIQParams, unqIQParams, intIQParams}
 
+  require(memIQParams.issueWidth == 1)
+
   val io = IO(new BackEndIO)
 
   val decoder         = Module(new Decoder)
@@ -40,21 +43,24 @@ class BackEnd(implicit params: CoreParameters) extends Module {
   val renameBusyTable = Module(new RenameBusyTable(true))
   val rob             = Module(new ReorderBuffer)
   val dispatcher      = Module(new BasicDispatcher)
-  // val memIssUnit      = Module(new IssueUnitCollapsing(memIQParams))
+  val memIssUnit      = Module(new IssueUnitCollapsing(memIQParams))
   // val unqIssUnit = Module(new IssueUnitCollapsing(unqIQParams))
   val intIssUnit  = Module(new IssueUnitCollapsing(intIQParams))
+  val memExeUnit  = Module(new MemExeUnit)
   val aluExeUnits = Seq.fill(intIQParams.issueWidth)(Module(new ALUExeUnit))
-  val regFile     = Module(new FullyPortedRF(pregNum, aluExeUnits.map(_.nReaders).sum, aluExeUnits.length))
+  val regFile     = Module(new FullyPortedRF(pregNum, aluExeUnits.map(_.nReaders).sum + memExeUnit.nReaders, aluExeUnits.length + 1))
 
   val flush = Wire(Bool())
 
   renameMapTable.io.rollback := flush
   renameFreeList.io.rollback := flush
-  // memIssUnit.io.flush := flush
+  memIssUnit.io.flush        := flush
   // unqIssUnit.io.flush := flush
   intIssUnit.io.flush := flush
+  memExeUnit.io_kill  := flush
   aluExeUnits.foreach(unit => unit.io_kill := flush)
 
+  memIssUnit.io.fu_types := VecInit(Seq(memExeUnit.io_fu_types))
   intIssUnit.io.fu_types := VecInit(aluExeUnits.map(_.io_fu_types))
 
   // decode & rename
@@ -89,6 +95,7 @@ class BackEnd(implicit params: CoreParameters) extends Module {
   decToRen.ready := disData.ready
   disData.ready  := VecInit(decToRen.bits.map(_.valid)).asUInt === disUopFire || flush
   var dis_valid_not_ready = false.B
+  var dis_first_valid     = true.B
   for (i <- 0 until coreWidth) {
     renameFreeList.io.allocPregs(i).ready := disData.bits(i).valid && disData.bits(i).bits.ldst =/= 0.U &&
       disUopReady(i)
@@ -101,12 +108,15 @@ class BackEnd(implicit params: CoreParameters) extends Module {
     renameBusyTable.io.uopReqs(i)    := disData.bits(i).bits
     renameBusyTable.io.rebusyReqs(i) := disData.bits(i).valid
 
-    rob.io.alloc(i).ready := disData.bits(i).valid && disUopReady(i)
+    rob.io.alloc(i).valid := disData.bits(i).valid && disUopReady(i)
     rob.io.alloc(i).uop   := disData.bits(i).bits
+
+    val dis_first_valid_yet     = dis_first_valid
+    val dis_valid_not_ready_yet = dis_valid_not_ready
 
     disData.bits(i).valid := decToRen.valid && decToRen.bits(i).valid && !disUopFireReg(i) &&
       (renameFreeList.io.allocPregs(i).valid || disData.bits(i).bits.ldst === 0.U) &&
-      rob.io.alloc(i).valid
+      (!disData.bits(i).bits.isUnique || (dis_first_valid_yet && rob.io.empty)) && !dis_valid_not_ready_yet && rob.io.alloc(i).ready
     disData.bits(i).bits        := decToRen.bits(i).bits
     disData.bits(i).bits.pdst   := renameFreeList.io.allocPregs(i).bits
     disData.bits(i).bits.robIdx := rob.io.alloc(i).idx
@@ -126,34 +136,41 @@ class BackEnd(implicit params: CoreParameters) extends Module {
     disData.bits(i).bits.prs1Busy := renameBusyTable.io.busyResps(i).prs1Busy
     disData.bits(i).bits.prs2Busy := renameBusyTable.io.busyResps(i).prs2Busy
 
-    val dis_valid_not_ready_yet = dis_valid_not_ready
+    dis_first_valid = dis_first_valid && !disData.bits(i).valid
+    dis_valid_not_ready = dis_valid_not_ready || (disData.bits(i).valid && !disUopReady(i))
 
-    dis_valid_not_ready = disData.bits(i).valid && !disUopReady(i)
-    dispatcher.io.ren_uops(i).valid := disData.bits(i).valid && !dis_valid_not_ready_yet
+    dispatcher.io.ren_uops(i).valid := disData.bits(i).valid
     dispatcher.io.ren_uops(i).bits  := disData.bits(i).bits
   }
   disUopReady := VecInit(dispatcher.io.ren_uops.map(_.ready)).asUInt
   disUopFire  := disUopFireReg | (disUopReady & VecInit(disData.bits.map(_.valid)).asUInt)
 
   // issue
-  dispatcher.io.dis_uops(0).foreach { dis =>
-    dis.ready := true.B
-  }
+  dispatcher.io.dis_uops(0) <> memIssUnit.io.dis_uops
   dispatcher.io.dis_uops(1).foreach { dis =>
     dis.ready := true.B
   }
   dispatcher.io.dis_uops(2) <> intIssUnit.io.dis_uops
 
   // execute
+  memIssUnit.io.iss_uops(0) <> memExeUnit.io_iss_uop
+  io.axi                    <> memExeUnit.io_axi
+  io.dtlbReq                := memExeUnit.io_dtlb_req
+  memExeUnit.io_dtlb_resp   := io.dtlbResp
   intIssUnit.io.iss_uops zip aluExeUnits map { case (iss_uop, exu) => iss_uop <> exu.io_iss_uop }
+
+  memExeUnit.io_read_reqs(0)  <> regFile.io.read_reqs(0)
+  memExeUnit.io_read_reqs(1)  <> regFile.io.read_reqs(1)
+  memExeUnit.io_read_resps(0) <> regFile.io.read_resps(0)
+  memExeUnit.io_read_resps(1) <> regFile.io.read_resps(1)
 
   val ftq_port_issued = Array.fill(2) { false.B }
   val ftq_port_addrs  = Array.fill(2) { 0.U(frontendParams.ftqIdxWidth.W) }
   for (i <- 0 until aluExeUnits.length) {
-    aluExeUnits(i).io_read_reqs(0)  <> regFile.io.read_reqs(2 * i)
-    aluExeUnits(i).io_read_reqs(1)  <> regFile.io.read_reqs(2 * i + 1)
-    aluExeUnits(i).io_read_resps(0) <> regFile.io.read_resps(2 * i)
-    aluExeUnits(i).io_read_resps(1) <> regFile.io.read_resps(2 * i + 1)
+    aluExeUnits(i).io_read_reqs(0)  <> regFile.io.read_reqs(2 * (i + 1))
+    aluExeUnits(i).io_read_reqs(1)  <> regFile.io.read_reqs(2 * (i + 1) + 1)
+    aluExeUnits(i).io_read_resps(0) <> regFile.io.read_resps(2 * (i + 1))
+    aluExeUnits(i).io_read_resps(1) <> regFile.io.read_resps(2 * (i + 1) + 1)
     for (w <- 0 until 2) {
       val req         = aluExeUnits(i).io_ftq_req(w)
       var read_issued = false.B
@@ -180,25 +197,43 @@ class BackEnd(implicit params: CoreParameters) extends Module {
   }
 
   // write back
-  (0 until aluExeUnits.length).foreach { i =>
-    renameBusyTable.io.wbValids(i) := aluExeUnits(i).io_alu_resp.valid
-    renameBusyTable.io.wbPdsts(i)  := aluExeUnits(i).io_alu_resp.bits.uop.pdst
+  renameBusyTable.io.wbValids(0) := memExeUnit.io_mem_resp.valid
+  renameBusyTable.io.wbPdsts(0)  := memExeUnit.io_mem_resp.bits.uop.pdst
 
-    intIssUnit.io.wakeup_ports(i).valid := aluExeUnits(i).io_alu_resp.valid
-    intIssUnit.io.wakeup_ports(i).bits  := aluExeUnits(i).io_alu_resp.bits.uop.pdst
+  memIssUnit.io.wakeup_ports(0).valid := memExeUnit.io_mem_resp.valid
+  memIssUnit.io.wakeup_ports(0).bits  := memExeUnit.io_mem_resp.bits.uop.pdst
+  intIssUnit.io.wakeup_ports(0).valid := memExeUnit.io_mem_resp.valid
+  intIssUnit.io.wakeup_ports(0).bits  := memExeUnit.io_mem_resp.bits.uop.pdst
 
-    regFile.io.write_ports(i).valid := aluExeUnits(i).io_alu_resp.valid &&
+  regFile.io.write_ports(0).valid := memExeUnit.io_mem_resp.valid &&
+    memExeUnit.io_mem_resp.bits.uop.ldst =/= 0.U
+  regFile.io.write_ports(0).bits.addr := memExeUnit.io_mem_resp.bits.uop.pdst
+  regFile.io.write_ports(0).bits.data := memExeUnit.io_mem_resp.bits.data
+
+  rob.io.write(0).valid       := memExeUnit.io_mem_resp.valid
+  rob.io.write(0).bits.uop    := memExeUnit.io_mem_resp.bits.uop
+  rob.io.write(0).bits.brInfo := memExeUnit.io_mem_resp.bits.brInfo
+
+  for (i <- 0 until aluExeUnits.length) {
+    renameBusyTable.io.wbValids(i + 1) := aluExeUnits(i).io_alu_resp.valid
+    renameBusyTable.io.wbPdsts(i + 1)  := aluExeUnits(i).io_alu_resp.bits.uop.pdst
+
+    memIssUnit.io.wakeup_ports(i + 1).valid := aluExeUnits(i).io_alu_resp.valid
+    memIssUnit.io.wakeup_ports(i + 1).bits  := aluExeUnits(i).io_alu_resp.bits.uop.pdst
+    intIssUnit.io.wakeup_ports(i + 1).valid := aluExeUnits(i).io_alu_resp.valid
+    intIssUnit.io.wakeup_ports(i + 1).bits  := aluExeUnits(i).io_alu_resp.bits.uop.pdst
+
+    regFile.io.write_ports(i + 1).valid := aluExeUnits(i).io_alu_resp.valid &&
       aluExeUnits(i).io_alu_resp.bits.uop.ldst =/= 0.U
-    regFile.io.write_ports(i).bits.addr := aluExeUnits(i).io_alu_resp.bits.uop.pdst
-    regFile.io.write_ports(i).bits.data := aluExeUnits(i).io_alu_resp.bits.data
+    regFile.io.write_ports(i + 1).bits.addr := aluExeUnits(i).io_alu_resp.bits.uop.pdst
+    regFile.io.write_ports(i + 1).bits.data := aluExeUnits(i).io_alu_resp.bits.data
 
-    rob.io.write(i).valid       := aluExeUnits(i).io_alu_resp.valid
-    rob.io.write(i).bits.uop    := aluExeUnits(i).io_alu_resp.bits.uop
-    rob.io.write(i).bits.brInfo := aluExeUnits(i).io_alu_resp.bits.brInfo
+    rob.io.write(i + 1).valid       := aluExeUnits(i).io_alu_resp.valid
+    rob.io.write(i + 1).bits.uop    := aluExeUnits(i).io_alu_resp.bits.uop
+    rob.io.write(i + 1).bits.brInfo := aluExeUnits(i).io_alu_resp.bits.brInfo
   }
 
   // commit
-  io.getPC(0).ftqIdx := 0.U
   for (i <- 0 until coreWidth) {
     renameMapTable.io.comRemapReqs(i).valid := rob.io.commit.valids(i) && rob.io.commit.uop(i).ldst =/= 0.U
     renameMapTable.io.comRemapReqs(i).ldst  := rob.io.commit.uop(i).ldst
@@ -210,11 +245,14 @@ class BackEnd(implicit params: CoreParameters) extends Module {
     renameFreeList.io.despec(i).valid := rob.io.commit.valids(i) && rob.io.commit.uop(i).ldst =/= 0.U
     renameFreeList.io.despec(i).bits  := rob.io.commit.uop(i).pdst
   }
+
+  io.getPC(0)             <> rob.io.getPC
   io.commit.valid         := rob.io.commit.valids.reduce(_ || _)
   io.commit.bits.ftqIdx   := rob.io.commit.ftqIdx
   io.commit.bits.brUpdate := rob.io.commit.brInfo
+  io.commit.bits.redirect := rob.io.commit.redirect
 
-  flush := io.commit.bits.brUpdate.valid && rob.io.commit.brInfo.bits.mispredict
+  flush := rob.io.commit.redirect.valid
 
   for (i <- 0 until backendParams.lregNum) {
     io.debug.regs(i) := regFile.io.debug(renameMapTable.io.debug(i))
@@ -224,22 +262,13 @@ class BackEnd(implicit params: CoreParameters) extends Module {
     debug.bits  := uop
   }
 
-  io.axi          := DontCare
-  io.axi.ar.valid := false.B
-  io.axi.r.ready  := false.B
-  io.axi.aw.valid := false.B
-  io.axi.w.valid  := false.B
-  io.axi.b.ready  := false.B
-
-  io.dtlbReq         := DontCare
-  io.dtlbReq.isWrite := false.B
-  io.dtlbReq.vaddr   := 0.U
-
   dontTouch(decData)
   dontTouch(decToRen)
   dontTouch(disData)
   dontTouch(rob.io)
   dontTouch(dispatcher.io)
   dontTouch(intIssUnit.io)
+  dontTouch(memIssUnit.io)
+  dontTouch(memExeUnit.io_mem_resp)
   aluExeUnits.foreach(unit => dontTouch(unit.io_alu_resp))
 }

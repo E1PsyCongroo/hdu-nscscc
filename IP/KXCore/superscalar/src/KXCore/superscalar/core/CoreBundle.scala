@@ -39,14 +39,22 @@ class MicroOp(implicit params: CoreParameters) extends Bundle {
   val robIdx    = UInt(backendParams.robIdxWidth.W)
   val exception = Bool()
   val ecode     = UInt(ECODE.getWidth.W)
-  // val mem_cmd         = UInt()
-  val isUnique        = Bool() // only allow this instruction in the pipeline, tell ROB to un-ready until empty
-  val flush_on_commit = Bool() // some instructions need to flush the pipeline behind them
+  val lsuCmd    = UInt(LSUType.getWidth.W)
+  val isUnique  = Bool() // only allow this instruction in the pipeline, tell ROB to un-ready until empty
+  val flush     = Bool() // some instructions need to flush the pipeline behind them
   // val csr_cmd          = UInt(freechips.rocketchip.rocket.CSR.SZ.W)
 
   val debug = new Bundle {
-    val pc    = UInt(commonParams.vaddrWidth.W)
-    val inst  = UInt(commonParams.instWidth.W)
-    val wdata = UInt(commonParams.dataWidth.W)
+    val pc         = UInt(commonParams.vaddrWidth.W)
+    val inst       = UInt(commonParams.instWidth.W)
+    val store      = UInt(8.W)
+    val storePaddr = UInt(commonParams.paddrWidth.W)
+    val storeVaddr = UInt(commonParams.vaddrWidth.W)
+    val storeData  = UInt(commonParams.dataWidth.W)
+    val load       = UInt(8.W)
+    val loadPaddr  = UInt(commonParams.paddrWidth.W)
+    val loadVaddr  = UInt(commonParams.vaddrWidth.W)
+    val loadData   = UInt(commonParams.dataWidth.W)
+    val wdata      = UInt(commonParams.dataWidth.W)
   }
 }
