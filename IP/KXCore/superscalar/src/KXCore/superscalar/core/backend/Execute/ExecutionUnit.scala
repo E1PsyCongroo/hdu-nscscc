@@ -259,10 +259,8 @@ class MemExeUnitWithCache(implicit params: CoreParameters) extends ExecutionUnit
     val stage2 = Bool()
   }))
 
-  // 实例化DCache
   val dcache = Module(new DCache()(commonParams, dcacheParams, axiParams))
 
-  // 连接DCache的AXI接口到外部
   io_axi <> dcache.io.axi
   dcache.io.flush := io_dcache_flush
 
@@ -296,7 +294,6 @@ class MemExeUnitWithCache(implicit params: CoreParameters) extends ExecutionUnit
     ),
   )
 
-  // DCache状态机 - 简化版本，因为DCache内部已经处理了复杂的状态转换
   val sIdle :: sWaitDCacheStage0 :: sWaitDCacheStage1 :: sWaitDCacheStage2 :: Nil = Enum(4)
   val state = RegInit(sIdle)
   val nextState = WireDefault(sIdle)
@@ -329,28 +326,23 @@ class MemExeUnitWithCache(implicit params: CoreParameters) extends ExecutionUnit
 
   stage1Data.ready := (state === sIdle) && dcache.io.req.stage0.ready
 
-  // 连接DCache Stage0 (地址请求)
   dcache.io.req.stage0.valid := (state === sIdle) && stage1Data.valid && !io_kill
   dcache.io.req.stage0.bits.vaddr := stage1Data.bits.vaddr
 
-  // 连接DCache Stage1 (详细请求)
   dcache.io.req.stage1.valid := (state === sWaitDCacheStage0) && !io_kill
   dcache.io.req.stage1.bits.vaddr := stage1Data.bits.vaddr
   dcache.io.req.stage1.bits.paddr := stage1Data.bits.paddr
-  dcache.io.req.stage1.bits.cached := true.B // 默认使用缓存，可以根据地址范围判断
-  dcache.io.req.stage1.bits.cacop := 0.U // 普通读写操作
+  dcache.io.req.stage1.bits.cached := true.B
+  dcache.io.req.stage1.bits.cacop := 0.U
   dcache.io.req.stage1.bits.isWrite := stage1Data.bits.isWrite
   dcache.io.req.stage1.bits.writeData := stage1Data.bits.writeData
   dcache.io.req.stage1.bits.writeMask := stage1Data.bits.wmask
 
-  // 保存stage1的数据到stage2
   val stage2Data = RegEnable(stage1Data.bits, state === sWaitDCacheStage0 && dcache.io.req.stage1.fire)
   val io_mem_resp = IO(Output(Valid(new ExeUnitResp)))
 
-  // DCache Stage2响应处理
   dcache.io.resp.stage2.ready := true.B
 
-  // 读数据处理 - 根据指令类型进行符号扩展或零扩展
   val dcache_rdata = dcache.io.resp.stage2.bits.data
   val loffset = WireDefault(stage2Data.paddr(1, 0) << 3.U)
   val lshift = dcache_rdata >> loffset
@@ -364,7 +356,6 @@ class MemExeUnitWithCache(implicit params: CoreParameters) extends ExecutionUnit
     ).map { case (key, data) => (stage2Data.uop.lsuCmd === key.asUInt, data) },
   )
 
-  // 输出响应
   io_mem_resp.valid := !io_kill && (state === sWaitDCacheStage2) && dcache.io.resp.stage2.valid
   io_mem_resp.bits.brInfo.valid         := false.B
   io_mem_resp.bits.brInfo.bits          := DontCare
@@ -379,7 +370,6 @@ class MemExeUnitWithCache(implicit params: CoreParameters) extends ExecutionUnit
   io_mem_resp.bits.uop.debug.storeData  := stage2Data.writeData
   io_mem_resp.bits.data                 := rdata
 
-  // 调试信号
   dontTouch(state)
   dontTouch(nextState)
   dontTouch(stage1Uop)

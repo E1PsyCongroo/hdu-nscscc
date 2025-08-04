@@ -47,7 +47,8 @@ class BackEnd(implicit params: CoreParameters) extends Module {
   val memIssUnit      = Module(new IssueUnitCollapsing(memIQParams))
   val unqIssUnit      = Module(new IssueUnitCollapsing(unqIQParams))
   val intIssUnit      = Module(new IssueUnitCollapsing(intIQParams))
-  val memExeUnit      = Module(new MemExeUnitWithCache)
+  // val memExeUnit      = Module(new MemExeUnitWithCache) // use MemExeUnitWithCache
+  val memExeUnit      = Module(new MemExeUnit)
   val unqExeUnit      = Module(new UniqueExeUnit)
   val aluExeUnits     = Seq.fill(intIQParams.issueWidth)(Module(new ALUExeUnit))
   val regFile         = Module(new FullyPortedRF(pregNum, aluExeUnits.map(_.nReaders).sum + memExeUnit.nReaders + memExeUnit.nReaders, aluExeUnits.length + 2))
@@ -166,9 +167,10 @@ class BackEnd(implicit params: CoreParameters) extends Module {
   io.dtlbReq                := memExeUnit.io_dtlb_req
   memExeUnit.io_dtlb_resp   := io.dtlbResp
 
+  /* use memExeUnitWithCache
   memExeUnit.io_dcache_flush.stage1 := flush
   memExeUnit.io_dcache_flush.stage2 := flush
-  
+  */
   unqIssUnit.io.iss_uops(0) <> unqExeUnit.io_iss_uop
   intIssUnit.io.iss_uops zip aluExeUnits map { case (iss_uop, exu) => iss_uop <> exu.io_iss_uop }
 
