@@ -241,6 +241,7 @@ class MemExeUnit(implicit params: CoreParameters) extends ExecutionUnit {
   dontTouch(stage2Data)
 }
 
+/*
 class MemExeUnitWithCache(implicit params: CoreParameters) extends ExecutionUnit {
   import params._
   import commonParams.{dataWidth, vaddrWidth, paddrWidth}
@@ -378,6 +379,7 @@ class MemExeUnitWithCache(implicit params: CoreParameters) extends ExecutionUnit
   dontTouch(stage2Data)
   dontTouch(dcache_rdata)
 }
+*/
 
 class UniqueExeUnit(
     val hasCSR: Boolean = false,
