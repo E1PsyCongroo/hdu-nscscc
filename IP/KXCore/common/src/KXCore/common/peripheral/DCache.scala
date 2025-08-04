@@ -257,6 +257,24 @@ class DCacheStage1(implicit commonParams: CommonParameters, cacheParams: CachePa
   val nextState = WireDefault(sHandleReq)
   val hit       = Wire(Bool())
 
+  val matches = wayTag.map(tag === _)
+  val matched = PriorityEncoder(matches)
+  hit := matches.reduce(_ || _) && wayValid(matched)
+
+  val idxSet = vaddr(blockWidth + setWidth - 1, blockWidth)
+  val idxWay = vaddr.tail(wayWidth)
+
+  val random        = if (nWays == 1) 0.U else GaloisLFSR.maxPeriod(wayWidth)
+  val replacedSel   = RegEnable(Mux(wayValid.contains(false.B), PriorityEncoder(wayValid.map(!_)), random), io.axi.ar.fire || io.axi.aw.fire)
+  val needWriteBack = wayValid(replacedSel) && wayDirty(replacedSel)
+  val writeBackAddr = Cat(wayTag(replacedSel), set, 0.U(blockWidth.W))
+
+  val lineData      = Reg(Vec(burstLen, UInt(axiParams.dataBits.W)))
+  val dirtyLineData = Reg(Vec(burstLen, UInt(axiParams.dataBits.W)))
+
+  val (burstCnt, _) = Counter(0 until burstLen, io.axi.r.valid, io.axi.ar.fire)
+  val (writeBackCnt, _) = Counter(0 until burstLen, io.axi.w.ready, io.axi.aw.fire)
+
   val cacopNeedWriteBack = (isHitInv && hit && wayDirty(matched)) || (isIdxInv && wayValid(idxWay) && wayDirty(idxWay))
 
   nextState := MuxLookup(state, sHandleReq)(
@@ -297,20 +315,6 @@ class DCacheStage1(implicit commonParams: CommonParameters, cacheParams: CachePa
   )
   state := nextState
 
-  val matches = wayTag.map(tag === _)
-  val matched = PriorityEncoder(matches)
-  hit := matches.reduce(_ || _) && wayValid(matched)
-
-  val random        = if (nWays == 1) 0.U else GaloisLFSR.maxPeriod(wayWidth)
-  val replacedSel   = RegEnable(Mux(wayValid.contains(false.B), PriorityEncoder(wayValid.map(!_)), random), io.axi.ar.fire || io.axi.aw.fire)
-  val needWriteBack = wayValid(replacedSel) && wayDirty(replacedSel)
-  val writeBackAddr = Cat(wayTag(replacedSel), set, 0.U(blockWidth.W))
-
-  val lineData      = Reg(Vec(burstLen, UInt(axiParams.dataBits.W)))
-  val dirtyLineData = Reg(Vec(burstLen, UInt(axiParams.dataBits.W)))
-
-  val (burstCnt, _) = Counter(0 until burstLen, io.axi.r.valid, io.axi.ar.fire)
-  val (writeBackCnt, _) = Counter(0 until burstLen, io.axi.w.ready, io.axi.aw.fire)
   lineData(burstCnt) := Mux(io.axi.r.valid, io.axi.r.bits.data, lineData(burstCnt))
 
   when(state === sReadDirtyData) {
@@ -338,14 +342,12 @@ class DCacheStage1(implicit commonParams: CommonParameters, cacheParams: CachePa
     ),
   )
 
-  io.resp.bits.cached := cached
+  io.resp.bits.cached    := cached
   io.resp.bits.set       := set
   io.resp.bits.way       := Mux(state === sSendReadResp, replacedSel, matched)
   io.resp.bits.uncachedRead := lineData(0)
   io.resp.bits.exception := false.B
 
-  val idxSet = vaddr(blockWidth + setWidth - 1, blockWidth)
-  val idxWay = vaddr.tail(wayWidth)
   io.validWrite.valid := MuxLookup(state, false.B)(
     Seq(
       sHandleReq -> (io.req.valid && ((isHitInv && hit) || isFlush || isIdxInv)),
@@ -401,7 +403,7 @@ class DCacheStage1(implicit commonParams: CommonParameters, cacheParams: CachePa
   io.dataWrite.bits.mask := blockMask
 
   io.axi.ar.valid     := (state === sSendBusReadReq) || (state === sFlushBusReq)
-  io.axi.ar.bits.addr := paddr
+  io.axi.ar.bits.addr := paddr & ~ (cacheParams.blockBytes -1).U(commonParams.paddrWidth.W)
   io.axi.ar.bits.id   := id.U
   io.axi.ar.bits.len  := Mux(cached, (burstLen - 1).U, 0.U)
   io.axi.ar.bits.size  := log2Ceil(axiParams.dataBits / 8).U
@@ -426,6 +428,7 @@ class DCacheStage1(implicit commonParams: CommonParameters, cacheParams: CachePa
   io.axi.w.bits.data := dirtyLineData(writeBackCnt)
   io.axi.w.bits.strb := Fill(axiParams.dataBits / 8, 1.U)
   io.axi.w.bits.last := writeBackCnt === (burstLen - 1).U
+  io.axi.w.bits.id   := id.U
 
   io.axi.b.ready := (state === sWriteBusResp)
 }
@@ -447,6 +450,7 @@ class DCacheStage1to2(implicit commonParams: CommonParameters, cacheParams: Cach
       val uncachedRead = UInt(axiParams.dataBits.W)
     }))
     val resp = Decoupled(new Bundle {
+      val cached    = Bool()
       val data      = UInt(commonParams.dataWidth.W)
       val exception = Bool()
     })
@@ -474,6 +478,7 @@ class DCacheStage1to2(implicit commonParams: CommonParameters, cacheParams: Cach
   val extractedData = (data >> (wordOffset * commonParams.dataWidth.U))(commonParams.dataWidth - 1, 0)
   val extractedUncachedData = uncachedRead(commonParams.dataWidth - 1, 0)
 
+  io.resp.bits.cached    := cached
   io.resp.bits.exception := RegEnable(io.req.bits.exception, io.req.fire)
   io.resp.bits.data      := Mux(cached, extractedData, extractedUncachedData)
 }
@@ -542,6 +547,7 @@ class DCache(implicit commonParams: CommonParameters, cacheParams: CacheParamete
   stage0to1.io.validWrite       := stage1.io.validWrite
   stage0to1.io.dirtyWrite       := stage1.io.dirtyWrite
   stage0to1.io.tagWrite         := stage1.io.tagWrite
+  stage0to1.io.dataWrite        := stage1.io.dataWrite
   stage1to2.io.dataWrite        := stage1.io.dataWrite
 
   val stage1to2Keep = RegEnable(
