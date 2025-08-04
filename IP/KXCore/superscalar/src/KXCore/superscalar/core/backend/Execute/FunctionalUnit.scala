@@ -81,7 +81,7 @@ class ALUUnit(implicit params: CoreParameters) extends FunctionalUnit(isAluUnit 
   io.resp.bits.uop             := io.req.bits.uop
   io.resp.bits.uop.debug.wdata := alu.io.out
   io.resp.bits.data            := alu.io.out
-  io.resp.bits.brInfo.valid    := true.B
+  io.resp.bits.brInfo.valid    := io.req.bits.uop.cfiType =/= CFIType.CFI_NONE.asUInt
   io.resp.bits.brInfo.bits     := brInfo
   assert(io.resp.ready)
 }

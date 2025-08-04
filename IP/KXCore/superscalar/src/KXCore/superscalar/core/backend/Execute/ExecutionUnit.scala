@@ -198,7 +198,7 @@ class MemExeUnit(implicit params: CoreParameters) extends ExecutionUnit {
   when(io_axi.r.fire) {
     assert(
       io_axi.r.bits.last.asBool && io_axi.r.bits.id === 1.U &&
-        io_axi.r.bits.resp === AXIParameters.RESP_EXOKAY,
+        io_axi.r.bits.resp === AXIParameters.RESP_OKAY,
     )
   }
   when(io_axi.b.fire) { assert(io_axi.b.bits.id === 1.U && io_axi.b.bits.resp === AXIParameters.RESP_OKAY) }
@@ -258,18 +258,18 @@ class UniqueExeUnit(
   if (hasMul) {
     val mulUnit = Module(new MultiplyUnit)
     mulUnit.io.kill := io_kill
-    
+
     mulUnit.io.req.bits.rs1_data := stage1Regs.bits(0)
     mulUnit.io.req.bits.rs2_data := stage1Regs.bits(1)
-    mulUnit.io.req.bits.uop := stage1Uop.bits
+    mulUnit.io.req.bits.uop      := stage1Uop.bits
     mulUnit.io.req.bits.ftq_info := DontCare
-    mulUnit.io.req.valid := stage1Uop.valid && stage1Regs.valid
-    stage1Uop.ready  := mulUnit.io.req.ready
-    stage1Regs.ready := mulUnit.io.req.ready
-    
+    mulUnit.io.req.valid         := stage1Uop.valid && stage1Regs.valid
+    stage1Uop.ready              := mulUnit.io.req.ready
+    stage1Regs.ready             := mulUnit.io.req.ready
+
     mulUnit.io.resp.ready := true.B
-    io_mul_resp.valid := mulUnit.io.resp.valid
-    io_mul_resp.bits := mulUnit.io.resp.bits
+    io_mul_resp.valid     := mulUnit.io.resp.valid
+    io_mul_resp.bits      := mulUnit.io.resp.bits
   }
 
   val io_div_resp = IO(Output(Valid(new ExeUnitResp)))
@@ -280,15 +280,15 @@ class UniqueExeUnit(
 
     divUnit.io.req.bits.rs1_data := stage1Regs.bits(0)
     divUnit.io.req.bits.rs2_data := stage1Regs.bits(1)
-    divUnit.io.req.bits.uop := stage1Uop.bits
+    divUnit.io.req.bits.uop      := stage1Uop.bits
     divUnit.io.req.bits.ftq_info := DontCare
-    divUnit.io.req.valid := stage1Uop.valid && stage1Regs.valid
-    stage1Uop.ready  := divUnit.io.req.ready
-    stage1Regs.ready := divUnit.io.req.ready
+    divUnit.io.req.valid         := stage1Uop.valid && stage1Regs.valid
+    stage1Uop.ready              := divUnit.io.req.ready
+    stage1Regs.ready             := divUnit.io.req.ready
 
     divUnit.io.resp.ready := true.B
-    io_div_resp.valid := divUnit.io.resp.valid
-    io_div_resp.bits := divUnit.io.resp.bits
+    io_div_resp.valid     := divUnit.io.resp.valid
+    io_div_resp.bits      := divUnit.io.resp.bits
   }
 }
 

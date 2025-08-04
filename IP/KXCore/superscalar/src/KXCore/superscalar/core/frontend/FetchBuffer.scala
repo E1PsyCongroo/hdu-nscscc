@@ -86,6 +86,13 @@ class FetchBuffer(implicit params: CoreParameters) extends Module {
     io.deq.bits.uops(i).bits  := row_uops(bank_ptr)(i)
   }
 
+  when(io.deq.fire) {
+    val bank_mask = (0 until nBanks)
+      .map { i => Mux(bank_ptr === i.U, ((1 << coreWidth) - 1).U << (i * coreWidth), 0.U) }
+      .reduce(_ | _)
+    valids(head_ptr) := valids(head_ptr) & ~bank_mask
+  }
+
   // -------------------------------------------------------------
   // **** Update State ****
   // -------------------------------------------------------------

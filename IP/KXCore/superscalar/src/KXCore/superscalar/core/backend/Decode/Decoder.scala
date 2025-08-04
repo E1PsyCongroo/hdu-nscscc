@@ -119,7 +119,8 @@ object ALUOPControlField extends DecodeField[Instruction, UInt] {
     op match {
       case ADD_W | ADDI_W | LU12I_W | PCADDU12I | BL | JIRL        => BitPat(ALUType.ALU_ADD.asUInt)
       case LD_B | LD_H | LD_W | ST_B | ST_H | ST_W | LD_BU | LD_HU => BitPat(ALUType.ALU_ADD.asUInt)
-      case SUB_W | BEQ                                             => BitPat(ALUType.ALU_SUB.asUInt)
+      case SUB_W                                                   => BitPat(ALUType.ALU_SUB.asUInt)
+      case BEQ                                                     => BitPat(ALUType.ALU_EQ.asUInt)
       case BNE                                                     => BitPat(ALUType.ALU_NEQ.asUInt)
       case SLT | SLTI | BLT                                        => BitPat(ALUType.ALU_SLT.asUInt)
       case BGE                                                     => BitPat(ALUType.ALU_SGE.asUInt)

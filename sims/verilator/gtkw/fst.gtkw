@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.124 (w)1999-2025 BSI
-[*] Mon Aug  4 09:12:20 2025
+[*] Mon Aug  4 13:01:55 2025
 [*]
 [dumpfile] "/home/focused_xy/demo/nscscc/chiplab/sims/verilator/run_prog/log/func/func_lab3_log/simu_trace.fst"
-[dumpfile_mtime] "Mon Aug  4 09:02:02 2025"
-[dumpfile_size] 928354
+[dumpfile_mtime] "Mon Aug  4 12:59:43 2025"
+[dumpfile_size] 8127349
 [savefile] "/home/focused_xy/demo/nscscc/chiplab/sims/verilator/gtkw/fst.gtkw"
-[timestart] 8222
+[timestart] 122045
 [size] 1920 997
 [pos] -1 -1
-*-4.200000 8248 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-4.200000 122110 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.simu_top.
 [treeopen] TOP.simu_top.soc.
@@ -17,7 +17,7 @@
 [treeopen] TOP.simu_top.soc.cpu.core.
 [treeopen] TOP.simu_top.soc.cpu.core.backend.
 [treeopen] TOP.simu_top.soc.cpu.core.backend.aluExeUnits_0.alu.
-[treeopen] TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.alu.
+[treeopen] TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.
 [treeopen] TOP.simu_top.soc.cpu.core.frontend.
 [treeopen] TOP.simu_top.soc.cpu.core.frontend.bpu.
 [treeopen] TOP.simu_top.soc.cpu.core.frontend.bpu.btb.
@@ -31,12 +31,17 @@ TOP.simu_top.soc.cpu.core.reset
 @200
 -frontend
 @28
-TOP.simu_top.soc.cpu.core.frontend.backendRedirect_valid
+TOP.simu_top.soc.cpu.core.frontend.io_commit_bits_redirect_valid
+@22
+TOP.simu_top.soc.cpu.core.frontend.io_commit_bits_redirect_bits[31:0]
+@28
 TOP.simu_top.soc.cpu.core.frontend.stage2Redirect_valid
 @22
 TOP.simu_top.soc.cpu.core.frontend.stage2Redirect_bits[31:0]
-@201
+@200
 -
+@22
+TOP.simu_top.soc.cpu.core.frontend.stage1to2_bits_fetchPC[31:0]
 @28
 TOP.simu_top.soc.cpu.core.frontend.fb.io_enq_valid
 TOP.simu_top.soc.cpu.core.frontend.fb.io_enq_ready
@@ -53,6 +58,10 @@ TOP.simu_top.soc.cpu.core.frontend.fb.io_enq_bits_pcs_0[31:0]
 TOP.simu_top.soc.cpu.core.frontend.fb.io_enq_bits_pcs_1[31:0]
 TOP.simu_top.soc.cpu.core.frontend.fb.io_enq_bits_pcs_2[31:0]
 TOP.simu_top.soc.cpu.core.frontend.fb.io_enq_bits_pcs_3[31:0]
+TOP.simu_top.soc.cpu.core.frontend.fb.head_ptr[3:0]
+TOP.simu_top.soc.cpu.core.frontend.fb.tail_ptr[3:0]
+@28
+TOP.simu_top.soc.cpu.core.frontend.fb.bank_ptr
 @200
 -
 @28
@@ -116,6 +125,12 @@ TOP.simu_top.soc.cpu.core.backend.renameFreeList.io_allocPregs_1_ready
 @200
 -dispatch
 @28
+TOP.simu_top.soc.cpu.core.backend.dis_valid_not_ready_yet
+@29
+TOP.simu_top.soc.cpu.core.backend.dis_valid_not_ready_yet_1
+@28
+TOP.simu_top.soc.cpu.core.backend.decToRen_bits_0_valid
+TOP.simu_top.soc.cpu.core.backend.decToRen_bits_1_valid
 TOP.simu_top.soc.cpu.core.backend.disData_valid
 TOP.simu_top.soc.cpu.core.backend.rob.io_empty
 @200
@@ -286,6 +301,18 @@ TOP.simu_top.soc.cpu.core.backend.memExeUnit.stage1Data_bits_isWrite
 TOP.simu_top.soc.cpu.core.backend.memExeUnit.stage1Data_bits_writeData[31:0]
 TOP.simu_top.soc.cpu.core.backend.memExeUnit.stage1Regs_bits_1[31:0]
 TOP.simu_top.soc.cpu.core.backend.memExeUnit.stage1Regs_bits_0[31:0]
+@200
+-
+@28
+TOP.simu_top.soc.cpu.core.backend.memExeUnit.io_axi_aw_valid
+TOP.simu_top.soc.cpu.core.backend.memExeUnit.io_axi_aw_ready
+@200
+-
+@28
+TOP.simu_top.soc.cpu.core.backend.memExeUnit.io_axi_w_valid
+TOP.simu_top.soc.cpu.core.backend.memExeUnit.io_axi_w_ready
+@200
+-
 @28
 TOP.simu_top.soc.cpu.core.io_axi_b_valid
 @200
@@ -317,6 +344,7 @@ TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.alu.io_req_bits_ftq_info_0_entry
 @28
 TOP.simu_top.soc.cpu.core.backend.memExeUnit.io_mem_resp_valid
 @22
+TOP.simu_top.soc.cpu.core.backend.memExeUnit.io_mem_resp_bits_uop_robIdx[4:0]
 TOP.simu_top.soc.cpu.core.backend.memExeUnit.io_mem_resp_bits_uop_debug_pc[31:0]
 TOP.simu_top.soc.cpu.core.backend.memExeUnit.io_mem_resp_bits_uop_debug_inst[31:0]
 @200
@@ -353,6 +381,11 @@ TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.io_alu_resp_bits_uop_pdst[6:0]
 TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.io_alu_resp_bits_uop_robIdx[4:0]
 TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.io_alu_resp_bits_uop_debug_pc[31:0]
 TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.io_alu_resp_bits_uop_debug_inst[31:0]
+TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.alu.alu.io_cmd[3:0]
+TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.alu.alu.io_in1[31:0]
+TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.alu.alu.io_in2[31:0]
+TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.alu.io_resp_bits_uop_lrs1[4:0]
+TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.alu.io_resp_bits_uop_prs1[6:0]
 @200
 -
 -commit
@@ -363,6 +396,16 @@ TOP.simu_top.soc.cpu.core.backend.rob.io_getPC_info_entry_fetchPC[31:0]
 TOP.simu_top.soc.cpu.core.backend.rob.io_commit_redirect_valid
 @22
 TOP.simu_top.soc.cpu.core.backend.rob.io_commit_redirect_bits[31:0]
+@28
+TOP.simu_top.soc.cpu.core.backend.rob.io_commit_brInfo_valid
+TOP.simu_top.soc.cpu.core.backend.rob.io_commit_brInfo_bits_cfiIdx_bits[1:0]
+TOP.simu_top.soc.cpu.core.backend.rob.io_commit_brInfo_bits_cfiIdx_valid
+TOP.simu_top.soc.cpu.core.backend.rob.io_commit_brInfo_bits_cfiIsB
+TOP.simu_top.soc.cpu.core.backend.rob.io_commit_brInfo_bits_cfiIsBr
+TOP.simu_top.soc.cpu.core.backend.rob.io_commit_brInfo_bits_cfiIsJirl
+TOP.simu_top.soc.cpu.core.backend.rob.io_commit_brInfo_bits_mispredict
+@22
+TOP.simu_top.soc.cpu.core.backend.rob.io_commit_brInfo_bits_target[31:0]
 @200
 -
 -
@@ -406,5 +449,16 @@ TOP.simu_top.soc.cpu.core.difftestStoreEvent.valid[7:0]
 TOP.simu_top.soc.cpu.core.difftestStoreEvent.storeVAddr[63:0]
 TOP.simu_top.soc.cpu.core.difftestStoreEvent.storePAddr[63:0]
 TOP.simu_top.soc.cpu.core.difftestStoreEvent.storeData[63:0]
+@28
+TOP.simu_top.soc.cpu.core.backend.rob.rob_row_brInfo_0_8_bits_cfiIdx_bits[1:0]
+TOP.simu_top.soc.cpu.core.backend.rob.rob_row_brInfo_0_8_bits_cfiIdx_valid
+TOP.simu_top.soc.cpu.core.backend.rob.rob_row_brInfo_0_8_bits_cfiIsB
+TOP.simu_top.soc.cpu.core.backend.rob.rob_row_brInfo_0_8_bits_cfiIsBr
+TOP.simu_top.soc.cpu.core.backend.rob.rob_row_brInfo_0_8_bits_cfiIsJirl
+TOP.simu_top.soc.cpu.core.backend.rob.rob_row_brInfo_0_8_bits_mispredict
+@22
+TOP.simu_top.soc.cpu.core.backend.rob.rob_row_brInfo_0_8_bits_target[31:0]
+@28
+TOP.simu_top.soc.cpu.core.backend.rob.rob_row_brInfo_0_8_valid
 [pattern_trace] 1
 [pattern_trace] 0

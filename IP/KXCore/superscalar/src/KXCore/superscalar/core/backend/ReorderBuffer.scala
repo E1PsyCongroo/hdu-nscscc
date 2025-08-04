@@ -97,29 +97,30 @@ class ReorderBuffer(implicit params: CoreParameters) extends Module {
   }
 
   val rob_row_ftq    = Reg(Vec(robRowNum, UInt(ftqIdxWidth.W)))
-  val rob_row_brInfo = Reg(Vec(robRowNum, Valid(new BrUpdateInfo)))
+  val rob_row_brInfo = Reg(Vec(if (coreWidth == retireWidth) 1 else coreWidth, Vec(robRowNum, Valid(new BrUpdateInfo))))
+  rob_row_brInfo.foreach(_.foreach(b => when(reset.asBool) { b.valid := false.B }))
   for (w <- 0 until coreWidth) {
     def MatchBank(bank_idx: UInt): Bool = (bank_idx === w.U)
 
     // one bank
-
-    val rob_val         = RegInit(VecInit(Seq.fill(robRowNum) { false.B }))
-    val rob_uop         = Reg(Vec(robRowNum, new MicroOp()))
-    val rob_compact_uop = Reg(Vec(robRowNum, new RoBCompactUop))
-    val rob_bsy         = Reg(Vec(robRowNum, Bool()))
-    val rob_exception   = Reg(Vec(robRowNum, Bool()))
+    val rob_row_brInfo_idx = if (coreWidth == retireWidth) 0 else w
+    val rob_val            = RegInit(VecInit(Seq.fill(robRowNum) { false.B }))
+    val rob_uop            = Reg(Vec(robRowNum, new MicroOp()))
+    val rob_compact_uop    = Reg(Vec(robRowNum, new RoBCompactUop))
+    val rob_bsy            = Reg(Vec(robRowNum, Bool()))
+    val rob_exception      = Reg(Vec(robRowNum, Bool()))
 
     // -----------------------------------------------
     // Dispatch: Add Entry to ROB
 
     when(io.alloc(w).valid && io.alloc(w).ready) {
-      rob_val(rob_tail)              := true.B
-      rob_bsy(rob_tail)              := io.alloc(w).uop.busy
-      rob_compact_uop(rob_tail)      := uop_to_compact(io.alloc(w).uop)
-      rob_uop(rob_tail)              := io.alloc(w).uop
-      rob_exception(rob_tail)        := io.alloc(w).uop.exception
-      rob_row_ftq(rob_tail)          := io.alloc(w).uop.ftqIdx
-      rob_row_brInfo(rob_tail).valid := false.B
+      rob_val(rob_tail)                                  := true.B
+      rob_bsy(rob_tail)                                  := io.alloc(w).uop.busy
+      rob_compact_uop(rob_tail)                          := uop_to_compact(io.alloc(w).uop)
+      rob_uop(rob_tail)                                  := io.alloc(w).uop
+      rob_exception(rob_tail)                            := io.alloc(w).uop.exception
+      rob_row_ftq(rob_tail)                              := io.alloc(w).uop.ftqIdx
+      rob_row_brInfo(rob_row_brInfo_idx)(rob_tail).valid := false.B
       assert(rob_val(rob_tail) === false.B, "[rob] overwriting a valid entry.")
     }
 
@@ -134,18 +135,17 @@ class ReorderBuffer(implicit params: CoreParameters) extends Module {
       val wb_uop     = wb_resp.bits.uop
       val wb_brInfo  = wb_resp.bits.brInfo
       val row_idx    = GetRowIdx(wb_uop.robIdx)
-      val rob_brInfo = rob_row_brInfo(row_idx)
+      val rob_brInfo = rob_row_brInfo(rob_row_brInfo_idx)(row_idx)
       when(wb_resp.valid && MatchBank(GetBankIdx(wb_uop.robIdx))) {
         rob_bsy(row_idx) := false.B
         rob_uop(row_idx) := wb_uop
-        when(wb_brInfo.valid) {
-          rob_brInfo.valid := true.B
-        }
+        // TODO: Make this better
         when(
           !rob_brInfo.valid || !rob_brInfo.bits.cfiIdx.valid ||
             (wb_brInfo.bits.cfiIdx.valid && wb_brInfo.bits.cfiIdx.bits < rob_brInfo.bits.cfiIdx.bits),
         ) {
-          rob_brInfo.bits := wb_brInfo.bits
+          // printf("[ROB] row_id: %x, write brInfo with valid %d and mispred %d\n", wb_uop.robIdx, wb_brInfo.valid, wb_brInfo.bits.mispredict)
+          rob_brInfo := wb_brInfo
         }
       }
     }
@@ -173,11 +173,10 @@ class ReorderBuffer(implicit params: CoreParameters) extends Module {
     io.commit.valids(w) := will_commit(w)
     io.commit.uop(w)    := compact_to_uop(rob_compact_uop(rob_head), rob_uop(rob_head))
     io.commit.ftqIdx    := rob_row_ftq(rob_head)
-    io.commit.brInfo    := rob_row_brInfo(rob_head)
 
     when(will_commit(w)) {
-      rob_val(rob_head)              := false.B
-      rob_row_brInfo(rob_head).valid := false.B
+      rob_val(rob_head)                                  := false.B
+      rob_row_brInfo(rob_row_brInfo_idx)(rob_head).valid := false.B
     }
 
     // -----------------------------------------------
@@ -190,10 +189,13 @@ class ReorderBuffer(implicit params: CoreParameters) extends Module {
 
     when(flush) {
       for (i <- 0 until robRowNum) {
-        rob_val(i) := false.B
+        rob_val(i)                                  := false.B
+        rob_row_brInfo(rob_row_brInfo_idx)(i).valid := false.B
       }
     }
 
+    dontTouch(rob_val)
+    dontTouch(rob_bsy)
   } // for (w <- 0 until coreWidth)
 
   // -----------------------------------------------
@@ -201,13 +203,28 @@ class ReorderBuffer(implicit params: CoreParameters) extends Module {
 
   var block_commit = false.B
   var commit_count = 0.U
+
+  io.commit.brInfo.valid := false.B
+  io.commit.brInfo.bits  := DontCare
   for (w <- 0 until coreWidth) {
     will_commit(w) := can_commit(w) && !block_commit
-    commit_count = Mux(will_commit(w), commit_count + 1.U, commit_count)
-    block_commit = (io.commit.brInfo.valid && io.commit.brInfo.bits.mispredict) ||
-      (can_commit(w) && io.commit.uop(w).flush) || (rob_head_vals(w) && !will_commit(w)) ||
-      (if (retireWidth != coreWidth) { commit_count === retireWidth.U }
-       else false.B) || block_commit
+
+    if (retireWidth == coreWidth) {
+      io.commit.brInfo := rob_row_brInfo(0)(rob_head)
+      block_commit = (rob_head_vals(w) &&
+        (!can_commit(w) || (io.commit.brInfo.valid && io.commit.brInfo.bits.mispredict))) ||
+        (can_commit(w) && io.commit.uop(w).flush) || block_commit
+    } else {
+      val brInfo = rob_row_brInfo(w)(rob_head)
+      // TODO: Make this valid when retiredWidth > 1
+      when(will_commit(w) && brInfo.valid) {
+        io.commit.brInfo := brInfo
+      }
+      commit_count = Mux(will_commit(w), commit_count + 1.U, commit_count)
+      block_commit = (rob_head_vals(w) &&
+        ((rob_row_brInfo(w)(rob_head).valid && rob_row_brInfo(w)(rob_head).bits.mispredict) || !can_commit(w))) ||
+        (can_commit(w) && io.commit.uop(w).flush) || (commit_count === retireWidth.U) || block_commit
+    }
   }
 
   io.getPC.ftqIdx := io.commit.ftqIdx
@@ -258,4 +275,6 @@ class ReorderBuffer(implicit params: CoreParameters) extends Module {
 
   // -----------------------------------------------
   // -----------------------------------------------
+  dontTouch(will_commit)
+  dontTouch(rob_head_vals)
 }

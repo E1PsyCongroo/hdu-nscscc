@@ -258,7 +258,7 @@ class ICacheStage1(implicit
   io.dataWrite.bits.data := lineData.asUInt
 
   io.axi.ar.valid     := state === sSendBusReq
-  io.axi.ar.bits.addr := paddr
+  io.axi.ar.bits.addr := paddr & ~(cacheParams.blockBytes - 1).U(commonParams.paddrWidth.W)
   io.axi.ar.bits.id   := id.U
   io.axi.ar.bits.len  := Mux(cached, (burstLen - 1).U, 0.U)
 

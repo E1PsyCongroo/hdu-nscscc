@@ -94,8 +94,8 @@ class BackEnd(implicit params: CoreParameters) extends Module {
   disData.valid  := decToRen.valid
   decToRen.ready := disData.ready
   disData.ready  := VecInit(decToRen.bits.map(_.valid)).asUInt === disUopFire || flush
-  var dis_valid_not_ready = false.B
-  var dis_first_valid     = true.B
+  var dis_not_fire    = false.B
+  var dis_first_valid = true.B
   for (i <- 0 until coreWidth) {
     renameFreeList.io.allocPregs(i).ready := disData.bits(i).valid && disData.bits(i).bits.ldst =/= 0.U &&
       disUopReady(i)
@@ -111,15 +111,16 @@ class BackEnd(implicit params: CoreParameters) extends Module {
     rob.io.alloc(i).valid := disData.bits(i).valid && disUopReady(i)
     rob.io.alloc(i).uop   := disData.bits(i).bits
 
-    val dis_first_valid_yet     = dis_first_valid
-    val dis_valid_not_ready_yet = dis_valid_not_ready
+    val dis_first_valid_yet     = WireInit(dis_first_valid)
+    val dis_valid_not_ready_yet = WireInit(dis_not_fire)
 
     disData.bits(i).valid := decToRen.valid && decToRen.bits(i).valid && !disUopFireReg(i) &&
       (renameFreeList.io.allocPregs(i).valid || disData.bits(i).bits.ldst === 0.U) &&
       (!disData.bits(i).bits.isUnique || (dis_first_valid_yet && rob.io.empty)) && !dis_valid_not_ready_yet && rob.io.alloc(i).ready
     disData.bits(i).bits        := decToRen.bits(i).bits
-    disData.bits(i).bits.pdst   := renameFreeList.io.allocPregs(i).bits
+    disData.bits(i).bits.pdst   := Mux(disData.bits(i).bits.ldst =/= 0.U, renameFreeList.io.allocPregs(i).bits, 0.U)
     disData.bits(i).bits.robIdx := rob.io.alloc(i).idx
+    // bug here
     for (j <- 0 until i) {
       when(disData.bits(j).valid) {
         when(disData.bits(j).bits.ldst === disData.bits(i).bits.ldst) {
@@ -137,8 +138,7 @@ class BackEnd(implicit params: CoreParameters) extends Module {
     disData.bits(i).bits.prs2Busy := renameBusyTable.io.busyResps(i).prs2Busy
 
     dis_first_valid = dis_first_valid && !disData.bits(i).valid
-    dis_valid_not_ready = dis_valid_not_ready || (disData.bits(i).valid && !disUopReady(i))
-
+    dis_not_fire = dis_not_fire || (decToRen.bits(i).valid && !(disData.bits(i).valid || disUopFireReg(i)))
     dispatcher.io.ren_uops(i).valid := disData.bits(i).valid
     dispatcher.io.ren_uops(i).bits  := disData.bits(i).bits
   }
