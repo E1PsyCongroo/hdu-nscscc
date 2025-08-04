@@ -63,7 +63,8 @@ class ALUUnit(implicit params: CoreParameters) extends FunctionalUnit(isAluUnit 
     Seq(
       CFIType.CFI_JIRL.asUInt -> (!io.req.bits.ftq_info(1).valid ||
         brInfo.target =/= io.req.bits.ftq_info(1).entry.fetchPC),
-      CFIType.CFI_BR.asUInt -> (alu.io.cmp_out(0) =/= io.req.bits.ftq_info(0).entry.taken),
+      CFIType.CFI_BR.asUInt -> (alu.io.cmp_out(0) =/= io.req.bits.ftq_info(0).entry.taken ||
+        io.req.bits.ftq_info(0).entry.cfiIdx =/= io.req.bits.uop.idx),
     ),
   )
   brInfo.cfiIdx.valid := brInfo.cfiIsB || brInfo.cfiIsJirl || (brInfo.cfiIsBr && alu.io.cmp_out(0))

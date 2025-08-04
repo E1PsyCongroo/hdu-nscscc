@@ -191,11 +191,13 @@ class FrontEnd(implicit params: CoreParameters) extends Module {
   val stage2JmpMask  = VecInit(stage2FetchBundle.insts.map(isJmp(_))).asUInt
   val stage2CallMask = VecInit(stage2FetchBundle.insts.map(isCall(_))).asUInt
   val stage2RetMask  = VecInit(stage2FetchBundle.insts.map(isRet(_))).asUInt
-  val stage2CfiMask = VecInit((0 until fetchWidth).map { i =>
+  val stage2CfiMask = PriorityEncoderOH(VecInit((0 until fetchWidth).map { i =>
     stage2FetchMask(i) && (stage2JmpMask(i) || (stage2BrMask(i) && bpu.io.resp.stage2.bits.pred(i).taken))
-  }).asUInt
-  val stage2CfiIdx = PriorityEncoder(stage2CfiMask)
+  }).asUInt)
+  val stage2CfiIdx = OHToUInt(stage2CfiMask)
   stage2FetchBundle.mask := stage2FetchMask & ~(MaskUpper(stage2CfiMask) << 1.U)
+  dontTouch(stage2CfiMask)
+  dontTouch(stage2CfiIdx)
 
   stage2FetchBundle.cfiIdx.valid := stage2CfiMask.orR
   stage2FetchBundle.cfiIdx.bits  := stage2CfiIdx

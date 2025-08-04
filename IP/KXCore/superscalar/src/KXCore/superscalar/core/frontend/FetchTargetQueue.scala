@@ -50,6 +50,7 @@ class FetchTargetQueue(implicit params: CoreParameters) extends Module {
     val new_entry = Wire(new FTQBundle)
     new_entry.fetchPC  := io.enq.bits.pc
     new_entry.taken    := io.enq.bits.cfiIdx.valid
+    new_entry.cfiIdx   := io.enq.bits.cfiIdx.bits
     new_entry.meta.bim := io.enq.bits.bpuMeta.bim
     new_entry.meta.btb := io.enq.bits.bpuMeta.btb
     ram(enq_ptr)       := new_entry

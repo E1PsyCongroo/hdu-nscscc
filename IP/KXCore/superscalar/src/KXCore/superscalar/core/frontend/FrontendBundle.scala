@@ -106,6 +106,7 @@ class FTQBundle(implicit params: CoreParameters) extends Bundle {
   import params.{commonParams, frontendParams}
   val fetchPC = UInt(commonParams.vaddrWidth.W)
   val taken   = Bool()
+  val cfiIdx  = UInt(log2Ceil(frontendParams.fetchWidth).W)
   val meta = new Bundle {
     val bim = Vec(params.frontendParams.fetchWidth, UInt(2.W))
     val btb = UInt(log2Ceil(params.frontendParams.btbParams.nWays).W)
