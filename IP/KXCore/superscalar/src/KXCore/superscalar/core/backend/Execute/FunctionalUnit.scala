@@ -7,6 +7,8 @@ import KXCore.superscalar.core._
 import KXCore.superscalar.core.frontend._
 import KXCore.common.utils.WallaceMultiplier
 import KXCore.common.utils.BoothDivider
+import KXCore.superscalar.ALUType.ALU_MUL
+import KXCore.superscalar.ALUType.ALU_MULH
 
 /** Abstract top level functional unit class that wraps a lower level hand made functional unit
   */
@@ -87,68 +89,117 @@ class ALUUnit(implicit params: CoreParameters) extends FunctionalUnit(isAluUnit 
   assert(io.resp.ready)
 }
 
+// class MultiplyUnit(implicit params: CoreParameters) extends FunctionalUnit {
+//   import params.{commonParams, frontendParams}
+//   import commonParams.{dataWidth}
+
+//   val uop        = io.req.bits.uop
+//   val multiplier = Module(new WallaceMultiplier(params.commonParams.dataWidth, params.backendParams.multiplierPipelineDepth))
+
+//   /* ------ State Machine ------ */
+//   val sIdle :: sRunning :: sKilled :: sDone :: Nil = Enum(4)
+//   val state                                        = RegInit(sIdle)
+//   state := MuxLookup(state, sIdle)(
+//     Seq(
+//       sIdle    -> Mux(io.req.valid && multiplier.io.out.ready, sRunning, sIdle),
+//       sRunning -> Mux(io.kill, sKilled, sRunning),
+//       sKilled  -> Mux(multiplier.io.out.valid, sIdle, sKilled),
+//       sDone    -> Mux(io.resp.ready, sDone, sIdle),
+//     ),
+//   )
+
+//   io.req.ready           := state === sIdle
+//   io.resp.valid          := state === sDone && !io.kill
+//   multiplier.io.in.valid := io.req.valid && state === sIdle
+//   /* ------ State Machine ------ */
+
+//   multiplier.io.in.bits.signed       := (uop.aluCmd === ALUType.ALU_MUL.asUInt || uop.aluCmd === ALUType.ALU_MULH.asUInt)
+//   multiplier.io.in.bits.multiplier   := io.req.bits.rs1_data
+//   multiplier.io.in.bits.multiplicand := io.req.bits.rs2_data
+
+//   io.resp.bits.uop  := io.req.bits.uop
+//   io.resp.bits.data := Mux(uop.aluCmd === ALUType.ALU_MUL.asUInt, multiplier.io.out.bits.result_hi, multiplier.io.out.bits.result_lo)
+// }
+
+// class DivUnit(implicit params: CoreParameters) extends FunctionalUnit {
+//   val divider = Module(new BoothDivider(params.commonParams.dataWidth))
+
+//   val uop = io.req.bits.uop
+
+//   /* ------ State Machine ------ */
+//   val sIdle :: sRunning :: sKilled :: sDone :: Nil = Enum(4)
+//   val state                                        = RegInit(sIdle)
+//   state := MuxLookup(state, sIdle)(
+//     Seq(
+//       sIdle    -> Mux(io.req.valid && divider.io.out.ready, sRunning, sIdle),
+//       sRunning -> Mux(io.kill, sKilled, sRunning),
+//       sKilled  -> Mux(divider.io.out.valid, sIdle, sKilled),
+//       sDone    -> Mux(io.resp.ready, sDone, sIdle),
+//     ),
+//   )
+
+//   io.req.ready        := state === sIdle
+//   io.resp.valid       := state === sDone && !io.kill
+//   divider.io.in.valid := io.req.valid && state === sIdle
+//   /* ------ State Machine ------ */
+
+//   divider.io.in.bits.dividend := io.req.bits.rs1_data
+//   divider.io.in.bits.divisor  := io.req.bits.rs2_data
+//   divider.io.in.bits.signed   := uop.aluCmd === ALUType.ALU_DIV.asUInt || uop.aluCmd === ALUType.ALU_MOD.asUInt
+
+//   io.resp.bits.uop := io.req.bits.uop
+//   io.resp.bits.data := Mux(
+//     uop.aluCmd === ALUType.ALU_DIV.asUInt || uop.aluCmd === ALUType.ALU_DIVU.asUInt,
+//     divider.io.out.bits.quotient,
+//     divider.io.out.bits.remainder,
+//   )
+// }
+
 class MultiplyUnit(implicit params: CoreParameters) extends FunctionalUnit {
-  import params.{commonParams, frontendParams}
+  import params.{commonParams, backendParams}
   import commonParams.{dataWidth}
 
-  val uop        = io.req.bits.uop
-  val multiplier = Module(new WallaceMultiplier(params.commonParams.dataWidth, params.backendParams.multiplierPipelineDepth))
+  val multiplier = Module(new WallaceMultiplier(dataWidth, backendParams.mulPipeDepth))
 
-  /* ------ State Machine ------ */
-  val sIdle :: sRunning :: sKilled :: sDone :: Nil = Enum(4)
-  val state                                        = RegInit(sIdle)
-  state := MuxLookup(state, sIdle)(
-    Seq(
-      sIdle    -> Mux(io.req.valid && multiplier.io.out.ready, sRunning, sIdle),
-      sRunning -> Mux(io.kill, sKilled, sRunning),
-      sKilled  -> Mux(multiplier.io.out.valid, sIdle, sKilled),
-      sDone    -> Mux(io.resp.ready, sDone, sIdle),
-    ),
+  val uopReg = RegEnable(io.req.bits.uop, io.req.ready)
+
+  multiplier.io.flush := io.kill
+
+  multiplier.io.in.valid             := io.req.valid
+  io.req.ready                       := multiplier.io.in.ready
+  multiplier.io.in.bits.signed       := Fill(2, ALUType.mul_divUnsigned(io.req.bits.uop.aluCmd))
+  multiplier.io.in.bits.multiplicand := io.req.bits.rs1_data
+  multiplier.io.in.bits.multiplier   := io.req.bits.rs2_data
+
+  io.resp.valid           := multiplier.io.out.valid
+  multiplier.io.out.ready := io.resp.ready
+  io.resp.bits.data := Mux(
+    ALUType.ismulh_mod(uopReg.aluCmd),
+    multiplier.io.out.bits.result_hi,
+    multiplier.io.out.bits.result_lo,
   )
-
-  io.req.ready           := state === sIdle
-  io.resp.valid          := state === sDone && !io.kill
-  multiplier.io.in.valid := io.req.valid && state === sIdle
-  /* ------ State Machine ------ */
-
-  multiplier.io.in.bits.signed       := (uop.aluCmd === ALUType.ALU_MUL.asUInt || uop.aluCmd === ALUType.ALU_MULH.asUInt)
-  multiplier.io.in.bits.multiplier   := io.req.bits.rs1_data
-  multiplier.io.in.bits.multiplicand := io.req.bits.rs2_data
-
-  io.resp.bits.uop  := io.req.bits.uop
-  io.resp.bits.data := Mux(uop.aluCmd === ALUType.ALU_MUL.asUInt, multiplier.io.out.bits.result_hi, multiplier.io.out.bits.result_lo)
+  io.resp.bits.brInfo.bits := DontCare
 }
 
 class DivUnit(implicit params: CoreParameters) extends FunctionalUnit {
   val divider = Module(new BoothDivider(params.commonParams.dataWidth))
 
-  val uop = io.req.bits.uop
+  val uopReg = RegEnable(io.req.bits.uop, io.req.ready)
 
-  /* ------ State Machine ------ */
-  val sIdle :: sRunning :: sKilled :: sDone :: Nil = Enum(4)
-  val state                                        = RegInit(sIdle)
-  state := MuxLookup(state, sIdle)(
-    Seq(
-      sIdle    -> Mux(io.req.valid && divider.io.out.ready, sRunning, sIdle),
-      sRunning -> Mux(io.kill, sKilled, sRunning),
-      sKilled  -> Mux(divider.io.out.valid, sIdle, sKilled),
-      sDone    -> Mux(io.resp.ready, sDone, sIdle),
-    ),
-  )
+  divider.io.flush := io.kill
 
-  io.req.ready        := state === sIdle
-  io.resp.valid       := state === sDone && !io.kill
-  divider.io.in.valid := io.req.valid && state === sIdle
-  /* ------ State Machine ------ */
-
+  divider.io.in.valid         := io.req.valid
+  io.req.ready                := divider.io.in.ready
+  divider.io.in.bits.signed   := Fill(2, ALUType.mul_divUnsigned(io.req.bits.uop.aluCmd))
   divider.io.in.bits.dividend := io.req.bits.rs1_data
   divider.io.in.bits.divisor  := io.req.bits.rs2_data
-  divider.io.in.bits.signed   := uop.aluCmd === ALUType.ALU_DIV.asUInt || uop.aluCmd === ALUType.ALU_MOD.asUInt
 
-  io.resp.bits.uop := io.req.bits.uop
+  io.resp.valid        := divider.io.out.valid
+  divider.io.out.ready := io.resp.ready
   io.resp.bits.data := Mux(
-    uop.aluCmd === ALUType.ALU_DIV.asUInt || uop.aluCmd === ALUType.ALU_DIVU.asUInt,
-    divider.io.out.bits.quotient,
+    ALUType.ismulh_mod(uopReg.aluCmd),
     divider.io.out.bits.remainder,
+    divider.io.out.bits.quotient,
   )
+  io.resp.bits.brInfo.bits := DontCare
 }

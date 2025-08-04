@@ -21,21 +21,25 @@ object ALUType extends ChiselEnum {
   val ALU_SGE  = Value("b1101".U)
   val ALU_SGEU = Value("b1110".U)
 
-  def ALU_MUL   = ALU_ADD
-  def ALU_MULH  = ALU_SLL
+  def ALU_MUL   = ALU_SLL
+  def ALU_MULH  = ALU_EQ
   def ALU_MULHU = ALU_SRA
-  def ALU_DIV   = ALU_NOR
-  def ALU_MOD   = ALU_AND
-  def ALU_DIVU  = ALU_OR
-  def ALU_MODU  = ALU_XOR
+  def ALU_DIV   = ALU_SUB
+  def ALU_MOD   = ALU_SLT
+  def ALU_DIVU  = ALU_SLTU
+  def ALU_MODU  = ALU_OR
 
-  def isSub(cmd: UInt)        = cmd(3)
-  def isCmp(cmd: UInt)        = cmd(3) & (cmd(0) ^ cmd(1))
-  def cmpUnsigned(cmd: UInt)  = cmd(1)
-  def cmpInverted(cmd: UInt)  = cmd(2)
-  def cmpEq(cmd: UInt)        = !cmd(3)
-  def shiftReverse(cmd: UInt) = !cmd(1)
-  def shiftArith(cmd: UInt)   = cmd(0)
+  def isSub(cmd: UInt)           = cmd(3)
+  def isCmp(cmd: UInt)           = cmd(3) & (cmd(0) ^ cmd(1))
+  def cmpUnsigned(cmd: UInt)     = cmd(1)
+  def cmpInverted(cmd: UInt)     = cmd(2)
+  def cmpEq(cmd: UInt)           = !cmd(3)
+  def shiftReverse(cmd: UInt)    = !cmd(1)
+  def shiftArith(cmd: UInt)      = cmd(0)
+  def mul_divUnsigned(cmd: UInt) = cmd(1)
+  def ismulh_mod(cmd: UInt)      = cmd(0)
+  def isDiv(cmd: UInt)           = cmd(3)
+
 }
 
 object LSUType extends ChiselEnum {

@@ -71,7 +71,7 @@ case class BackendParameters(
     lregNum: Int = 32,
     pregNum: Int = 80,
     robNum: Int = 32, // Number of entries in the ROB
-    multiplierPipelineDepth: Int = 3,
+    mulPipeDepth: Int = 3,
     dcacheParams: CacheParameters = CacheParameters(id = 1),
     issueParams: Seq[IssueParams],
 ) {
@@ -96,10 +96,8 @@ case class CoreParameters(
     implicit val frontendParams: FrontendParmaeters = FrontendParmaeters(),
     implicit val backendParams: BackendParameters = BackendParameters(issueParams =
       Seq(
-        // IssueParams(2, 1, 12, IQType.IQT_MEM.asUInt),
-        // IssueParams(2, 1, 12, IQType.IQT_UNQ.asUInt),
         IssueParams(2, 1, 12, IQType.IQT_MEM.asUInt),
-        IssueParams(2, 0, 0, IQType.IQT_UNQ.asUInt),
+        IssueParams(2, 1, 12, IQType.IQT_UNQ.asUInt),
         IssueParams(2, 2, 20, IQType.IQT_INT.asUInt),
       ),
     ),

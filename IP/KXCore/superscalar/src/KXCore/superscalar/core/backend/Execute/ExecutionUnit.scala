@@ -253,7 +253,17 @@ class UniqueExeUnit(
       (if (hasDiv) FUType.FUT_DIV.asUInt else 0.U)
   override def nReaders = 2
 
-  val io_mul_resp = IO(Output(Valid(new ExeUnitResp)))
+  iss_uop_ext.ready(2) := true.B
+
+  val io_unq_resp = IO(Output(Valid(new ExeUnitResp)))
+
+  io_unq_resp.valid := false.B
+  io_unq_resp.bits  := DontCare
+
+  stage1Uop.ready  := false.B
+  stage1Regs.ready := false.B
+
+  val stage2Uop = RegEnable(stage1Uop.bits, stage1Uop.fire)
 
   if (hasMul) {
     val mulUnit = Module(new MultiplyUnit)
@@ -263,16 +273,20 @@ class UniqueExeUnit(
     mulUnit.io.req.bits.rs2_data := stage1Regs.bits(1)
     mulUnit.io.req.bits.uop      := stage1Uop.bits
     mulUnit.io.req.bits.ftq_info := DontCare
-    mulUnit.io.req.valid         := stage1Uop.valid && stage1Regs.valid
-    stage1Uop.ready              := mulUnit.io.req.ready
-    stage1Regs.ready             := mulUnit.io.req.ready
+    mulUnit.io.req.valid         := false.B
+    when(stage1Uop.valid && stage1Regs.valid && !ALUType.isDiv(stage1Uop.bits.aluCmd)) {
+      mulUnit.io.req.valid := true.B
+      stage1Uop.ready      := mulUnit.io.req.fire
+      stage1Regs.ready     := mulUnit.io.req.fire
+    }
 
+    when(!ALUType.isDiv(stage2Uop.aluCmd)) {
+      io_unq_resp.valid := mulUnit.io.resp.valid
+      io_unq_resp.bits  := mulUnit.io.resp.bits
+    }
     mulUnit.io.resp.ready := true.B
-    io_mul_resp.valid     := mulUnit.io.resp.valid
-    io_mul_resp.bits      := mulUnit.io.resp.bits
-  }
 
-  val io_div_resp = IO(Output(Valid(new ExeUnitResp)))
+  }
 
   if (hasDiv) {
     val divUnit = Module(new DivUnit)
@@ -282,14 +296,20 @@ class UniqueExeUnit(
     divUnit.io.req.bits.rs2_data := stage1Regs.bits(1)
     divUnit.io.req.bits.uop      := stage1Uop.bits
     divUnit.io.req.bits.ftq_info := DontCare
-    divUnit.io.req.valid         := stage1Uop.valid && stage1Regs.valid
-    stage1Uop.ready              := divUnit.io.req.ready
-    stage1Regs.ready             := divUnit.io.req.ready
 
+    when(stage1Uop.valid && stage1Regs.valid && ALUType.isDiv(stage1Uop.bits.aluCmd)) {
+      divUnit.io.req.valid := true.B
+      stage1Uop.ready      := divUnit.io.req.fire
+      stage1Regs.ready     := divUnit.io.req.fire
+    }
+
+    when(ALUType.isDiv(stage2Uop.aluCmd)) {
+      io_unq_resp.valid := divUnit.io.resp.valid
+      io_unq_resp.bits  := divUnit.io.resp.bits
+    }
     divUnit.io.resp.ready := true.B
-    io_div_resp.valid     := divUnit.io.resp.valid
-    io_div_resp.bits      := divUnit.io.resp.bits
   }
+
 }
 
 class ALUExeUnit(implicit params: CoreParameters) extends ExecutionUnit {
@@ -325,9 +345,9 @@ class ALUExeUnit(implicit params: CoreParameters) extends ExecutionUnit {
 
   val alu = Module(new ALUUnit)
   alu.io.req.valid := stage1Uop.valid && stage1Regs.valid && stage1Ftq.valid
-  stage1Uop.ready  := alu.io.req.ready
-  stage1Regs.ready := alu.io.req.ready
-  stage1Ftq.ready  := alu.io.req.ready
+  stage1Uop.ready  := alu.io.req.fire
+  stage1Regs.ready := alu.io.req.fire
+  stage1Ftq.ready  := alu.io.req.fire
   alu.io.req.bits  := exe_req
   alu.io.kill      := io_kill
 
