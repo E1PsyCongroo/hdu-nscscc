@@ -77,6 +77,44 @@ class UniqueExeUnit(
       (if (hasMul) FUType.FUT_MUL.asUInt else 0.U) |
       (if (hasDiv) FUType.FUT_DIV.asUInt else 0.U)
   override def nReaders = 2
+
+  val io_mul_resp = IO(Output(Valid(new ExeUnitResp)))
+
+  if (hasMul) {
+    val mulUnit = Module(new MultiplyUnit)
+    mulUnit.io.kill := io_kill
+    
+    mulUnit.io.req.bits.rs1_data := stage1Regs.bits(0)
+    mulUnit.io.req.bits.rs2_data := stage1Regs.bits(1)
+    mulUnit.io.req.bits.uop := stage1Uop.bits
+    mulUnit.io.req.bits.ftq_info := DontCare
+    mulUnit.io.req.valid := stage1Uop.valid && stage1Regs.valid
+    stage1Uop.ready  := mulUnit.io.req.ready
+    stage1Regs.ready := mulUnit.io.req.ready
+    
+    mulUnit.io.resp.ready := true.B
+    io_mul_resp.valid := mulUnit.io.resp.valid
+    io_mul_resp.bits := mulUnit.io.resp.bits
+  }
+
+  val io_div_resp = IO(Output(Valid(new ExeUnitResp)))
+
+  if (hasDiv) {
+    val divUnit = Module(new DivUnit)
+    divUnit.io.kill := io_kill
+
+    divUnit.io.req.bits.rs1_data := stage1Regs.bits(0)
+    divUnit.io.req.bits.rs2_data := stage1Regs.bits(1)
+    divUnit.io.req.bits.uop := stage1Uop.bits
+    divUnit.io.req.bits.ftq_info := DontCare
+    divUnit.io.req.valid := stage1Uop.valid && stage1Regs.valid
+    stage1Uop.ready  := divUnit.io.req.ready
+    stage1Regs.ready := divUnit.io.req.ready
+
+    divUnit.io.resp.ready := true.B
+    io_div_resp.valid := divUnit.io.resp.valid
+    io_div_resp.bits := divUnit.io.resp.bits
+  }
 }
 
 class ALUExeUnit(implicit params: CoreParameters) extends ExecutionUnit {

@@ -118,7 +118,7 @@ class MultiplyUnit(implicit params: CoreParameters) extends FunctionalUnit {
   io.resp.bits.data := Mux(uop.aluCmd === ALUType.ALU_MUL.asUInt, multiplier.io.out.bits.result_hi, multiplier.io.out.bits.result_lo)
 }
 
-class DivUnit(dataWidth: Int)(implicit params: CoreParameters) extends FunctionalUnit {
+class DivUnit(implicit params: CoreParameters) extends FunctionalUnit {
   val divider = Module(new BoothDivider(params.commonParams.dataWidth))
 
   val uop = io.req.bits.uop
