@@ -159,6 +159,7 @@ object RS1ControlField extends DecodeField[Instruction, UInt] {
       case SYSCALL | BREAK | ERTN                                              => BitPat(RS1From.rs1None.asUInt)
       case RDCNTVL_W | RDCNTVH_W                                               => BitPat(RS1From.rs1FromRd.asUInt)
       case RDCNTID_W_0 | RDCNTID_W_1 | RDCNTID_W_2 | RDCNTID_W_3 | RDCNTID_W_4 => BitPat(RS1From.rs1FromRd.asUInt)
+      case BEQ | BNE | BLT | BGE | BLTU | BGEU                        => BitPat(RS1From.rs1FromRd.asUInt)
       case _                                                                   => BitPat(RS1From.rs1FromRj.asUInt)
     }
   }
@@ -178,12 +179,12 @@ object RS2ControlField extends DecodeField[Instruction, UInt] {
       case ADDI_W | LU12I_W | SLTI | SLTUI | PCADDU12I                         => BitPat(RS2From.rs2None.asUInt)
       case ANDI | ORI | XORI                                                   => BitPat(RS2From.rs2None.asUInt)
       case SLLI_W | SRLI_W | SRAI_W                                            => BitPat(RS2From.rs2None.asUInt)
-      case BEQ | BNE | BLT | BGE | BLTU | BGEU                                 => BitPat(RS2From.rs2None.asUInt)
       case B | BL | JIRL                                                       => BitPat(RS2From.rs2None.asUInt)
       case LD_B | LD_H | LD_W | ST_B | ST_H | ST_W | LD_BU | LD_HU             => BitPat(RS2From.rs2None.asUInt)
       case SYSCALL | BREAK | ERTN | IDLE                                       => BitPat(RS2From.rs2None.asUInt)
       case RDCNTVL_W | RDCNTVH_W                                               => BitPat(RS2From.rs2None.asUInt)
       case CSRRD | CSRWR | CSRXCHG_0 | CSRXCHG_1 | CSRXCHG_2 | CSRXCHG_3       => BitPat(RS2From.rs2None.asUInt)
+      case BEQ | BNE | BLT | BGE | BLTU | BGEU                        => BitPat(RS2From.rs2FromRj.asUInt)
       case RDCNTID_W_0 | RDCNTID_W_1 | RDCNTID_W_2 | RDCNTID_W_3 | RDCNTID_W_4 => BitPat(RS2From.rs2FromRj.asUInt)
       case _                                                                   => BitPat(RS2From.rs2FromRk.asUInt)
     }
@@ -354,9 +355,9 @@ class Decoder(implicit params: CoreParameters) extends Module {
         IMMType.IMM_12U -> inst(21, 10),
         IMMType.IMM_14U -> inst(23, 10),
         IMMType.IMM_15U -> inst(14, 0),
-        IMMType.IMM_16  -> Sext((inst(25, 10) << 2.U), dataWidth),
+        IMMType.IMM_16  -> Sext((inst(25, 10) ## 0b00.U(2.W)), dataWidth),
         IMMType.IMM_20  -> (inst(24, 5) << 12.U),
-        IMMType.IMM_26  -> Sext(Cat(inst(9, 0), inst(25, 10)) << 2.U, dataWidth),
+        IMMType.IMM_26  -> Sext(inst(9, 0) ## inst(25, 10) ## 0b00.U(2.W), dataWidth),
       ).map { case (key, value) => (decodeResult(IMMTypeControlField) === key.asUInt, value) },
     )
     uop.op1Sel := decodeResult(OP1SelControlField)

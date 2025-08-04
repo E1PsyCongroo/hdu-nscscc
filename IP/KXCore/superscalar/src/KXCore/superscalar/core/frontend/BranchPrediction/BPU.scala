@@ -74,7 +74,7 @@ class SimpleBranchPredictor(implicit params: CoreParameters) extends Module {
       val stage1 = Flipped(Decoupled(UInt(vaddrWidth.W)))
     }
     val resp = new Bundle {
-      val stage1 = Decoupled(Vec(fetchWidth, new BranchPrediction))
+      val stage1 = Valid(Vec(fetchWidth, new BranchPrediction))
       val stage2 = Decoupled(new Bundle {
         val pred = Vec(fetchWidth, new BranchPrediction)
         val meta = new Bundle {
@@ -104,16 +104,13 @@ class SimpleBranchPredictor(implicit params: CoreParameters) extends Module {
   stage0ReqExt.ready(1)   := bim.io.req.stage0.ready
   bim.io.req.stage0.bits  := stage0ReqExt.bits
 
-  val stage1ReqExt = ReadyValidIOExpand(io.req.stage1, 2)
-  btb.io.req.stage1.valid := stage1ReqExt.valid(0)
-  stage1ReqExt.ready(0)   := btb.io.req.stage1.ready
-  btb.io.req.stage1.bits  := stage1ReqExt.bits
+  btb.io.req.stage1.valid := io.req.stage1.valid
+  btb.io.req.stage1.bits  := io.req.stage1.bits
 
-  bim.io.req.stage1.valid := stage1ReqExt.valid(1)
-  stage1ReqExt.ready(1)   := bim.io.req.stage1.ready
-  bim.io.req.stage1.bits  := stage1ReqExt.bits
+  bim.io.req.stage1.valid := io.req.stage1.valid
+  bim.io.req.stage1.bits  := io.req.stage1.bits
 
-  val stage1Resp = Wire(io.resp.stage1.cloneType)
+  val stage1Resp = Wire(Decoupled(io.resp.stage1.bits.cloneType))
   stage1Resp.valid  := btb.io.resp.valid && bim.io.resp.valid
   btb.io.resp.ready := stage1Resp.ready
   bim.io.resp.ready := stage1Resp.ready
@@ -121,16 +118,15 @@ class SimpleBranchPredictor(implicit params: CoreParameters) extends Module {
     stage1Resp.bits(i)       := btb.io.resp.bits.pred(i)
     stage1Resp.bits(i).taken := bim.io.resp.bits.pred(i).taken
   }
-  val stage1RespExt = ReadyValidIOExpand(stage1Resp, 2)
-  io.resp.stage1.valid   := stage1RespExt.valid(0)
-  stage1RespExt.ready(0) := io.resp.stage1.ready
-  io.resp.stage1.bits    := stage1RespExt.bits
+  io.resp.stage1.valid := stage1Resp.valid
+  io.resp.stage1.bits  := stage1Resp.bits
 
-  val stage1to2 = Wire(io.resp.stage2.cloneType)
-  stage1to2.valid         := stage1RespExt.valid(1)
-  stage1RespExt.ready(1)  := stage1to2.ready
-  stage1to2.bits.pred     := stage1RespExt.bits
-  stage1to2.bits.meta.bim := bim.io.resp.bits.meta
-  stage1to2.bits.meta.btb := btb.io.resp.bits.meta.writeWay
-  PipeConnect(Some(io.flush.stage2), stage1to2, io.resp.stage2)
+  val stage1Data = Wire(Decoupled(io.resp.stage2.bits.cloneType))
+  stage1Data.valid         := stage1Resp.valid
+  stage1Resp.ready         := stage1Data.ready
+  io.req.stage1.ready      := stage1Data.ready
+  stage1Data.bits.pred     := stage1Resp.bits
+  stage1Data.bits.meta.bim := bim.io.resp.bits.meta
+  stage1Data.bits.meta.btb := btb.io.resp.bits.meta.writeWay
+  PipeConnect(Some(io.flush.stage2), stage1Data, io.resp.stage2)
 }

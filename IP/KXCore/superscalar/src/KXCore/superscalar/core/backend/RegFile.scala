@@ -58,7 +58,15 @@ class FullyPortedRF(
 
   val regfile = Mem(numRegisters, UInt(params.commonParams.dataWidth.W))
 
-  (0 until numReadPorts) map { p => io.read_resps(p) := regfile(io.read_reqs(p).bits) }
+  (0 until numReadPorts) map { p =>
+    io.read_resps(p) := regfile(io.read_reqs(p).bits)
+    // bypass
+    for (w <- 0 until numWritePorts) {
+      when(io.write_ports(w).valid && io.read_reqs(p).bits === io.write_ports(w).bits.addr) {
+        io.read_resps(p) := io.write_ports(w).bits.data
+      }
+    }
+  }
 
   io.write_ports map { p => when(p.valid) { regfile(p.bits.addr) := p.bits.data } }
 

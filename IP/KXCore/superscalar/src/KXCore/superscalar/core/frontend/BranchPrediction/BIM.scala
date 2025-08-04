@@ -59,14 +59,14 @@ class BIM(implicit params: CoreParameters) extends Module {
 
     for (w <- 0 until fetchWidth) {
       updateWmask(w) := false.B
-      updateWdata(w) := DontCare
+      updateWdata(w) := 2.U
 
+      // TODO: fix this logic
       when(io.update.valid && io.update.bits.cfiIdx === w.U) {
-        val isTaken = (io.update.bits.cfiIsBr && io.update.bits.cfiTaken) || io.update.bits.cfiIsB
+        val isTaken = io.update.bits.cfiTaken
         updateWmask(w) := true.B
         updateWdata(w) := bimWrite(updateMeta(w), isTaken)
       }
-
     }
 
     when(doingReset || io.update.valid) {
@@ -102,7 +102,7 @@ class BIM(implicit params: CoreParameters) extends Module {
     val flush = Input(Bool())
     val req = new Bundle {
       val stage0 = Flipped(Decoupled(UInt(vaddrWidth.W)))
-      val stage1 = Flipped(Decoupled(UInt(vaddrWidth.W)))
+      val stage1 = Flipped(Valid(UInt(vaddrWidth.W)))
     }
     val resp = Decoupled(new Bundle {
       val pred = Vec(fetchWidth, new BranchPrediction)
@@ -120,7 +120,6 @@ class BIM(implicit params: CoreParameters) extends Module {
   stage0to1.io.update   := io.update
   stage0to1.io.keepRead := io.req.stage1.bits
 
-  io.req.stage1.ready := stage1.io.req.ready
-  stage1.io.req       <> stage0to1.io.resp
-  stage1.io.resp      <> io.resp
+  stage1.io.req  <> stage0to1.io.resp
+  stage1.io.resp <> io.resp
 }

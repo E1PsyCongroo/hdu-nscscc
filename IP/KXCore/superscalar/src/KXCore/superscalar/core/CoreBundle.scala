@@ -16,8 +16,6 @@ class MicroOp(implicit params: CoreParameters) extends Bundle {
   val fuType  = UInt(FUType.getWidth.W) // which functional unit do we use?
   val cfiType = UInt(CFIType.getWidth.W)
 
-  // Was this a branch that was predicted taken?
-  val taken  = Bool()
   val ftqIdx = UInt(log2Ceil(frontendParams.ftqNum).W)
 
   val imm = UInt(commonParams.dataWidth.W) // densely pack the imm in decode
@@ -41,17 +39,14 @@ class MicroOp(implicit params: CoreParameters) extends Bundle {
   val robIdx    = UInt(backendParams.robIdxWidth.W)
   val exception = Bool()
   val ecode     = UInt(ECODE.getWidth.W)
-  // val mem_cmd          = UInt(M_SZ.W)          // sync primitives/cache flushes
-  // val mem_size         = UInt(2.W)
-  // val mem_signed       = Bool()
-  // val uses_ldq         = Bool()
-  // val uses_stq         = Bool()
-  val isUnique = Bool() // only allow this instruction in the pipeline, tell ROB to un-ready until empty
-  // val flush_on_commit  = Bool()                      // some instructions need to flush the pipeline behind them
+  // val mem_cmd         = UInt()
+  val isUnique        = Bool() // only allow this instruction in the pipeline, tell ROB to un-ready until empty
+  val flush_on_commit = Bool() // some instructions need to flush the pipeline behind them
   // val csr_cmd          = UInt(freechips.rocketchip.rocket.CSR.SZ.W)
 
   val debug = new Bundle {
-    val pc   = UInt(commonParams.vaddrWidth.W)
-    val inst = UInt(commonParams.instWidth.W)
+    val pc    = UInt(commonParams.vaddrWidth.W)
+    val inst  = UInt(commonParams.instWidth.W)
+    val wdata = UInt(commonParams.dataWidth.W)
   }
 }

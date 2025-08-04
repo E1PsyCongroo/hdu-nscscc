@@ -43,9 +43,9 @@ class FrontEnd(implicit params: CoreParameters) extends Module {
     val stage1 = Bool()
     val stage2 = Bool()
   })
-  val stage1Redirect = Wire(Decoupled(UInt(vaddrWidth.W)))
-  val stage2Redirect = Wire(Decoupled(UInt(vaddrWidth.W)))
 
+  val stage1Redirect  = Wire(UInt(vaddrWidth.W))
+  val stage2Redirect  = Wire(Valid(UInt(vaddrWidth.W)))
   val backendRedirect = Wire(Valid(UInt(vaddrWidth.W)))
   backendRedirect.valid := io.commit.valid && io.commit.bits.brUpdate.valid && io.commit.bits.brUpdate.bits.mispredict
   backendRedirect.bits  := io.commit.bits.brUpdate.bits.target
@@ -74,41 +74,37 @@ class FrontEnd(implicit params: CoreParameters) extends Module {
   val stage0Data = Wire(Decoupled(new Bundle {
     val fetchPC = UInt(vaddrWidth.W)
   }))
-  val npc = Module(new Queue(UInt(vaddrWidth.W), 1, false, true, false, true))
-  npc.io.flush.get := flush.stage1
-  npc.io.enq.valid := RegNext(reset.asBool) || backendRedirect.valid ||
-    stage2Redirect.valid || stage1Redirect.valid
-  npc.io.enq.bits := MuxCase(
-    DontCare,
+  val stage0Fire = icache.io.req.stage0.ready && bpu.io.req.stage0.ready && stage0Data.ready
+  val isReset    = RegInit(true.B)
+  val npc = MuxCase(
+    stage1Redirect,
     Seq(
-      RegNext(reset.asBool) -> pcReset.U,
+      isReset               -> pcReset.U,
       backendRedirect.valid -> backendRedirect.bits,
       stage2Redirect.valid  -> stage2Redirect.bits,
-      stage1Redirect.valid  -> stage1Redirect.bits,
     ),
   )
-  stage1Redirect.ready := npc.io.enq.ready
-  stage2Redirect.ready := npc.io.enq.ready
-  val npcExt = ReadyValidIOExpand(npc.io.deq, 3)
 
-  icache.io.req.stage0.valid      := npcExt.valid(0)
-  npcExt.ready(0)                 := icache.io.req.stage0.ready
-  icache.io.req.stage0.bits.vaddr := npcExt.bits
+  isReset := Mux(stage0Fire, false.B, isReset)
 
-  bpu.io.req.stage0.valid := npcExt.valid(1)
-  npcExt.ready(1)         := bpu.io.req.stage0.ready
-  bpu.io.req.stage0.bits  := npcExt.bits
+  icache.io.req.stage0.valid      := stage0Fire
+  icache.io.req.stage0.bits.vaddr := npc
 
-  stage0Data.valid        := npcExt.valid(2)
-  npcExt.ready(2)         := stage0Data.ready
-  stage0Data.bits.fetchPC := npcExt.bits
+  bpu.io.req.stage0.valid := stage0Fire
+  bpu.io.req.stage0.bits  := npc
+
+  stage0Data.valid        := stage0Fire
+  stage0Data.bits.fetchPC := npc
 
   val stage0to1 = Wire(stage0Data.cloneType)
   PipeConnect(Some(flush.stage1), stage0Data, stage0to1)
 
   // stage1: fetch & branch prediction
-  val stage0to1Ext     = ReadyValidIOExpand(stage0to1, 2)
-  val bpuRespStage1Ext = ReadyValidIOExpand(bpu.io.resp.stage1, 2)
+  val stage1Data = Wire(Decoupled(new Bundle {
+    val fetchPC        = UInt(vaddrWidth.W)
+    val stage1Redirect = UInt(vaddrWidth.W)
+  }))
+  val stage0to1Ext = ReadyValidIOExpand(stage0to1, 3)
 
   val icacheCacopReq = Wire(io.icacheReq.cloneType)
   PipeConnect(None, io.icacheReq, icacheCacopReq)
@@ -141,22 +137,16 @@ class FrontEnd(implicit params: CoreParameters) extends Module {
     stage1FetchMask(i) && bpu.io.resp.stage1.bits(i).target.valid &&
     (bpu.io.resp.stage1.bits(i).isJmp || (bpu.io.resp.stage1.bits(i).isBr && bpu.io.resp.stage1.bits(i).taken))
   }
-  stage1Redirect.valid      := bpuRespStage1Ext.valid(0)
-  bpuRespStage1Ext.ready(0) := stage1Redirect.ready
-  stage1Redirect.bits := Mux(
+  stage1Redirect := Mux(
     stage1Redirects.reduce(_ || _),
     bpu.io.resp.stage1.bits(PriorityEncoder(stage1Redirects)).target.bits,
     nextFetch(stage0to1Ext.bits.fetchPC),
   )
 
-  val stage1Data = Wire(Decoupled(new Bundle {
-    val fetchPC        = UInt(vaddrWidth.W)
-    val stage1Redirect = UInt(vaddrWidth.W)
-  }))
-  stage1Data.valid               := bpuRespStage1Ext.valid(1)
-  bpuRespStage1Ext.ready(1)      := stage1Data.ready
+  stage1Data.valid               := bpu.io.resp.stage1.valid && stage0to1Ext.valid(2)
+  stage0to1Ext.ready(2)          := stage1Data.ready
   stage1Data.bits.fetchPC        := stage0to1Ext.bits.fetchPC
-  stage1Data.bits.stage1Redirect := stage1Redirect.bits
+  stage1Data.bits.stage1Redirect := stage1Redirect
 
   val stage1to2 = Wire(stage1Data.cloneType)
   PipeConnect(Some(flush.stage2), stage1Data, stage1to2)
@@ -211,30 +201,27 @@ class FrontEnd(implicit params: CoreParameters) extends Module {
   stage2FetchBundle.bpuMeta      := bpu.io.resp.stage2.bits.meta
 
   val stage2Data = Wire(Decoupled(stage2FetchBundle.cloneType))
+  val stage2Fire = fb.io.enq.ready && ftq.io.enq.ready && stage2Data.valid
   stage2Data.valid            := bpu.io.resp.stage2.valid && icache.io.resp.stage2.valid && stage1to2.valid
-  bpu.io.resp.stage2.ready    := stage2Data.ready
-  icache.io.resp.stage2.ready := stage2Data.ready
-  stage1to2.ready             := stage2Data.ready
+  bpu.io.resp.stage2.ready    := stage2Fire
+  icache.io.resp.stage2.ready := stage2Fire
+  stage1to2.ready             := stage2Fire
   stage2Data.bits             := stage2FetchBundle
-  val stage2DataExt = ReadyValidIOExpand(stage2Data, 2)
 
-  stage2Redirect.valid := stage2DataExt.valid(0) && stage2DataExt.bits.cfiIdx.valid &&
+  stage2Redirect.valid := stage2Data.valid && stage2Data.bits.cfiIdx.valid &&
     stage2Redirect.bits =/= stage1to2.bits.stage1Redirect
-  stage2DataExt.ready(0) := stage2Redirect.ready
   stage2Redirect.bits := MuxCase(
     stage1to2.bits.stage1Redirect,
     Seq(
       stage2RetMask(stage2CfiIdx)  -> ras.io.read.addr,
       stage2JIRLMask(stage2CfiIdx) -> bpu.io.resp.stage2.bits.pred(stage2CfiIdx).target.bits,
-      stage2BMask(stage2CfiIdx) -> (stage2DataExt.bits
-        .pcs(stage2CfiIdx) + Sext(Cat(stage2DataExt.bits.insts(stage2CfiIdx)(9, 0), stage2DataExt.bits.insts(stage2CfiIdx)(25, 10), 0.U(2.W)), 32)),
-      stage2BrMask(stage2CfiIdx) -> (stage2DataExt.bits.pcs(stage2CfiIdx) + Sext(Cat(stage2DataExt.bits.insts(stage2CfiIdx)(25, 10), 0.U(2.W)), 32)),
+      stage2BMask(stage2CfiIdx) -> (stage2Data.bits
+        .pcs(stage2CfiIdx) + Sext(Cat(stage2Data.bits.insts(stage2CfiIdx)(9, 0), stage2Data.bits.insts(stage2CfiIdx)(25, 10), 0.U(2.W)), 32)),
+      stage2BrMask(stage2CfiIdx) -> (stage2Data.bits.pcs(stage2CfiIdx) + Sext(Cat(stage2Data.bits.insts(stage2CfiIdx)(25, 10), 0.U(2.W)), 32)),
     ),
   )
-  dontTouch(stage2FetchBundle)
-  dontTouch(stage2Redirect)
 
-  ras.io.write.valid := stage2Data.fire && stage2DataExt.bits.cfiIdx.valid && stage2CallMask(stage2CfiIdx)
+  ras.io.write.valid := stage2Data.fire && stage2Data.bits.cfiIdx.valid && stage2CallMask(stage2CfiIdx)
   ras.io.write.idx   := rasIdx
   ras.io.write.addr  := stage2PCs(stage2Data.bits.cfiIdx.bits +& 1.U)
   rasIdx := MuxCase(
@@ -245,10 +232,17 @@ class FrontEnd(implicit params: CoreParameters) extends Module {
     ),
   )
 
-  val stage2Fire = fb.io.enq.ready && ftq.io.enq.ready && stage2DataExt.valid(1)
-  stage2DataExt.ready(1) := stage2Fire
-  fb.io.enq.valid        := stage2Fire
-  fb.io.enq.bits         := stage2DataExt.bits
-  ftq.io.enq.valid       := stage2Fire
-  ftq.io.enq.bits        := stage2DataExt.bits
+  stage2Data.ready := stage2Fire
+  fb.io.enq.valid  := stage2Fire
+  fb.io.enq.bits   := stage2Data.bits
+  ftq.io.enq.valid := stage2Fire
+  ftq.io.enq.bits  := stage2Data.bits
+
+  dontTouch(stage0to1)
+  dontTouch(stage1Data)
+  dontTouch(stage1to2)
+  dontTouch(stage2Data)
+  dontTouch(stage1Redirect)
+  dontTouch(stage2Redirect)
+  dontTouch(stage2FetchBundle)
 }

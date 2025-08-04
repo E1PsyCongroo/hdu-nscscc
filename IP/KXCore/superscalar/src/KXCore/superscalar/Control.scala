@@ -34,7 +34,7 @@ object ALUType extends ChiselEnum {
   def cmpUnsigned(cmd: UInt)  = cmd(1)
   def cmpInverted(cmd: UInt)  = cmd(2)
   def cmpEq(cmd: UInt)        = !cmd(3)
-  def shiftReverse(cmd: UInt) = cmd(1)
+  def shiftReverse(cmd: UInt) = !cmd(1)
   def shiftArith(cmd: UInt)   = cmd(0)
 }
 

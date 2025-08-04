@@ -82,7 +82,7 @@ class FetchBuffer(implicit params: CoreParameters) extends Module {
 
   io.deq.valid := row_valids(bank_ptr).orR
   (0 until coreWidth).map { i =>
-    io.deq.bits.uops(i).valid := row_valids(bank_ptr)(i)
+    io.deq.bits.uops(i).valid := row_valids(bank_ptr)(i) && !io.flush
     io.deq.bits.uops(i).bits  := row_uops(bank_ptr)(i)
   }
 

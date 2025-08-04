@@ -65,10 +65,10 @@ class ALUUnit(implicit params: CoreParameters) extends FunctionalUnit(isAluUnit 
     Seq(
       CFIType.CFI_JIRL.asUInt -> (!io.req.bits.ftq_info(1).valid ||
         brInfo.target =/= io.req.bits.ftq_info(1).entry.fetchPC),
-      CFIType.CFI_BR.asUInt -> (alu.io.out(0) =/= io.req.bits.uop.taken),
+      CFIType.CFI_BR.asUInt -> (alu.io.cmp_out(0) =/= io.req.bits.ftq_info(0).entry.taken),
     ),
   )
-  brInfo.cfiIdx.valid := brInfo.cfiIsB || brInfo.cfiIsJirl || (brInfo.cfiIsBr && alu.io.out(0))
+  brInfo.cfiIdx.valid := brInfo.cfiIsB || brInfo.cfiIsJirl || (brInfo.cfiIsBr && alu.io.cmp_out(0))
   brInfo.cfiIdx.bits  := io.req.bits.uop.idx
   brInfo.cfiIsB       := io.req.bits.uop.cfiType === CFIType.CFI_B.asUInt
   brInfo.cfiIsJirl    := io.req.bits.uop.cfiType === CFIType.CFI_JIRL.asUInt
@@ -77,13 +77,14 @@ class ALUUnit(implicit params: CoreParameters) extends FunctionalUnit(isAluUnit 
     io.req.bits.uop.cfiType === CFIType.CFI_JIRL.asUInt,
     io.req.bits.rs1_data,
     uop_pc,
-  ) + io.req.bits.uop.imm
+  ) + Mux(brInfo.cfiIdx.valid, io.req.bits.uop.imm, 4.U)
 
-  io.resp.valid             := io.req.valid
-  io.resp.bits.uop          := io.req.bits.uop
-  io.resp.bits.data         := alu.io.out
-  io.resp.bits.brInfo.valid := true.B
-  io.resp.bits.brInfo.bits  := brInfo
+  io.resp.valid                := io.req.valid
+  io.resp.bits.uop             := io.req.bits.uop
+  io.resp.bits.uop.debug.wdata := alu.io.out
+  io.resp.bits.data            := alu.io.out
+  io.resp.bits.brInfo.valid    := true.B
+  io.resp.bits.brInfo.bits     := brInfo
   assert(io.resp.ready)
 }
 

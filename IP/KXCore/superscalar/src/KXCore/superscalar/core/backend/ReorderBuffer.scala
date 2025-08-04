@@ -16,8 +16,8 @@ class RoBEntry(implicit params: CoreParameters) extends Bundle {
   import params.{commonParams, frontendParams, backendParams}
   import frontendParams.{ftqIdxWidth}
   import backendParams.{coreWidth, robRowNum, robIdxWidth, retireWidth, lregWidth, pregWidth, wbPortNum}
-  val valids = Vec(retireWidth, Bool())
-  val uop    = Vec(retireWidth, new MicroOp)
+  val valids = Vec(coreWidth, Bool())
+  val uop    = Vec(coreWidth, new MicroOp)
   val ftqIdx = UInt(ftqIdxWidth.W)
   val brInfo = Valid(new BrUpdateInfo)
 }
@@ -132,6 +132,7 @@ class ReorderBuffer(implicit params: CoreParameters) extends Module {
       val rob_brInfo = rob_row_brInfo(row_idx)
       when(wb_resp.valid && MatchBank(GetBankIdx(wb_uop.robIdx))) {
         rob_bsy(row_idx) := false.B
+        rob_uop(row_idx) := wb_uop
         when(wb_brInfo.valid) {
           rob_brInfo.valid := true.B
         }
@@ -142,6 +143,7 @@ class ReorderBuffer(implicit params: CoreParameters) extends Module {
           rob_brInfo.bits := wb_brInfo.bits
         }
       }
+
     }
 
     // // -----------------------------------------------------

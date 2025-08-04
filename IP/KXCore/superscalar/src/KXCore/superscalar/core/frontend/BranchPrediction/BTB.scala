@@ -84,7 +84,7 @@ class BTB(implicit params: CoreParameters) extends Module {
     updateBtbData.extended := offsetIsExtended
     val updateBtbMask  = UIntToOH(updateBits.cfiIdx) & Fill(fetchWidth, io.update.valid && updateBits.cfiTaken)
     val updateMetaData = Wire(Vec(fetchWidth, new BTBMeta))
-    val updateMetaMask = UIntToOH(updateBits.cfiIdx) & Fill(fetchWidth, io.update.valid)
+    val updateMetaMask = UIntToOH(updateBits.cfiIdx) & Fill(fetchWidth, io.update.valid && updateBits.cfiTaken)
     for (i <- 0 until fetchWidth) {
       updateMetaData(i).isBr := updateBits.cfiIsBr
       updateMetaData(i).tag  := updateTag
@@ -177,7 +177,7 @@ class BTB(implicit params: CoreParameters) extends Module {
     val flush = Input(Bool())
     val req = new Bundle {
       val stage0 = Flipped(Decoupled(UInt(vaddrWidth.W)))
-      val stage1 = Flipped(Decoupled(UInt(vaddrWidth.W)))
+      val stage1 = Flipped(Valid(UInt(vaddrWidth.W)))
     }
     val resp = Decoupled(new Bundle {
       val pred = Vec(fetchWidth, new BranchPrediction)
@@ -197,10 +197,10 @@ class BTB(implicit params: CoreParameters) extends Module {
 
   stage1.io.req.valid      := stage0to1.io.resp.valid && io.req.stage1.valid
   stage0to1.io.resp.ready  := stage1.io.req.ready
-  io.req.stage1.ready      := stage1.io.req.ready
   stage1.io.req.bits.vaddr := io.req.stage1.bits
   stage1.io.req.bits.meta  := stage0to1.io.resp.bits.meta
   stage1.io.req.bits.btb   := stage0to1.io.resp.bits.btb
   stage1.io.req.bits.ebtb  := stage0to1.io.resp.bits.ebtb
-  stage1.io.resp           <> io.resp
+
+  stage1.io.resp <> io.resp
 }

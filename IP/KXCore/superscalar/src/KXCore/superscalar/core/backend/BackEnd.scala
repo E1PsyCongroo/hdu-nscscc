@@ -9,6 +9,7 @@ import KXCore.common.utils._
 import KXCore.superscalar._
 import KXCore.superscalar.core._
 import KXCore.superscalar.core.frontend._
+import scala.annotation.varargs
 
 class BackEndIO(implicit params: CoreParameters) extends Bundle {
   import params.{commonParams, axiParams, frontendParams, backendParams}
@@ -22,7 +23,8 @@ class BackEndIO(implicit params: CoreParameters) extends Bundle {
     val brUpdate = Valid(new BrUpdateInfo)
   })
   val debug = Output(new Bundle {
-    val regs = Vec(backendParams.lregNum, UInt(commonParams.dataWidth.W))
+    val regs        = Vec(backendParams.lregNum, UInt(commonParams.dataWidth.W))
+    val commit_uops = Vec(backendParams.coreWidth, Valid(new MicroOp))
   })
 }
 
@@ -85,7 +87,7 @@ class BackEnd(implicit params: CoreParameters) extends Module {
   val disData = Wire(Decoupled(Vec(coreWidth, Valid(new MicroOp))))
   disData.valid  := decToRen.valid
   decToRen.ready := disData.ready
-  disData.ready  := VecInit(disData.bits.map(_.valid)).asUInt === disUopFire || flush
+  disData.ready  := VecInit(decToRen.bits.map(_.valid)).asUInt === disUopFire || flush
   var dis_valid_not_ready = false.B
   for (i <- 0 until coreWidth) {
     renameFreeList.io.allocPregs(i).ready := disData.bits(i).valid && disData.bits(i).bits.ldst =/= 0.U &&
@@ -129,14 +131,6 @@ class BackEnd(implicit params: CoreParameters) extends Module {
     dis_valid_not_ready = disData.bits(i).valid && !disUopReady(i)
     dispatcher.io.ren_uops(i).valid := disData.bits(i).valid && !dis_valid_not_ready_yet
     dispatcher.io.ren_uops(i).bits  := disData.bits(i).bits
-
-    when(dispatcher.io.ren_uops(i).fire) {
-      printf("alloc preg (lreg: %d -> %d)", dispatcher.io.ren_uops(i).bits.ldst, dispatcher.io.ren_uops(i).bits.pdst)
-    }
-
-    when(renameFreeList.io.dealloc(i).valid) {
-      printf("free preg %d", renameFreeList.io.dealloc(i).bits)
-    }
   }
   disUopReady := VecInit(dispatcher.io.ren_uops.map(_.ready)).asUInt
   disUopFire  := disUopFireReg | (disUopReady & VecInit(disData.bits.map(_.valid)).asUInt)
@@ -193,7 +187,8 @@ class BackEnd(implicit params: CoreParameters) extends Module {
     intIssUnit.io.wakeup_ports(i).valid := aluExeUnits(i).io_alu_resp.valid
     intIssUnit.io.wakeup_ports(i).bits  := aluExeUnits(i).io_alu_resp.bits.uop.pdst
 
-    regFile.io.write_ports(i).valid     := aluExeUnits(i).io_alu_resp.valid
+    regFile.io.write_ports(i).valid := aluExeUnits(i).io_alu_resp.valid &&
+      aluExeUnits(i).io_alu_resp.bits.uop.ldst =/= 0.U
     regFile.io.write_ports(i).bits.addr := aluExeUnits(i).io_alu_resp.bits.uop.pdst
     regFile.io.write_ports(i).bits.data := aluExeUnits(i).io_alu_resp.bits.data
 
@@ -211,6 +206,9 @@ class BackEnd(implicit params: CoreParameters) extends Module {
 
     renameFreeList.io.dealloc(i).valid := rob.io.commit.valids(i) && rob.io.commit.uop(i).ldst =/= 0.U
     renameFreeList.io.dealloc(i).bits  := rob.io.commit.uop(i).stalePdst
+
+    renameFreeList.io.despec(i).valid := rob.io.commit.valids(i) && rob.io.commit.uop(i).ldst =/= 0.U
+    renameFreeList.io.despec(i).bits  := rob.io.commit.uop(i).pdst
   }
   io.commit.valid         := rob.io.commit.valids.reduce(_ || _)
   io.commit.bits.ftqIdx   := rob.io.commit.ftqIdx
@@ -220,6 +218,10 @@ class BackEnd(implicit params: CoreParameters) extends Module {
 
   for (i <- 0 until backendParams.lregNum) {
     io.debug.regs(i) := regFile.io.debug(renameMapTable.io.debug(i))
+  }
+  (io.debug.commit_uops zip rob.io.commit.valids zip rob.io.commit.uop).map { case ((debug, v), uop) =>
+    debug.valid := v
+    debug.bits  := uop
   }
 
   io.axi          := DontCare
@@ -234,6 +236,7 @@ class BackEnd(implicit params: CoreParameters) extends Module {
   io.dtlbReq.vaddr   := 0.U
 
   dontTouch(decData)
+  dontTouch(decToRen)
   dontTouch(disData)
   dontTouch(rob.io)
   dontTouch(dispatcher.io)

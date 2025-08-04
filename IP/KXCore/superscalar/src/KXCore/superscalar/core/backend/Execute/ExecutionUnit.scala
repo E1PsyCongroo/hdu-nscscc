@@ -126,5 +126,8 @@ class ALUExeUnit(implicit params: CoreParameters) extends ExecutionUnit {
   dontTouch(stage0Uop)
   dontTouch(stage0Ftq)
   dontTouch(stage0Regs)
+  dontTouch(stage1Uop)
+  dontTouch(stage1Ftq)
+  dontTouch(stage1Regs)
   dontTouch(io_read_reqs)
 }
