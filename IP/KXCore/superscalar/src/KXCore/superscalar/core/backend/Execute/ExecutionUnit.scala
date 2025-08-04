@@ -83,7 +83,7 @@ class MemExeUnit(implicit params: CoreParameters) extends ExecutionUnit {
   io_dtlb_req.asid    := 0.U
   io_dtlb_req.isWrite := isWrite
   io_dtlb_req.plv     := 0.U
-  io_dtlb_req.vaddr   := Mux(isWrite, stage1Regs.bits(1), stage1Regs.bits(0)) + stage1Uop.bits.imm
+  io_dtlb_req.vaddr   := stage1Regs.bits(0) + stage1Uop.bits.imm
 
   val stage1Data = Wire(DecoupledIO(new Bundle {
     val uop       = new MicroOp
@@ -98,13 +98,13 @@ class MemExeUnit(implicit params: CoreParameters) extends ExecutionUnit {
   stage1Regs.ready          := stage1Data.ready
   stage1Data.bits.uop       := stage1Uop.bits
   stage1Data.bits.isWrite   := isWrite
-  stage1Data.bits.writeData := stage1Regs.bits(0)
+  stage1Data.bits.writeData := stage1Regs.bits(1) << (stage1Data.bits.vaddr(1, 0) ## 0.U(3.W))
   stage1Data.bits.paddr     := io_dtlb_resp.paddr
   stage1Data.bits.vaddr     := io_dtlb_req.vaddr
   stage1Data.bits.wmask := MuxLookup(stage1Uop.bits.lsuCmd, 0.U)(
     Seq(
       LSU_STB.asUInt -> ("b0001".U << stage1Data.bits.paddr(1, 0)),
-      LSU_STH.asUInt -> ("b0011".U << stage1Data.bits.paddr(1)),
+      LSU_STH.asUInt -> ("b0011".U << stage1Data.bits.paddr(1, 0)),
       LSU_STW.asUInt -> "b1111".U,
     ),
   )
@@ -230,8 +230,14 @@ class MemExeUnit(implicit params: CoreParameters) extends ExecutionUnit {
   io_mem_resp.bits.uop.debug.store      := VecInit(Seq(LSU_STB, LSU_STH, LSU_STW).map(_.asUInt === stage2Data.uop.lsuCmd)).asUInt
   io_mem_resp.bits.uop.debug.storeVaddr := stage2Data.vaddr
   io_mem_resp.bits.uop.debug.storePaddr := stage2Data.paddr
-  io_mem_resp.bits.uop.debug.storeData  := stage2Data.writeData
-  io_mem_resp.bits.data                 := rdata
+  io_mem_resp.bits.uop.debug.storeData := stage2Data.writeData & (VecInit(
+    (0 until 4).map { i =>
+      val bit = stage2Data.wmask(i)
+      Fill(8, bit) << (i * 8)
+    },
+  ).reduce(_ | _))
+
+  io_mem_resp.bits.data := rdata
 
   dontTouch(state)
   dontTouch(nextState)
@@ -379,12 +385,12 @@ class MemExeUnitWithCache(implicit params: CoreParameters) extends ExecutionUnit
   dontTouch(stage2Data)
   dontTouch(dcache_rdata)
 }
-*/
+ */
 
 class UniqueExeUnit(
-    val hasCSR: Boolean = false,
-    val hasMul: Boolean = false,
-    val hasDiv: Boolean = false,
+    val hasCSR: Boolean = true,
+    val hasMul: Boolean = true,
+    val hasDiv: Boolean = true,
 )(implicit params: CoreParameters)
     extends ExecutionUnit {
   override def fu_types: UInt =
@@ -451,6 +457,10 @@ class UniqueExeUnit(
     divUnit.io.resp.ready := true.B
   }
 
+  if (hasCSR) {}
+
+  dontTouch(stage1Uop)
+  dontTouch(stage1Regs)
 }
 
 class ALUExeUnit(implicit params: CoreParameters) extends ExecutionUnit {

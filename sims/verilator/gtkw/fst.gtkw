@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.124 (w)1999-2025 BSI
-[*] Mon Aug  4 16:08:18 2025
+[*] Mon Aug  4 16:53:51 2025
 [*]
-[dumpfile] "/home/focused_xy/demo/nscscc/chiplab/sims/verilator/run_prog/log/func/func_lab6_log/simu_trace.fst"
-[dumpfile_mtime] "Mon Aug  4 16:05:23 2025"
-[dumpfile_size] 85946773
+[dumpfile] "/home/focused_xy/demo/nscscc/chiplab/sims/verilator/run_prog/log/func/func_lab7_log/simu_trace.fst"
+[dumpfile_mtime] "Mon Aug  4 16:53:20 2025"
+[dumpfile_size] 59775082
 [savefile] "/home/focused_xy/demo/nscscc/chiplab/sims/verilator/gtkw/fst.gtkw"
-[timestart] 1063153
+[timestart] 1063317
 [size] 1920 997
 [pos] -1 -1
-*-4.200000 1063192 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-4.200000 1063377 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.simu_top.
 [treeopen] TOP.simu_top.soc.
@@ -19,6 +19,9 @@
 [treeopen] TOP.simu_top.soc.cpu.core.backend.aluExeUnits_0.alu.
 [treeopen] TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.
 [treeopen] TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.alu.
+[treeopen] TOP.simu_top.soc.cpu.core.backend.unqExeUnit.
+[treeopen] TOP.simu_top.soc.cpu.core.backend.unqExeUnit.divUnit.
+[treeopen] TOP.simu_top.soc.cpu.core.backend.unqIssUnit.
 [treeopen] TOP.simu_top.soc.cpu.core.frontend.
 [treeopen] TOP.simu_top.soc.cpu.core.frontend.bpu.
 [treeopen] TOP.simu_top.soc.cpu.core.frontend.bpu.btb.
@@ -194,9 +197,17 @@ TOP.simu_top.soc.cpu.core.backend.dispatcher.io_ren_uops_1_bits_flush
 -issue
 -mem
 @28
-TOP.simu_top.soc.cpu.core.backend.memIssUnit.io_iss_uops_0_valid
+TOP.simu_top.soc.cpu.core.backend.memExeUnit.io_iss_uop_valid
 @200
 -unq
+@22
+TOP.simu_top.soc.cpu.core.backend.unqIssUnit.io_fu_types_0[5:0]
+@28
+TOP.simu_top.soc.cpu.core.backend.unqExeUnit.io_iss_uop_valid
+TOP.simu_top.soc.cpu.core.backend.unqIssUnit.slots_4.valid
+TOP.simu_top.soc.cpu.core.backend.unqIssUnit.slots_4.io_request
+TOP.simu_top.soc.cpu.core.backend.unqIssUnit.slots_4.io_grant
+@200
 -alu
 @28
 TOP.simu_top.soc.cpu.core.backend.aluExeUnits_0.io_iss_uop_valid
@@ -268,9 +279,67 @@ TOP.simu_top.soc.cpu.core.backend.memExeUnit.io_axi_w_ready
 -
 @28
 TOP.simu_top.soc.cpu.core.io_axi_b_valid
-@201
--unq
 @200
+-unq
+@28
+TOP.simu_top.soc.cpu.core.backend.unqExeUnit.io_iss_uop_valid
+TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Uop_valid
+TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_valid
+@c00022
+TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_bits_0[31:0]
+@28
+(0)TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_bits_0[31:0]
+(1)TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_bits_0[31:0]
+(2)TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_bits_0[31:0]
+(3)TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_bits_0[31:0]
+(4)TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_bits_0[31:0]
+(5)TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_bits_0[31:0]
+(6)TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_bits_0[31:0]
+(7)TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_bits_0[31:0]
+(8)TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_bits_0[31:0]
+(9)TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_bits_0[31:0]
+(10)TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_bits_0[31:0]
+(11)TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_bits_0[31:0]
+(12)TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_bits_0[31:0]
+(13)TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_bits_0[31:0]
+(14)TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_bits_0[31:0]
+(15)TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_bits_0[31:0]
+(16)TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_bits_0[31:0]
+(17)TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_bits_0[31:0]
+(18)TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_bits_0[31:0]
+(19)TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_bits_0[31:0]
+(20)TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_bits_0[31:0]
+(21)TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_bits_0[31:0]
+(22)TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_bits_0[31:0]
+(23)TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_bits_0[31:0]
+(24)TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_bits_0[31:0]
+(25)TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_bits_0[31:0]
+(26)TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_bits_0[31:0]
+(27)TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_bits_0[31:0]
+(28)TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_bits_0[31:0]
+(29)TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_bits_0[31:0]
+(30)TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_bits_0[31:0]
+(31)TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_bits_0[31:0]
+@1401200
+-group_end
+@22
+TOP.simu_top.soc.cpu.core.backend.unqExeUnit.stage1Regs_bits_1[31:0]
+@200
+-div
+@28
+TOP.simu_top.soc.cpu.core.backend.unqExeUnit.divUnit.io_req_valid
+@22
+TOP.simu_top.soc.cpu.core.backend.unqExeUnit.divUnit.io_req_bits_uop_aluCmd[3:0]
+TOP.simu_top.soc.cpu.core.backend.unqExeUnit.divUnit.divider.io_in_bits_dividend[31:0]
+TOP.simu_top.soc.cpu.core.backend.unqExeUnit.divUnit.divider.io_in_bits_divisor[31:0]
+@29
+TOP.simu_top.soc.cpu.core.backend.unqExeUnit.divUnit.divider.io_in_bits_signed
+@28
+TOP.simu_top.soc.cpu.core.backend.unqExeUnit.divUnit.io_resp_valid
+@22
+TOP.simu_top.soc.cpu.core.backend.unqExeUnit.divUnit.io_resp_bits_data[31:0]
+@200
+-mul
 -alu
 @28
 TOP.simu_top.soc.cpu.core.backend.aluExeUnits_0.stage0Ftq_valid
@@ -372,8 +441,17 @@ TOP.simu_top.soc.cpu.core.backend.rob.io_commit_brInfo_bits_target[31:0]
 -
 @28
 TOP.simu_top.soc.cpu.core.backend.rob.io_commit_valids_0
-@22
+@c00022
 TOP.simu_top.soc.cpu.core.backend.rob.io_commit_uop_0_robIdx[4:0]
+@28
+(0)TOP.simu_top.soc.cpu.core.backend.rob.io_commit_uop_0_robIdx[4:0]
+(1)TOP.simu_top.soc.cpu.core.backend.rob.io_commit_uop_0_robIdx[4:0]
+(2)TOP.simu_top.soc.cpu.core.backend.rob.io_commit_uop_0_robIdx[4:0]
+(3)TOP.simu_top.soc.cpu.core.backend.rob.io_commit_uop_0_robIdx[4:0]
+(4)TOP.simu_top.soc.cpu.core.backend.rob.io_commit_uop_0_robIdx[4:0]
+@1401200
+-group_end
+@22
 TOP.simu_top.soc.cpu.core.backend.rob.io_commit_uop_0_debug_inst[31:0]
 TOP.simu_top.soc.cpu.core.backend.rob.io_commit_uop_0_debug_pc[31:0]
 TOP.simu_top.soc.cpu.core.backend.rob.io_commit_uop_0_ldst[4:0]

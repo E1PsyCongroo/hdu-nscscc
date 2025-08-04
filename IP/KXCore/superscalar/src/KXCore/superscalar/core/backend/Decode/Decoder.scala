@@ -148,7 +148,6 @@ object ALUOPControlField extends DecodeField[Instruction, UInt] {
 object RS1From extends ChiselEnum {
   val rs1None   = Value
   val rs1FromRj = Value
-  val rs1FromRd = Value
 }
 
 object RS1ControlField extends DecodeField[Instruction, UInt] {
@@ -158,10 +157,8 @@ object RS1ControlField extends DecodeField[Instruction, UInt] {
     op match {
       case LU12I_W | PCADDU12I | B | BL                                        => BitPat(RS1From.rs1None.asUInt)
       case SYSCALL | BREAK | ERTN                                              => BitPat(RS1From.rs1None.asUInt)
-      case RDCNTVL_W | RDCNTVH_W                                               => BitPat(RS1From.rs1FromRd.asUInt)
-      case RDCNTID_W_0 | RDCNTID_W_1 | RDCNTID_W_2 | RDCNTID_W_3 | RDCNTID_W_4 => BitPat(RS1From.rs1FromRd.asUInt)
-      case BEQ | BNE | BLT | BGE | BLTU | BGEU                                 => BitPat(RS1From.rs1FromRd.asUInt)
-      case ST_B | ST_H | ST_W                                                  => BitPat(RS1From.rs1FromRd.asUInt)
+      case RDCNTVL_W | RDCNTVH_W                                               => BitPat(RS1From.rs1None.asUInt)
+      case RDCNTID_W_0 | RDCNTID_W_1 | RDCNTID_W_2 | RDCNTID_W_3 | RDCNTID_W_4 => BitPat(RS1From.rs1None.asUInt)
       case _                                                                   => BitPat(RS1From.rs1FromRj.asUInt)
     }
   }
@@ -170,7 +167,7 @@ object RS1ControlField extends DecodeField[Instruction, UInt] {
 object RS2From extends ChiselEnum {
   val rs2None   = Value
   val rs2FromRk = Value
-  val rs2FromRj = Value
+  val rs2FromRd = Value
 }
 
 object RS2ControlField extends DecodeField[Instruction, UInt] {
@@ -186,9 +183,9 @@ object RS2ControlField extends DecodeField[Instruction, UInt] {
       case SYSCALL | BREAK | ERTN | IDLE                                       => BitPat(RS2From.rs2None.asUInt)
       case RDCNTVL_W | RDCNTVH_W                                               => BitPat(RS2From.rs2None.asUInt)
       case CSRRD | CSRWR | CSRXCHG_0 | CSRXCHG_1 | CSRXCHG_2 | CSRXCHG_3       => BitPat(RS2From.rs2None.asUInt)
-      case BEQ | BNE | BLT | BGE | BLTU | BGEU                                 => BitPat(RS2From.rs2FromRj.asUInt)
-      case RDCNTID_W_0 | RDCNTID_W_1 | RDCNTID_W_2 | RDCNTID_W_3 | RDCNTID_W_4 => BitPat(RS2From.rs2FromRj.asUInt)
-      case ST_B | ST_H | ST_W                                                  => BitPat(RS2From.rs2FromRj.asUInt)
+      case RDCNTID_W_0 | RDCNTID_W_1 | RDCNTID_W_2 | RDCNTID_W_3 | RDCNTID_W_4 => BitPat(RS2From.rs2None.asUInt)
+      case BEQ | BNE | BLT | BGE | BLTU | BGEU                                 => BitPat(RS2From.rs2FromRd.asUInt)
+      case ST_B | ST_H | ST_W                                                  => BitPat(RS2From.rs2FromRd.asUInt)
       case _                                                                   => BitPat(RS2From.rs2FromRk.asUInt)
     }
   }
@@ -215,7 +212,7 @@ object WBControlField extends DecodeField[Instruction, UInt] {
       case LD_B | LD_H | LD_W | LD_BU | LD_HU                                  => BitPat(WBDest.destRd.asUInt)
       case RDCNTVL_W | RDCNTVH_W                                               => BitPat(WBDest.destRd.asUInt)
       case CSRRD | CSRWR | CSRXCHG_0 | CSRXCHG_1 | CSRXCHG_2 | CSRXCHG_3       => BitPat(WBDest.destRd.asUInt)
-      case RDCNTID_W_0 | RDCNTID_W_1 | RDCNTID_W_2 | RDCNTID_W_3 | RDCNTID_W_4 => BitPat(WBDest.destRd.asUInt)
+      case RDCNTID_W_0 | RDCNTID_W_1 | RDCNTID_W_2 | RDCNTID_W_3 | RDCNTID_W_4 => BitPat(WBDest.destRj.asUInt)
       case BL                                                                  => BitPat(WBDest.destR1.asUInt)
       case _                                                                   => BitPat(WBDest.destNone.asUInt)
     }
@@ -257,8 +254,8 @@ object LSUOPControlField extends DecodeField[Instruction, UInt] {
       case LD_B  => BitPat(LSUType.LSU_LDB.asUInt)
       case LD_H  => BitPat(LSUType.LSU_LDH.asUInt)
       case LD_W  => BitPat(LSUType.LSU_LDW.asUInt)
-      case ST_B  => BitPat(LSUType.LSU_STW.asUInt)
-      case ST_H  => BitPat(LSUType.LSU_STW.asUInt)
+      case ST_B  => BitPat(LSUType.LSU_STB.asUInt)
+      case ST_H  => BitPat(LSUType.LSU_STH.asUInt)
       case ST_W  => BitPat(LSUType.LSU_STW.asUInt)
       case LD_BU => BitPat(LSUType.LSU_LDBU.asUInt)
       case LD_HU => BitPat(LSUType.LSU_LDHU.asUInt)
@@ -405,15 +402,14 @@ class Decoder(implicit params: CoreParameters) extends Module {
       Seq(
         RS1From.rs1None   -> 0.U,
         RS1From.rs1FromRj -> inst(9, 5),
-        RS1From.rs1FromRd -> inst(4, 0),
       ).map { case (key, value) => (decodeResult(RS1ControlField) === key.asUInt, value) },
     )
     uop.lrs2 := MuxCase(
       0.U,
       Seq(
         RS2From.rs2None   -> 0.U,
+        RS2From.rs2FromRd -> inst(4, 0),
         RS2From.rs2FromRk -> inst(14, 10),
-        RS2From.rs2FromRj -> inst(9, 5),
       ).map { case (key, value) => (decodeResult(RS2ControlField) === key.asUInt, value) },
     )
     uop.ldst := MuxCase(

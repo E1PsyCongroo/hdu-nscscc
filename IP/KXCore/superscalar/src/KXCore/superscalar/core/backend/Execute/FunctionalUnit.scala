@@ -167,7 +167,7 @@ class MultiplyUnit(implicit params: CoreParameters) extends FunctionalUnit {
 
   multiplier.io.in.valid             := io.req.valid
   io.req.ready                       := multiplier.io.in.ready
-  multiplier.io.in.bits.signed       := Fill(2, ALUType.mul_divUnsigned(io.req.bits.uop.aluCmd))
+  multiplier.io.in.bits.signed       := Fill(2, !ALUType.mul_divUnsigned(io.req.bits.uop.aluCmd))
   multiplier.io.in.bits.multiplicand := io.req.bits.rs1_data
   multiplier.io.in.bits.multiplier   := io.req.bits.rs2_data
 
@@ -192,7 +192,7 @@ class DivUnit(implicit params: CoreParameters) extends FunctionalUnit {
 
   divider.io.in.valid         := io.req.valid
   io.req.ready                := divider.io.in.ready
-  divider.io.in.bits.signed   := Fill(2, ALUType.mul_divUnsigned(io.req.bits.uop.aluCmd))
+  divider.io.in.bits.signed   := Fill(2, !ALUType.mul_divUnsigned(io.req.bits.uop.aluCmd))
   divider.io.in.bits.dividend := io.req.bits.rs1_data
   divider.io.in.bits.divisor  := io.req.bits.rs2_data
 
