@@ -49,7 +49,7 @@ class BackEnd(implicit params: CoreParameters) extends Module {
   val intIssUnit      = Module(new IssueUnitCollapsing(intIQParams))
   // val memExeUnit      = Module(new MemExeUnitWithCache) // use MemExeUnitWithCache
   val memExeUnit      = Module(new MemExeUnit)
-  val unqExeUnit      = Module(new UniqueExeUnit)
+  val unqExeUnit      = Module(new UniqueExeUnit(false, true, true))
   val aluExeUnits     = Seq.fill(intIQParams.issueWidth)(Module(new ALUExeUnit))
   val regFile         = Module(new FullyPortedRF(pregNum, aluExeUnits.map(_.nReaders).sum + memExeUnit.nReaders + memExeUnit.nReaders, aluExeUnits.length + 2))
 

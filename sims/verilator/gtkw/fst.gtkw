@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.124 (w)1999-2025 BSI
-[*] Mon Aug  4 13:58:49 2025
+[*] Mon Aug  4 16:08:18 2025
 [*]
-[dumpfile] "/home/focused_xy/demo/nscscc/chiplab/sims/verilator/run_prog/log/func/func_lab4_log/simu_trace.fst"
-[dumpfile_mtime] "Mon Aug  4 13:58:20 2025"
-[dumpfile_size] 30169798
+[dumpfile] "/home/focused_xy/demo/nscscc/chiplab/sims/verilator/run_prog/log/func/func_lab6_log/simu_trace.fst"
+[dumpfile_mtime] "Mon Aug  4 16:05:23 2025"
+[dumpfile_size] 85946773
 [savefile] "/home/focused_xy/demo/nscscc/chiplab/sims/verilator/gtkw/fst.gtkw"
-[timestart] 375653
+[timestart] 1063153
 [size] 1920 997
 [pos] -1 -1
-*-4.200000 375730 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-4.200000 1063192 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.simu_top.
 [treeopen] TOP.simu_top.soc.
@@ -18,6 +18,7 @@
 [treeopen] TOP.simu_top.soc.cpu.core.backend.
 [treeopen] TOP.simu_top.soc.cpu.core.backend.aluExeUnits_0.alu.
 [treeopen] TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.
+[treeopen] TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.alu.
 [treeopen] TOP.simu_top.soc.cpu.core.frontend.
 [treeopen] TOP.simu_top.soc.cpu.core.frontend.bpu.
 [treeopen] TOP.simu_top.soc.cpu.core.frontend.bpu.btb.
@@ -195,38 +196,16 @@ TOP.simu_top.soc.cpu.core.backend.dispatcher.io_ren_uops_1_bits_flush
 @28
 TOP.simu_top.soc.cpu.core.backend.memIssUnit.io_iss_uops_0_valid
 @200
+-unq
 -alu
 @28
 TOP.simu_top.soc.cpu.core.backend.aluExeUnits_0.io_iss_uop_valid
 @22
-TOP.simu_top.soc.cpu.core.backend.aluExeUnits_0.io_iss_uop_bits_aluCmd[3:0]
-@28
-TOP.simu_top.soc.cpu.core.backend.aluExeUnits_0.io_iss_uop_bits_busy
-TOP.simu_top.soc.cpu.core.backend.aluExeUnits_0.io_iss_uop_bits_cfiType[1:0]
-@22
 TOP.simu_top.soc.cpu.core.backend.aluExeUnits_0.io_iss_uop_bits_debug_inst[31:0]
 TOP.simu_top.soc.cpu.core.backend.aluExeUnits_0.io_iss_uop_bits_debug_pc[31:0]
-TOP.simu_top.soc.cpu.core.backend.aluExeUnits_0.io_iss_uop_bits_ecode[6:0]
-@28
-TOP.simu_top.soc.cpu.core.backend.aluExeUnits_0.io_iss_uop_bits_exception
-@22
-TOP.simu_top.soc.cpu.core.backend.aluExeUnits_0.io_iss_uop_bits_ftqIdx[4:0]
-TOP.simu_top.soc.cpu.core.backend.aluExeUnits_0.io_iss_uop_bits_fuType[5:0]
-@28
-TOP.simu_top.soc.cpu.core.backend.aluExeUnits_0.io_iss_uop_bits_idx[1:0]
-@22
-TOP.simu_top.soc.cpu.core.backend.aluExeUnits_0.io_iss_uop_bits_imm[31:0]
-TOP.simu_top.soc.cpu.core.backend.aluExeUnits_0.io_iss_uop_bits_inst[31:0]
-@28
-TOP.simu_top.soc.cpu.core.backend.aluExeUnits_0.io_iss_uop_bits_iqType[1:0]
-@22
 TOP.simu_top.soc.cpu.core.backend.aluExeUnits_0.io_iss_uop_bits_ldst[4:0]
 TOP.simu_top.soc.cpu.core.backend.aluExeUnits_0.io_iss_uop_bits_lrs1[4:0]
 TOP.simu_top.soc.cpu.core.backend.aluExeUnits_0.io_iss_uop_bits_lrs2[4:0]
-@28
-TOP.simu_top.soc.cpu.core.backend.aluExeUnits_0.io_iss_uop_bits_op1Sel[1:0]
-TOP.simu_top.soc.cpu.core.backend.aluExeUnits_0.io_iss_uop_bits_op2Sel[1:0]
-@22
 TOP.simu_top.soc.cpu.core.backend.aluExeUnits_0.io_iss_uop_bits_pdst[6:0]
 @28
 TOP.simu_top.soc.cpu.core.backend.aluExeUnits_0.io_iss_uop_bits_prs1Busy
@@ -243,34 +222,12 @@ TOP.simu_top.soc.cpu.core.backend.aluExeUnits_0.io_iss_uop_bits_stalePdst[6:0]
 @28
 TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.io_iss_uop_valid
 @22
-TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.io_iss_uop_bits_aluCmd[3:0]
-@28
-TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.io_iss_uop_bits_busy
-TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.io_iss_uop_bits_cfiType[1:0]
-@22
 TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.io_iss_uop_bits_debug_inst[31:0]
 TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.io_iss_uop_bits_debug_pc[31:0]
 TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.io_iss_uop_bits_ecode[6:0]
-@28
-TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.io_iss_uop_bits_exception
-@22
-TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.io_iss_uop_bits_ftqIdx[4:0]
-TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.io_iss_uop_bits_fuType[5:0]
-@28
-TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.io_iss_uop_bits_idx[1:0]
-@22
-TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.io_iss_uop_bits_imm[31:0]
-TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.io_iss_uop_bits_inst[31:0]
-@28
-TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.io_iss_uop_bits_iqType[1:0]
-@22
 TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.io_iss_uop_bits_ldst[4:0]
 TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.io_iss_uop_bits_lrs1[4:0]
 TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.io_iss_uop_bits_lrs2[4:0]
-@28
-TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.io_iss_uop_bits_op1Sel[1:0]
-TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.io_iss_uop_bits_op2Sel[1:0]
-@22
 TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.io_iss_uop_bits_pdst[6:0]
 @28
 TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.io_iss_uop_bits_prs1Busy
@@ -311,6 +268,8 @@ TOP.simu_top.soc.cpu.core.backend.memExeUnit.io_axi_w_ready
 -
 @28
 TOP.simu_top.soc.cpu.core.io_axi_b_valid
+@201
+-unq
 @200
 -alu
 @28
@@ -331,7 +290,13 @@ TOP.simu_top.soc.cpu.core.backend.aluExeUnits_0.io_ftq_req_1_bits[4:0]
 @28
 TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.stage1Ftq_bits_0_valid
 TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.stage1Ftq_bits_0_entry_taken
+TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.io_read_reqs_0_valid
 @22
+TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.io_read_reqs_0_bits[6:0]
+@28
+TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.io_read_reqs_1_valid
+@22
+TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.io_read_reqs_1_bits[6:0]
 TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.stage1Ftq_bits_0_entry_fetchPC[31:0]
 @28
 TOP.simu_top.soc.cpu.core.backend.aluExeUnits_1.alu.io_req_bits_ftq_info_0_entry_taken

@@ -173,12 +173,14 @@ class MultiplyUnit(implicit params: CoreParameters) extends FunctionalUnit {
 
   io.resp.valid           := multiplier.io.out.valid
   multiplier.io.out.ready := io.resp.ready
+  io.resp.bits.uop        := uopReg
   io.resp.bits.data := Mux(
     ALUType.ismulh_mod(uopReg.aluCmd),
     multiplier.io.out.bits.result_hi,
     multiplier.io.out.bits.result_lo,
   )
-  io.resp.bits.brInfo.bits := DontCare
+  io.resp.bits.brInfo.valid := false.B
+  io.resp.bits.brInfo.bits  := DontCare
 }
 
 class DivUnit(implicit params: CoreParameters) extends FunctionalUnit {
@@ -196,10 +198,12 @@ class DivUnit(implicit params: CoreParameters) extends FunctionalUnit {
 
   io.resp.valid        := divider.io.out.valid
   divider.io.out.ready := io.resp.ready
+  io.resp.bits.uop     := uopReg
   io.resp.bits.data := Mux(
     ALUType.ismulh_mod(uopReg.aluCmd),
     divider.io.out.bits.remainder,
     divider.io.out.bits.quotient,
   )
-  io.resp.bits.brInfo.bits := DontCare
+  io.resp.bits.brInfo.valid := false.B
+  io.resp.bits.brInfo.bits  := DontCare
 }

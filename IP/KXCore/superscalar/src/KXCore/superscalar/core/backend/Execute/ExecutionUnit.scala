@@ -437,6 +437,7 @@ class UniqueExeUnit(
     divUnit.io.req.bits.uop      := stage1Uop.bits
     divUnit.io.req.bits.ftq_info := DontCare
 
+    divUnit.io.req.valid := false.B
     when(stage1Uop.valid && stage1Regs.valid && ALUType.isDiv(stage1Uop.bits.aluCmd)) {
       divUnit.io.req.valid := true.B
       stage1Uop.ready      := divUnit.io.req.fire
@@ -465,7 +466,7 @@ class ALUExeUnit(implicit params: CoreParameters) extends ExecutionUnit {
   io_ftq_req(1).valid := iss_uop_ext.valid(2) && iss_uop_ext.bits.cfiType === CFIType.CFI_JIRL.asUInt
   io_ftq_req(1).bits  := WrapInc(iss_uop_ext.bits.ftqIdx, params.frontendParams.ftqNum)
   val stage0Ftq = Wire(Decoupled(io_ftq_resp.cloneType))
-  stage0Ftq.valid      := (!io_ftq_req(0).valid || io_ftq_req(0).ready) && (!io_ftq_req(1).valid || io_ftq_req(1).ready)
+  stage0Ftq.valid      := iss_uop_ext.valid(2) && (!io_ftq_req(0).valid || io_ftq_req(0).ready) && (!io_ftq_req(1).valid || io_ftq_req(1).ready)
   stage0Ftq.bits       := io_ftq_resp
   iss_uop_ext.ready(2) := stage0Ftq.ready
 
