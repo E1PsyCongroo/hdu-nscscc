@@ -227,7 +227,6 @@ class CSRIO(implicit params: CoreParameters) extends Bundle {
   val badv    = Input(UInt(32.W)) // Bad virtual address for exception
   val excp_en = Input(Bool())      // Exception enable
   val eentry  = Output(UInt(32.W)) // Exception entry address
-  val tlbrentry = Output(UInt(32.W)) // TLB exception entry address
   /* ------ Exception Enter ------ */
 
   /* ------ Exception Return ------ */
