@@ -10,6 +10,8 @@ class TLBReq(implicit params: CommonParameters) extends Bundle {
   /** request address from CPU. */
   val vaddr = UInt(params.vaddrWidth.W)
 
+  val size = UInt(2.W) // request size, 0 for 1B, 1 for 2B, 2 for 4B
+
   // /* address space identifier */
   // val asid = UInt(10.W)
 
@@ -120,6 +122,16 @@ class TLB(implicit params: CommonParameters) extends Module {
 
   val tlbEntry = Reg(Vec(params.tlbCount, new TLBEntry))
 
+  def is_unaligned(vaddr: UInt, size: UInt): Bool = {
+    val mask = size match {
+      case 0.U => 0x1.U // 1B
+      case 1.U => 0x3.U // 2B
+      case 2.U => 0x7.U // 4B
+      case _   => 0xF.U // 8B (not used)
+    }
+    (vaddr & mask) =/= 0.U
+  }
+
   def tlb_translate(req: TLBReq, is_fetch: Boolean): TLBResp = {
     val vaddr = req.vaddr
 
@@ -164,11 +176,12 @@ class TLB(implicit params: CommonParameters) extends Module {
       Cat(found.ppn(params.paddrWidth - 13, 0), vaddr(11, 0)),// 4K page
     )
 
-    val tlb_exception_valid = !isHit || !found.valid || io.mode.plv > found.plv ||
+    val is_unaligned = is_unaligned(vaddr, req.size)
+    val tlb_exception_valid = is_unaligned ||!isHit || !found.valid || io.mode.plv > found.plv ||
       (req.isWrite && found.dirty === 0.U) || (is_fetch.B && vaddr(log2Ceil(params.instBytes), 0) =/= 0.U)
     val tlb_exception_ecode =
       Mux(
-        is_fetch.B && vaddr(log2Ceil(params.instBytes), 0) =/= 0.U,
+        is_unaligned,
         ECODE.ADEF,
         Mux(
           !isHit,
@@ -192,8 +205,9 @@ class TLB(implicit params: CommonParameters) extends Module {
 
   def tlb_translate_direct(req: TLBReq, mat: UInt): TLBResp = {
     val resp = Wire(new TLBResp)
-    resp.exception.valid := false.B
-    resp.exception.bits  := DontCare
+    val is_unaligned = is_unaligned(req.vaddr, req.size)
+    resp.exception.valid := is_unaligned
+    resp.exception.bits  := Mux(is_unaligned, ECODE.ADEF, 0.U)
     resp.mat             := mat
     resp.paddr           := req.vaddr // passthrough vaddr as paddr for now
     resp
