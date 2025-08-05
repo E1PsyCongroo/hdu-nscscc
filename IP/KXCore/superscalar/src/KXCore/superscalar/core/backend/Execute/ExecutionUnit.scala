@@ -77,9 +77,9 @@ class MemExeUnit(implicit params: CoreParameters) extends ExecutionUnit {
   val io_axi       = IO(new AXIBundle(params.axiParams))
 
   val isWrite = Seq(LSU_STB, LSU_STH, LSU_STW).map(_.asUInt === stage1Uop.bits.lsuCmd).reduce(_ || _)
-  io_dtlb_req.asid    := 0.U
+  // io_dtlb_req.asid    := 0.U
   io_dtlb_req.isWrite := isWrite
-  io_dtlb_req.plv     := 0.U
+  // io_dtlb_req.plv     := 0.U
   io_dtlb_req.vaddr   := stage1Regs.bits(0) + stage1Uop.bits.imm
 
   val stage1Data = Wire(DecoupledIO(new Bundle {

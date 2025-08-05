@@ -47,16 +47,18 @@ class Core(implicit params: CoreParameters) extends Module {
   tlb.io.mode.da   := csr.io.tlb.da
   tlb.io.mode.pg   := csr.io.tlb.pg
   tlb.io.mode.dmw  := csr.io.tlb.dmw
+  tlb.io.mode.asid := csr.io.tlb.asid
+  tlb.io.mode.plv  := csr.io.priv
   tlb.io.mode.matf := csr.io.tlb.matf
   tlb.io.mode.matd := csr.io.tlb.matd
 
-  tlb.io.transReq0      := frontend.io.itlbReq
-  tlb.io.transReq0.asid := csr.io.tlb.asid
-  tlb.io.transReq0.plv  := csr.io.priv
-  tlb.io.transReq1      := backend.io.dtlbReq
-  tlb.io.transReq0.asid := csr.io.tlb.asid
-  tlb.io.transReq0.plv  := csr.io.priv
-  tlb.io.cmd_in         := DontCare
+  tlb.io.transReq0 := frontend.io.itlbReq
+  // tlb.io.transReq0.asid := csr.io.tlb.asid
+  // tlb.io.transReq0.plv  := csr.io.priv
+  tlb.io.transReq1 := backend.io.dtlbReq
+  // tlb.io.transReq0.asid := csr.io.tlb.asid
+  // tlb.io.transReq0.plv  := csr.io.priv
+  tlb.io.cmd_in := DontCare
 
   csr.io.raddr                := backend.io.csr_access.raddr
   backend.io.csr_access.rdata := csr.io.rdata
