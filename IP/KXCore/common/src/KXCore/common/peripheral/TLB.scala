@@ -178,7 +178,7 @@ class TLB(implicit params: CommonParameters) extends Module {
     val tlb_exception_ecode =
       Mux(
         unaligned,
-        if (is_fetch) ECODE.AIF else Mux(req.isWrite, ECODE.AIS, ECODE.AIL),
+        if (is_fetch) ECODE.ADEF else ECODE.ALE,
         Mux(
           !isHit,
           ECODE.TLBR,
@@ -204,14 +204,14 @@ class TLB(implicit params: CommonParameters) extends Module {
     val unaligned = is_unaligned(req.vaddr, req.size)
     dontTouch(unaligned)
     resp.exception.valid := unaligned
-    resp.exception.bits  := Mux(unaligned, if (is_fetch) ECODE.AIF else Mux(req.isWrite, ECODE.AIS, ECODE.AIL), 0.U)
+    resp.exception.bits  := Mux(unaligned, if (is_fetch) ECODE.ADEF.asUInt else ECODE.ALE.asUInt, 0.U)
     resp.mat             := mat
     resp.paddr           := req.vaddr // passthrough vaddr as paddr for now
     resp
   }
 
-  io.transResp0 := Mux(io.mode.da && !io.mode.pg, tlb_translate_direct(io.transReq0, io.mode.matf), tlb_translate(io.transReq0, true))
-  io.transResp1 := Mux(io.mode.da && !io.mode.pg, tlb_translate_direct(io.transReq1, io.mode.matd), tlb_translate(io.transReq1, false))
+  io.transResp0 := Mux(io.mode.da && !io.mode.pg, tlb_translate_direct(io.transReq0, io.mode.matf, true), tlb_translate(io.transReq0, true))
+  io.transResp1 := Mux(io.mode.da && !io.mode.pg, tlb_translate_direct(io.transReq1, io.mode.matd, false), tlb_translate(io.transReq1, false))
 
   /* ------ TLBSRCH ------ */
   val srch_vppn = io.cmd_in.tlb_ehi(31, 13)
