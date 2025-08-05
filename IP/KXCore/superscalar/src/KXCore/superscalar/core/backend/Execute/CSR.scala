@@ -334,7 +334,14 @@ class CSR(implicit params: CoreParameters) extends Module {
     crmd  := excp_crmd
     prmd  := excp_prmd
     estat := excp_estat
-    badv  := io.badv
+    badv  := Mux(
+      io.ecode === ECODE.TLBR.asUInt || io.ecode === ECODE.ADEF.asUInt || 
+      io.ecode === ECODE.ALE.asUInt || io.ecode === ECODE.PIL.asUInt || 
+      io.ecode === ECODE.PIS.asUInt || io.ecode === ECODE.PIF.asUInt ||
+      io.ecode === ECODE.PME.asUInt || io.ecode === ECODE.PPI.asUInt,
+      io.badv,
+      badv
+    )
     era   := io.pc
   }.elsewhen(io.eret_en) {
     crmd := eret_crmd
