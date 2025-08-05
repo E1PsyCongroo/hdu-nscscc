@@ -91,14 +91,16 @@ class MemExeUnit(implicit params: CoreParameters) extends ExecutionUnit {
     val vaddr     = UInt(vaddrWidth.W)
     val wmask     = UInt(4.W)
   }))
-  stage1Data.valid          := stage1Uop.valid && stage1Regs.valid
-  stage1Uop.ready           := stage1Data.ready
-  stage1Regs.ready          := stage1Data.ready
-  stage1Data.bits.uop       := stage1Uop.bits
-  stage1Data.bits.isWrite   := isWrite
-  stage1Data.bits.writeData := stage1Regs.bits(1) << (stage1Data.bits.vaddr(1, 0) ## 0.U(3.W))
-  stage1Data.bits.paddr     := io_dtlb_resp.paddr
-  stage1Data.bits.vaddr     := io_dtlb_req.vaddr
+  stage1Data.valid              := stage1Uop.valid && stage1Regs.valid
+  stage1Uop.ready               := stage1Data.ready
+  stage1Regs.ready              := stage1Data.ready
+  stage1Data.bits.uop           := stage1Uop.bits
+  stage1Data.bits.uop.exception := stage1Uop.bits.exception | io_dtlb_resp.exception.valid
+  stage1Data.bits.uop.ecode     := Mux(stage1Uop.bits.exception, stage1Uop.bits.ecode, io_dtlb_resp.exception.bits)
+  stage1Data.bits.isWrite       := isWrite
+  stage1Data.bits.writeData     := stage1Regs.bits(1) << (stage1Data.bits.vaddr(1, 0) ## 0.U(3.W))
+  stage1Data.bits.paddr         := io_dtlb_resp.paddr
+  stage1Data.bits.vaddr         := io_dtlb_req.vaddr
   stage1Data.bits.wmask := MuxLookup(stage1Uop.bits.lsuCmd, 0.U)(
     Seq(
       LSU_STB.asUInt -> ("b0001".U << stage1Data.bits.paddr(1, 0)),
@@ -108,14 +110,14 @@ class MemExeUnit(implicit params: CoreParameters) extends ExecutionUnit {
   )
 
   // TODO: Fix this state machine make it Irrevocable
-  val sSendReq :: sWaitAWfire :: sWaitWfire :: sWaitResp :: sWaitAWfireNextIgnore :: sWaitWfireNextIgnore :: sIgnoreResp :: Nil = Enum(7)
+  val sSendReq :: sWaitAWfire :: sWaitWfire :: sWaitResp :: sWaitAWfireNextIgnore :: sWaitWfireNextIgnore :: sIgnoreResp :: sSendExcp :: Nil = Enum(8)
 
   val state     = RegInit(sSendReq)
   val nextState = WireDefault(sSendReq)
   nextState := MuxLookup(state, sSendReq)(
     Seq(
       sSendReq -> Mux(
-        stage1Data.valid,
+        stage1Data.valid && !stage1Uop.bits.exception,
         MuxCase(
           sSendReq,
           Seq(
@@ -124,7 +126,7 @@ class MemExeUnit(implicit params: CoreParameters) extends ExecutionUnit {
             (io_axi.w.fire)                                       -> sWaitAWfire,
           ),
         ),
-        sSendReq,
+        Mux(stage1Data.valid && stage1Uop.bits.exception, sSendExcp, sSendReq),
       ),
       sWaitAWfire -> Mux(
         io_kill,
@@ -152,9 +154,9 @@ class MemExeUnit(implicit params: CoreParameters) extends ExecutionUnit {
   )
   state := nextState
 
-  stage1Data.ready := nextState === sWaitResp
+  stage1Data.ready := (nextState === sWaitResp) || (nextState === sSendExcp)
 
-  io_axi.ar.valid     := (state === sSendReq && stage1Data.valid && !stage1Data.bits.isWrite)
+  io_axi.ar.valid     := state === sSendReq && stage1Data.valid && !stage1Data.bits.isWrite && !stage1Data.bits.uop.exception
   io_axi.ar.bits.addr := stage1Data.bits.paddr
   io_axi.ar.bits.id   := 1.U
   io_axi.ar.bits.len  := 0.U
@@ -167,7 +169,7 @@ class MemExeUnit(implicit params: CoreParameters) extends ExecutionUnit {
 
   io_axi.r.ready := (state === sWaitResp) || (state === sIgnoreResp)
 
-  io_axi.aw.valid := (state === sSendReq && stage1Data.valid && stage1Data.bits.isWrite) ||
+  io_axi.aw.valid := (state === sSendReq && stage1Data.valid && stage1Data.bits.isWrite && !stage1Data.bits.uop.exception) ||
     state === sWaitAWfire || state === sWaitAWfireNextIgnore
   io_axi.aw.bits.addr := stage1Data.bits.paddr
   io_axi.aw.bits.id   := 1.U
@@ -179,7 +181,7 @@ class MemExeUnit(implicit params: CoreParameters) extends ExecutionUnit {
   io_axi.aw.bits.cache := 0.U
   io_axi.aw.bits.prot  := 0.U
 
-  io_axi.w.valid := (state === sSendReq && stage1Data.valid && stage1Data.bits.isWrite) ||
+  io_axi.w.valid := (state === sSendReq && stage1Data.valid && stage1Data.bits.isWrite && !stage1Data.bits.uop.exception) ||
     state === sWaitWfire || state === sWaitWfireNextIgnore
   io_axi.w.bits.id   := 1.U
   io_axi.w.bits.last := 1.U
@@ -216,8 +218,8 @@ class MemExeUnit(implicit params: CoreParameters) extends ExecutionUnit {
     ).map { case (key, data) => (stage2Data.uop.lsuCmd === key.asUInt, data) },
   )
 
-  io_mem_resp.valid := !io_kill && (state === sWaitResp) &&
-    ((io_axi.r.fire && io_axi.r.bits.id === 1.U) || (io_axi.b.fire && io_axi.b.bits.id === 1.U))
+  io_mem_resp.valid := !io_kill && ((state === sWaitResp) &&
+    ((io_axi.r.fire && io_axi.r.bits.id === 1.U) || (io_axi.b.fire && io_axi.b.bits.id === 1.U)))
   io_mem_resp.bits.brInfo.valid         := false.B
   io_mem_resp.bits.brInfo.bits          := DontCare
   io_mem_resp.bits.uop                  := stage2Data.uop

@@ -319,14 +319,14 @@ class BackEnd(implicit params: CoreParameters) extends Module {
 
   // commit
   for (i <- 0 until coreWidth) {
-    renameMapTable.io.comRemapReqs(i).valid := rob.io.commit.valids(i) && rob.io.commit.uop(i).ldst =/= 0.U
+    renameMapTable.io.comRemapReqs(i).valid := rob.io.commit.valids(i) && rob.io.commit.uop(i).ldst =/= 0.U && !rob.io.commit.exception.valid
     renameMapTable.io.comRemapReqs(i).ldst  := rob.io.commit.uop(i).ldst
     renameMapTable.io.comRemapReqs(i).pdst  := rob.io.commit.uop(i).pdst
 
-    renameFreeList.io.dealloc(i).valid := rob.io.commit.valids(i) && rob.io.commit.uop(i).ldst =/= 0.U
+    renameFreeList.io.dealloc(i).valid := rob.io.commit.valids(i) && rob.io.commit.uop(i).ldst =/= 0.U && !rob.io.commit.exception.valid
     renameFreeList.io.dealloc(i).bits  := rob.io.commit.uop(i).stalePdst
 
-    renameFreeList.io.despec(i).valid := rob.io.commit.valids(i) && rob.io.commit.uop(i).ldst =/= 0.U
+    renameFreeList.io.despec(i).valid := rob.io.commit.valids(i) && rob.io.commit.uop(i).ldst =/= 0.U && !rob.io.commit.exception.valid
     renameFreeList.io.despec(i).bits  := rob.io.commit.uop(i).pdst
   }
 

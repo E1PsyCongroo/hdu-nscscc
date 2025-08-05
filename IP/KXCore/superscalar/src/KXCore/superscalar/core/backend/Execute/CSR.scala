@@ -132,6 +132,7 @@ class Timer extends Module {
 
     val pending = Output(Bool())
   })
+
   val en        = RegInit(false.B)
   val periodic  = RegInit(false.B)
   val initvalue = RegInit(0.U(32.W))
@@ -151,20 +152,24 @@ class Timer extends Module {
     tcfg_initvalue,
     Mux(
       en,
-      Mux(
-        tval === 0.U,
-        Mux(periodic, initvalue, 0.U),
-        tval - 1.U,
-      ),
-      0.U,
+      Mux(tval === 0.U, Mux(periodic, initvalue, tval), tval - 1.U),
+      tval,
     ),
   )
 
   val write_ticlr = io.waddr === CSRAddr.TICLR.U && io.wen
-  pending := Mux(
-    write_ticlr && io.wdata(0),
+  // pending := Mux(
+  //   write_ticlr && io.wdata(0),
+  //   false.B,
+  //   Mux(en && (tval === 1.U || initvalue === 0.U), true.B, pending),
+  // )
+  pending := MuxCase(
     false.B,
-    Mux(en && tval === 1.U, true.B, pending),
+    Seq(
+      (write_tfcg && io.wdata(0) && tcfg_initvalue === 0.U)     -> true.B,
+      (en && (tval === 1.U || (initvalue === 0.U && periodic))) -> true.B,
+      (pending && !(write_ticlr && io.wdata(0)))                -> true.B,
+    ),
   )
 
   io.pending := pending

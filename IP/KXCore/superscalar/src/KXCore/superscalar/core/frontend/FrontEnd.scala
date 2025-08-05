@@ -104,6 +104,7 @@ class FrontEnd(implicit params: CoreParameters) extends Module {
   val stage1Data = Wire(Decoupled(new Bundle {
     val fetchPC        = UInt(vaddrWidth.W)
     val stage1Redirect = UInt(vaddrWidth.W)
+    val exception      = Valid(UInt(ECODE.getWidth.W))
   }))
   val stage0to1Ext     = ReadyValidIOExpand(stage0to1, 3)
   val bpuStage1RespExt = ReadyValidIOExpand(bpu.io.resp.stage1, 2)
@@ -120,8 +121,8 @@ class FrontEnd(implicit params: CoreParameters) extends Module {
   val icacheArb = Module(new Arbiter(io.icacheReq.bits.cloneType, 2))
   icacheArb.io.in(0)               <> icacheCacopReq
   icacheArb.io.in(1)               <> icacheFetchReq
-  icache.io.req.stage1.valid       := icacheArb.io.out.valid
-  icacheArb.io.out.ready           := icache.io.req.stage1.ready
+  icache.io.req.stage1.valid       := icacheArb.io.out.valid && !io.itlbResp.exception.valid
+  icacheArb.io.out.ready           := icache.io.req.stage1.ready || io.itlbResp.exception.valid
   icache.io.req.stage1.bits.vaddr  := icacheArb.io.out.bits.vaddr
   io.itlbReq.vaddr                 := stage0to1Ext.bits.fetchPC
   io.itlbReq.isWrite               := false.B
@@ -143,13 +144,14 @@ class FrontEnd(implicit params: CoreParameters) extends Module {
     bpuStage1RespExt.bits(PriorityEncoder(stage1Redirects)).target.bits,
     nextFetch(stage0to1Ext.bits.fetchPC),
   )
-  bpuStage1RespExt.ready(0) := icache.io.req.stage1.ready
+  bpuStage1RespExt.ready(0) := icache.io.req.stage1.ready || io.itlbResp.exception.valid
 
   stage1Data.valid               := bpuStage1RespExt.valid(1) && stage0to1Ext.valid(2)
   bpuStage1RespExt.ready(1)      := stage1Data.ready
   stage0to1Ext.ready(2)          := stage1Data.ready
   stage1Data.bits.fetchPC        := stage0to1Ext.bits.fetchPC
   stage1Data.bits.stage1Redirect := stage1Redirect
+  stage1Data.bits.exception      := io.itlbResp.exception
 
   val stage1to2 = Wire(stage1Data.cloneType)
   PipeConnect(Some(flush.stage2), stage1Data, stage1to2)
@@ -196,7 +198,8 @@ class FrontEnd(implicit params: CoreParameters) extends Module {
     stage2FetchMask(i) && (stage2JmpMask(i) || (stage2BrMask(i) && bpu.io.resp.stage2.bits.pred(i).taken))
   }).asUInt)
   val stage2CfiIdx = OHToUInt(stage2CfiMask)
-  stage2FetchBundle.mask := stage2FetchMask & ~(MaskUpper(stage2CfiMask) << 1.U)
+  stage2FetchBundle.mask      := stage2FetchMask & ~(MaskUpper(stage2CfiMask) << 1.U)
+  stage2FetchBundle.exception := stage1to2.bits.exception
   dontTouch(stage2CfiMask)
   dontTouch(stage2CfiIdx)
 
@@ -207,7 +210,7 @@ class FrontEnd(implicit params: CoreParameters) extends Module {
 
   val stage2Data = Wire(Decoupled(stage2FetchBundle.cloneType))
   val stage2Fire = fb.io.enq.ready && ftq.io.enq.ready && stage2Data.valid
-  stage2Data.valid            := bpu.io.resp.stage2.valid && icache.io.resp.stage2.valid && stage1to2.valid
+  stage2Data.valid            := ((bpu.io.resp.stage2.valid && icache.io.resp.stage2.valid) || stage1to2.bits.exception.valid) && stage1to2.valid
   bpu.io.resp.stage2.ready    := stage2Fire
   icache.io.resp.stage2.ready := stage2Fire
   stage1to2.ready             := stage2Fire

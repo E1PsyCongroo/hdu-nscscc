@@ -291,7 +291,7 @@ class DecoderIO(implicit params: CoreParameters) extends Bundle {
 
 class Decoder(implicit params: CoreParameters) extends Module {
   import params.{commonParams, backendParams}
-  import commonParams.{instWidth, dataWidth}
+  import commonParams.{instWidth, dataWidth, vaddrWidth}
   import backendParams.{coreWidth}
   val io = IO(new DecoderIO)
 
@@ -454,11 +454,12 @@ class Decoder(implicit params: CoreParameters) extends Module {
       Seq(
         io.req(i).exception               -> io.req(i).ecode,
         ine                               -> ECODE.INE.asUInt,
-        io.intr_pending                   -> io.intr_pending,
+        io.intr_pending                   -> ECODE.INT.asUInt,
         (io.req(i).inst === SYSCALL.inst) -> ECODE.SYS.asUInt,
         (io.req(i).inst === BREAK.inst)   -> ECODE.BRK.asUInt,
       ),
     )
+    uop.badv := io.req(i).badv & Fill(vaddrWidth, io.req(i).ecode === ECODE.ADEF.asUInt && io.req(i).exception)
     uop.ertn := io.req(i).inst === ERTN.inst
     uop.busy := !uop.exception && !uop.ertn
 

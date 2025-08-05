@@ -21,7 +21,7 @@ class FetchBundle(implicit params: CoreParameters) extends Bundle {
 
   val ftqIdx = UInt(log2Ceil(ftqNum).W)
 
-  val exception = new Bundle {}
+  val exception = Valid(UInt(ECODE.getWidth.W))
 
   // val ghist = new GlobalHistory
   // val lhist = Vec(nBanks, UInt(localHistoryLength.W))

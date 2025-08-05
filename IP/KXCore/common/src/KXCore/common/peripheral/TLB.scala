@@ -3,7 +3,7 @@ package KXCore.common.peripheral
 import chisel3._
 import chisel3.util._
 import KXCore.common._
-import KXCore.common.Privilege.ECODE
+import KXCore.common.Privilege._
 
 class TLBReq(implicit params: CommonParameters) extends Bundle {
 
@@ -27,7 +27,7 @@ class TLBResp(implicit params: CommonParameters) extends Bundle {
   /** physical address */
   val paddr = UInt(params.paddrWidth.W)
 
-  val exception = Valid(UInt(6.W))
+  val exception = Valid(UInt(ECODE.getWidth.W))
 }
 
 class TLBTranslateItem(implicit params: CommonParameters) extends Bundle {
@@ -164,16 +164,22 @@ class TLB(implicit params: CommonParameters) extends Module {
       Cat(found.ppn(params.paddrWidth - 13, 0), vaddr(11, 0)),// 4K page
     )
 
-    val tlb_exception_valid = !isHit || !found.valid || io.mode.plv > found.plv || (req.isWrite && found.dirty === 0.U)
-    val tlb_exception_ecode = Mux(
-      !isHit,
-      ECODE.TLBR,
+    val tlb_exception_valid = !isHit || !found.valid || io.mode.plv > found.plv ||
+      (req.isWrite && found.dirty === 0.U) || (is_fetch.B && vaddr(log2Ceil(params.instBytes), 0) =/= 0.U)
+    val tlb_exception_ecode =
       Mux(
-        !found.valid,
-        if (is_fetch) ECODE.PIF else Mux(req.isWrite, ECODE.PIS, ECODE.PIL),
-        Mux(io.mode.plv > found.plv, ECODE.PPI, Mux(req.isWrite && found.dirty === 0.U, ECODE.PME, DontCare)),
-      ),
-    ).asUInt
+        is_fetch.B && vaddr(log2Ceil(params.instBytes), 0) =/= 0.U,
+        ECODE.ADEF,
+        Mux(
+          !isHit,
+          ECODE.TLBR,
+          Mux(
+            !found.valid,
+            if (is_fetch) ECODE.PIF else Mux(req.isWrite, ECODE.PIS, ECODE.PIL),
+            Mux(io.mode.plv > found.plv, ECODE.PPI, Mux(req.isWrite && found.dirty === 0.U, ECODE.PME, DontCare)),
+          ),
+        ),
+      ).asUInt
 
     val resp = Wire(new TLBResp)
     resp.exception.valid := Mux(dmw_hit, false.B, !isHit)
