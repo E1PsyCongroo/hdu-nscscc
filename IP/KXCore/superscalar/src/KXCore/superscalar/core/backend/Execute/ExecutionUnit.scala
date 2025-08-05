@@ -82,6 +82,25 @@ class MemExeUnit(implicit params: CoreParameters) extends ExecutionUnit {
   io_dtlb_req.isWrite := isWrite
   // io_dtlb_req.plv     := 0.U
   io_dtlb_req.vaddr := stage1Regs.bits(0) + stage1Uop.bits.imm
+  io_dtlb_req.size  := Mux(
+    isWrite,
+    MuxLookup(stage1Uop.bits.lsuCmd, 0.U)(
+      Seq(
+        LSU_STB.asUInt -> 0.U,
+        LSU_STH.asUInt -> 1.U,
+        LSU_STW.asUInt -> 3.U,
+      ),
+    ),
+    MuxLookup(stage1Uop.bits.lsuCmd, 0.U)(
+      Seq(
+        LSU_LDB.asUInt  -> 0.U,
+        LSU_LDBU.asUInt -> 0.U,
+        LSU_LDH.asUInt  -> 1.U,
+        LSU_LDHU.asUInt -> 1.U,
+        LSU_LDW.asUInt  -> 3.U,
+      ),
+    ),
+  )
 
   val stage1Data = Wire(DecoupledIO(new Bundle {
     val uop       = new MicroOp
