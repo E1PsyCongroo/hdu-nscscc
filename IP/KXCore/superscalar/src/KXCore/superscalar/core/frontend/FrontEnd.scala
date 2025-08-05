@@ -126,6 +126,7 @@ class FrontEnd(implicit params: CoreParameters) extends Module {
   icache.io.req.stage1.bits.vaddr  := icacheArb.io.out.bits.vaddr
   io.itlbReq.vaddr                 := stage0to1Ext.bits.fetchPC
   io.itlbReq.isWrite               := false.B
+  io.itlbReq.size                  := 3.U
   icache.io.req.stage1.bits.paddr  := io.itlbResp.paddr
   icache.io.req.stage1.bits.cacop  := icacheArb.io.out.bits.cacop
   icache.io.req.stage1.bits.cached := io.itlbResp.mat(0)
