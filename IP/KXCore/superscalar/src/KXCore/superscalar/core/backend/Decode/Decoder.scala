@@ -441,14 +441,17 @@ class Decoder(implicit params: CoreParameters) extends Module {
         WBDest.destNone -> 0.U,
         WBDest.destRd   -> inst(4, 0),
         WBDest.destR1   -> 1.U,
-        WBDest.destRj   -> inst(9, 4),
+        WBDest.destRj   -> inst(9, 5),
       ).map { case (key, value) => (decodeResult(WBControlField) === key.asUInt, value) },
     )
     uop.isUnique := decodeResult(UniqControlField)
     uop.flush    := decodeResult(CommitFlushControlField)
     uop.exuCmd   := decodeResult(EXUOPControlField)
-    uop.csrCmd   := decodeResult(CSROPControlField)
-    uop.lsuCmd   := decodeResult(LSUOPControlField)
+    when(Seq(RDCNTID_W_0, RDCNTID_W_1, RDCNTID_W_2, RDCNTID_W_3, RDCNTID_W_4, RDCNTVH_W, RDCNTVL_W).map(_.inst === uop.inst).reduce(_ || _)) {
+      printf("%x %x %x %x\n", uop.inst, uop.exuCmd, uop.csrCmd, uop.ldst)
+    }
+    uop.csrCmd := decodeResult(CSROPControlField)
+    uop.lsuCmd := decodeResult(LSUOPControlField)
     uop.exception := io.req(i).exception || io.intr_pending || ine ||
       io.req(i).inst === SYSCALL.inst || io.req(i).inst === BREAK.inst
     uop.ecode := MuxCase(

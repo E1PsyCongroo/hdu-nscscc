@@ -382,7 +382,7 @@ class CSR(implicit params: CoreParameters) extends Module {
       CSRAddr.TICLR.U  -> 0.U,// TICLR is always read as 0
     ) ++ (0 until 4).map(i => (CSRAddr.SAVED0 + i).U -> saved(i)),
   )
-  io.counterID := 0.U
+  io.counterID := tid
   io.cntvh     := cntvh
   io.cntvl     := cntvl
   /* ------ Read Logic ------ */

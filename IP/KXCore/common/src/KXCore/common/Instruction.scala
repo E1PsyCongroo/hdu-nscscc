@@ -108,6 +108,8 @@ object Instruction {
   val RDCNTID_W_4 = Instruction("RDCNTID.W", TYPE_2R, BitPat("b0000 0000 0000 00000 11000 ????1 00000"))
   val RDCNTVL_W   = Instruction("RDCNTVL.W", TYPE_2R, BitPat("b0000 0000 0000 00000 11000 00000 ?????"))
   val RDCNTVH_W   = Instruction("RDCNTVH.W", TYPE_2R, BitPat("b0000 0000 0000 00000 11001 00000 ?????"))
+  val RDTIMEL_W   = Instruction("RDTIMEL.W", TYPE_2R, BitPat("b0000 0000 0000 00000 11000 ????? ?????"))
+  val RDTIMEH_W   = Instruction("RDTIMEL.W", TYPE_2R, BitPat("b0000 0000 0000 00000 11001 ????? ?????"))
 
   /* CSR Access Instructions */
   val CSRRD     = Instruction("CSRRD", TYPE_2RI14, BitPat("b00000100 ?????????????? 00000 ?????"))
