@@ -104,7 +104,7 @@ object Instruction {
   val RDCNTID_W_0 = Instruction("RDCNTID.W", TYPE_2R, BitPat("b0000 0000 0000 00000 11000 1???? 00000"))
   val RDCNTID_W_1 = Instruction("RDCNTID.W", TYPE_2R, BitPat("b0000 0000 0000 00000 11000 ?1??? 00000"))
   val RDCNTID_W_2 = Instruction("RDCNTID.W", TYPE_2R, BitPat("b0000 0000 0000 00000 11000 ??1?? 00000"))
-  val RDCNTID_W_3 = Instruction("RDCNTID.W", TYPE_2R, BitPat("b0000 0000 0000 00000 11000 ??01? 00000"))
+  val RDCNTID_W_3 = Instruction("RDCNTID.W", TYPE_2R, BitPat("b0000 0000 0000 00000 11000 ???1? 00000"))
   val RDCNTID_W_4 = Instruction("RDCNTID.W", TYPE_2R, BitPat("b0000 0000 0000 00000 11000 ????1 00000"))
   val RDCNTVL_W   = Instruction("RDCNTVL.W", TYPE_2R, BitPat("b0000 0000 0000 00000 11000 00000 ?????"))
   val RDCNTVH_W   = Instruction("RDCNTVH.W", TYPE_2R, BitPat("b0000 0000 0000 00000 11001 00000 ?????"))
