@@ -10,11 +10,11 @@ class TLBReq(implicit params: CommonParameters) extends Bundle {
   /** request address from CPU. */
   val vaddr = UInt(params.vaddrWidth.W)
 
-  /* address space identifier */
-  val asid = UInt(10.W)
+  // /* address space identifier */
+  // val asid = UInt(10.W)
 
-  /* privilege level */
-  val plv = UInt(2.W)
+  // /* privilege level */
+  // val plv = UInt(2.W)
 
   /* memory access type */
   val isWrite = Bool()
@@ -85,6 +85,9 @@ class TLB(implicit params: CommonParameters) extends Module {
       val pg  = Bool() // page table access
       val dmw = Vec(2, new DMW)
 
+      val asid = UInt(10.W)
+      val plv  = UInt(2.W)
+
       val matf = UInt(2.W)
       val matd = UInt(2.W)
     })
@@ -123,7 +126,7 @@ class TLB(implicit params: CommonParameters) extends Module {
     val dmw_hits = Wire(Vec(2, Bool()))
     for (i <- 0 until 2) {
       val dmw = io.mode.dmw(i)
-      dmw_hits(i) := (dmw.plv0() && req.plv === 0.U) || (dmw.plv3() && req.plv === 3.U) ||
+      dmw_hits(i) := (dmw.plv0() && io.mode.plv === 0.U) || (dmw.plv3() && io.mode.plv === 3.U) ||
         (dmw.vseg() === req.vaddr(31, 29))
     }
     val dmw_hit = dmw_hits.asUInt.orR
@@ -144,7 +147,7 @@ class TLB(implicit params: CommonParameters) extends Module {
     for (i <- 0 until params.tlbCount) {
       val entry = tlbEntry(i)
       tlb_hits(i) := (entry.vppn === req.vaddr(params.vaddrWidth - 1, 13)) &&
-        ((entry.asid === req.asid) || entry.global) &&
+        ((entry.asid === io.mode.asid) || entry.global) &&
         (entry.e)
     }
     val isHit = tlb_hits.asUInt.orR
@@ -161,14 +164,14 @@ class TLB(implicit params: CommonParameters) extends Module {
       Cat(found.ppn(params.paddrWidth - 13, 0), vaddr(11, 0)),// 4K page
     )
 
-    val tlb_exception_valid = !isHit || !found.valid || req.plv > found.plv || (req.isWrite && found.dirty === 0.U)
+    val tlb_exception_valid = !isHit || !found.valid || io.mode.plv > found.plv || (req.isWrite && found.dirty === 0.U)
     val tlb_exception_ecode = Mux(
       !isHit,
       ECODE.TLBR,
       Mux(
         !found.valid,
         if (is_fetch) ECODE.PIF else Mux(req.isWrite, ECODE.PIS, ECODE.PIL),
-        Mux(req.plv > found.plv, ECODE.PPI, Mux(req.isWrite && found.dirty === 0.U, ECODE.PME, DontCare)),
+        Mux(io.mode.plv > found.plv, ECODE.PPI, Mux(req.isWrite && found.dirty === 0.U, ECODE.PME, DontCare)),
       ),
     ).asUInt
 
