@@ -169,7 +169,7 @@ class Timer extends Module {
 
   io.pending := pending
   io.tval    := tval
-  io.tcfg    := Cat(initvalue, periodic, en)
+  io.tcfg    := Cat(initvalue(31, 2), periodic, en)
 }
 
 object CSRAddr {
