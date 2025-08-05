@@ -56,7 +56,7 @@ class FetchBuffer(implicit params: CoreParameters) extends Module {
     in_mask(i)            := io.enq.valid && (io.enq.bits.mask(i) || io.enq.bits.exception.valid)
     in_uops(i).exception  := io.enq.bits.exception.valid
     in_uops(i).ecode      := io.enq.bits.exception.bits
-    in_uops(i).badv       := pc
+    in_uops(i).badv       := io.enq.bits.pc
     in_uops(i).debug.pc   := pc
     in_uops(i).debug.inst := io.enq.bits.insts(i)
     in_uops(i).idx        := i.U

@@ -5,6 +5,7 @@ import chisel3.util._
 import KXCore.common._
 import KXCore.common.peripheral._
 import KXCore.common.Privilege._
+import KXCore.common.Privilege.ECODE._
 import KXCore.superscalar._
 
 class CRMD extends Bundle {
@@ -334,14 +335,7 @@ class CSR(implicit params: CoreParameters) extends Module {
     crmd  := excp_crmd
     prmd  := excp_prmd
     estat := excp_estat
-    badv  := Mux(
-      io.ecode === ECODE.TLBR.asUInt || io.ecode === ECODE.ADEF.asUInt || 
-      io.ecode === ECODE.ALE.asUInt || io.ecode === ECODE.PIL.asUInt || 
-      io.ecode === ECODE.PIS.asUInt || io.ecode === ECODE.PIF.asUInt ||
-      io.ecode === ECODE.PME.asUInt || io.ecode === ECODE.PPI.asUInt,
-      io.badv,
-      badv
-    )
+    badv  := Mux(Seq(TLBR, ADEF, ALE, PIL, PIS, PIF, PME, PPI).map(e => ECODE.getEcode(e.asUInt) === io.ecode).reduce(_ || _), io.badv, badv)
     era   := io.pc
   }.elsewhen(io.eret_en) {
     crmd := eret_crmd

@@ -82,7 +82,7 @@ class MemExeUnit(implicit params: CoreParameters) extends ExecutionUnit {
   io_dtlb_req.isWrite := isWrite
   // io_dtlb_req.plv     := 0.U
   io_dtlb_req.vaddr := stage1Regs.bits(0) + stage1Uop.bits.imm
-  io_dtlb_req.size  := Mux(
+  io_dtlb_req.size := Mux(
     isWrite,
     MuxLookup(stage1Uop.bits.lsuCmd, 0.U)(
       Seq(
@@ -136,7 +136,7 @@ class MemExeUnit(implicit params: CoreParameters) extends ExecutionUnit {
   nextState := MuxLookup(state, sSendReq)(
     Seq(
       sSendReq -> Mux(
-        stage1Data.valid && !stage1Uop.bits.exception,
+        stage1Data.valid && !stage1Data.bits.uop.exception,
         MuxCase(
           sSendReq,
           Seq(
@@ -145,7 +145,7 @@ class MemExeUnit(implicit params: CoreParameters) extends ExecutionUnit {
             (io_axi.w.fire)                                       -> sWaitAWfire,
           ),
         ),
-        Mux(stage1Data.valid && stage1Uop.bits.exception, sSendExcp, sSendReq),
+        Mux(stage1Data.valid && stage1Data.bits.uop.exception, sSendExcp, sSendReq),
       ),
       sWaitAWfire -> Mux(
         io_kill,
@@ -169,6 +169,7 @@ class MemExeUnit(implicit params: CoreParameters) extends ExecutionUnit {
         sSendReq,
         sIgnoreResp,
       ),
+      sSendExcp -> sSendReq,
     ),
   )
   state := nextState
@@ -188,8 +189,8 @@ class MemExeUnit(implicit params: CoreParameters) extends ExecutionUnit {
 
   io_axi.r.ready := (state === sWaitResp) || (state === sIgnoreResp)
 
-  io_axi.aw.valid := (state === sSendReq && stage1Data.valid && stage1Data.bits.isWrite && !stage1Data.bits.uop.exception) ||
-    state === sWaitAWfire || state === sWaitAWfireNextIgnore
+  io_axi.aw.valid := state === sWaitAWfire || state === sWaitAWfireNextIgnore ||
+    (state === sSendReq && stage1Data.valid && stage1Data.bits.isWrite && !stage1Data.bits.uop.exception)
   io_axi.aw.bits.addr := stage1Data.bits.paddr
   io_axi.aw.bits.id   := 1.U
   io_axi.aw.bits.len  := 0.U
@@ -200,8 +201,9 @@ class MemExeUnit(implicit params: CoreParameters) extends ExecutionUnit {
   io_axi.aw.bits.cache := 0.U
   io_axi.aw.bits.prot  := 0.U
 
-  io_axi.w.valid := (state === sSendReq && stage1Data.valid && stage1Data.bits.isWrite && !stage1Data.bits.uop.exception) ||
-    state === sWaitWfire || state === sWaitWfireNextIgnore
+  io_axi.w.valid := state === sWaitWfire || state === sWaitWfireNextIgnore ||
+    (state === sSendReq && stage1Data.valid && stage1Data.bits.isWrite && !stage1Data.bits.uop.exception)
+
   io_axi.w.bits.id   := 1.U
   io_axi.w.bits.last := 1.U
   io_axi.w.bits.data := stage1Data.bits.writeData
@@ -237,11 +239,12 @@ class MemExeUnit(implicit params: CoreParameters) extends ExecutionUnit {
     ).map { case (key, data) => (stage2Data.uop.lsuCmd === key.asUInt, data) },
   )
 
-  io_mem_resp.valid := !io_kill && ((state === sWaitResp) &&
-    ((io_axi.r.fire && io_axi.r.bits.id === 1.U) || (io_axi.b.fire && io_axi.b.bits.id === 1.U)))
+  io_mem_resp.valid := !io_kill && ((state === sSendExcp) || ((state === sWaitResp) &&
+    ((io_axi.r.fire && io_axi.r.bits.id === 1.U) || (io_axi.b.fire && io_axi.b.bits.id === 1.U))))
   io_mem_resp.bits.brInfo.valid         := false.B
   io_mem_resp.bits.brInfo.bits          := DontCare
   io_mem_resp.bits.uop                  := stage2Data.uop
+  io_mem_resp.bits.uop.badv             := stage2Data.vaddr
   io_mem_resp.bits.uop.debug.load       := VecInit(Seq(LSU_LDB, LSU_LDBU, LSU_LDH, LSU_LDHU, LSU_LDW).map(_.asUInt === stage2Data.uop.lsuCmd)).asUInt
   io_mem_resp.bits.uop.debug.loadVaddr  := stage2Data.vaddr
   io_mem_resp.bits.uop.debug.loadPaddr  := stage2Data.paddr

@@ -293,14 +293,14 @@ class ReorderBuffer(implicit params: CoreParameters) extends Module {
   io.commit.redirect.bits := MuxCase(
     DontCare,
     Seq(
+      exception -> io.eentry,
       will_etrn -> io.era,
       flush     -> flushPC,
-      exception -> io.eentry,
       mispred   -> io.commit.brInfo.bits.target,
     ),
   )
   io.commit.exception.valid          := will_throw_exception.reduce(_ || _)
-  io.commit.exception.bits.pc        := pcs(exception_idx)
+  io.commit.exception.bits.pc        := Mux(rob_exception_info.bits.ecode === ECODE.ADEF.asUInt, io.getPC.info.entry.fetchPC, pcs(exception_idx))
   io.commit.exception.bits.badv      := rob_exception_info.bits.badv
   io.commit.exception.bits.ecode     := ECODE.getEcode(rob_exception_info.bits.ecode)
   io.commit.exception.bits.ecode_sub := ECODE.getEsubCode(rob_exception_info.bits.ecode)

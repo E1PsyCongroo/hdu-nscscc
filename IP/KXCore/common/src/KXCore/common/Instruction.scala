@@ -156,6 +156,7 @@ object Privilege {
     val PME  = Value(0x04.U)
     val PPI  = Value(0x07.U)
     val ADEF = Value(0x08.U)
+    val ALE  = Value(0x09.U)
     val SYS  = Value(0x0b.U)
     val BRK  = Value(0x0c.U)
     val INE  = Value(0x0d.U)
@@ -163,6 +164,6 @@ object Privilege {
     val FPD  = Value(0x0f.U)
     val FPE  = Value(0x12.U)
     val TLBR = Value(0x3f.U)
-    val ALE  = Value(0x78.U)
+    val ADEM = Value(0x7f.U)
   }
 }

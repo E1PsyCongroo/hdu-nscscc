@@ -459,7 +459,7 @@ class Decoder(implicit params: CoreParameters) extends Module {
         (io.req(i).inst === BREAK.inst)   -> ECODE.BRK.asUInt,
       ),
     )
-    uop.badv := io.req(i).badv & Fill(vaddrWidth, io.req(i).ecode === ECODE.ADEF.asUInt && io.req(i).exception)
+    uop.badv := io.req(i).badv
     uop.ertn := io.req(i).inst === ERTN.inst
     uop.busy := !uop.exception && !uop.ertn
 
