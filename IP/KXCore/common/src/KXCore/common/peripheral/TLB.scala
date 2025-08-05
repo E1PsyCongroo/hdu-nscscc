@@ -210,6 +210,11 @@ class TLB(implicit params: CommonParameters) extends Module {
     resp
   }
 
+  val unaligned = is_unaligned(io.transReq0.vaddr, io.transReq0.size)
+  dontTouch(unaligned)
+  dontTouch(io.transReq0.size)
+  dontTouch(io.transReq0.vaddr)
+
   io.transResp0 := Mux(io.mode.da && !io.mode.pg, tlb_translate_direct(io.transReq0, io.mode.matf, true), tlb_translate(io.transReq0, true))
   io.transResp1 := Mux(io.mode.da && !io.mode.pg, tlb_translate_direct(io.transReq1, io.mode.matd, false), tlb_translate(io.transReq1, false))
 
