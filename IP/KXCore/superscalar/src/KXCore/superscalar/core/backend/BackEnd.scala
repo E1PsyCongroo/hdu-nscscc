@@ -98,6 +98,7 @@ class BackEnd(implicit params: CoreParameters) extends Module {
   intIssUnit.io.fu_types := VecInit(aluExeUnits.map(_.io_fu_types))
 
   // decode & rename
+  decoder.io.intr_pending := io.csr_access.intr_pending
   val decData = Wire(Decoupled(Vec(coreWidth, Valid(new MicroOp))))
   decData.valid        := io.fetchPacket.valid
   io.fetchPacket.ready := decData.ready
