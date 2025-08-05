@@ -148,7 +148,7 @@ class ReorderBuffer(implicit params: CoreParameters) extends Module {
       rob_exception(rob_tail)                            := io.alloc(w).uop.exception
       rob_row_ftq(rob_tail)                              := io.alloc(w).uop.ftqIdx
       rob_row_brInfo(rob_row_brInfo_idx)(rob_tail).valid := false.B
-      when(!rob_exception_info.valid) {
+      when(!rob_exception_info.valid && io.alloc(w).uop.exception) {
         rob_exception_info.valid       := io.alloc(w).uop.exception
         rob_exception_info.bits.badv   := io.alloc(w).uop.badv
         rob_exception_info.bits.ecode  := io.alloc(w).uop.exception
@@ -186,7 +186,11 @@ class ReorderBuffer(implicit params: CoreParameters) extends Module {
           rob_brInfo := wb_brInfo
         }
       }
-      when(!rob_exception_info.valid || (wb_uop.exception && is_old_rob(wb_uop.robIdx, oldest_excp_idx))) {
+      when(
+        wb_uop.exception &&
+          (!rob_exception_info.valid || (rob_exception_info.valid
+            && is_old_rob(wb_uop.robIdx, oldest_excp_idx))),
+      ) {
         oldest_excp_idx = wb_uop.robIdx
         rob_exception_info.valid      := wb_uop.exception
         rob_exception_info.bits.ecode := wb_uop.ecode
