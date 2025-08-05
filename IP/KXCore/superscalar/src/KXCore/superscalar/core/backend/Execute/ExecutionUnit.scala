@@ -1,6 +1,5 @@
 package KXCore.superscalar.core.backend
 
-import scala.collection.mutable.{ArrayBuffer}
 import chisel3._
 import chisel3.util._
 import KXCore.common._
@@ -9,10 +8,7 @@ import KXCore.common.peripheral._
 import KXCore.superscalar._
 import KXCore.superscalar.core._
 import KXCore.superscalar.core.frontend._
-import os.write
 import dataclass.data
-import chisel3.internal.binding
-import KXCore.common.Instruction.ST_B
 
 abstract class ExecutionUnit(implicit params: CoreParameters) extends Module {
   def fu_types: UInt = 0.U(FUType.getWidth.W)
@@ -27,15 +23,16 @@ abstract class ExecutionUnit(implicit params: CoreParameters) extends Module {
 
   val iss_uop_ext = ReadyValidIOExpand(io_iss_uop, 3)
 
-  io_read_reqs(0).valid := iss_uop_ext.valid(0) && iss_uop_ext.bits.lrs1 =/= 0.U
+  io_read_reqs(0).valid := iss_uop_ext.valid(0) && iss_uop_ext.bits.busy && iss_uop_ext.bits.lrs1 =/= 0.U
   io_read_reqs(0).bits  := iss_uop_ext.bits.prs1
   if (nReaders == 2) {
-    io_read_reqs(1).valid := iss_uop_ext.valid(0) && iss_uop_ext.bits.lrs2 =/= 0.U
+    io_read_reqs(1).valid := iss_uop_ext.valid(0) && iss_uop_ext.bits.busy && iss_uop_ext.bits.lrs2 =/= 0.U
     io_read_reqs(1).bits  := iss_uop_ext.bits.prs2
   }
 
   val stage0Regs = Wire(Decoupled(Vec(nReaders, UInt(params.commonParams.dataWidth.W))))
-  stage0Regs.valid   := iss_uop_ext.valid(0) && io_read_reqs.map(req => (!req.valid || req.ready)).reduce(_ && _)
+  stage0Regs.valid := iss_uop_ext.valid(0) && iss_uop_ext.bits.busy &&
+    io_read_reqs.map(req => (!req.valid || req.ready)).reduce(_ && _)
   stage0Regs.bits(0) := io_read_resps(0)
   if (nReaders == 2) {
     stage0Regs.bits(1) := io_read_resps(1)
@@ -43,7 +40,7 @@ abstract class ExecutionUnit(implicit params: CoreParameters) extends Module {
   iss_uop_ext.ready(0) := stage0Regs.ready
 
   val stage0Uop = Wire(Decoupled(new MicroOp))
-  stage0Uop.valid      := iss_uop_ext.valid(1)
+  stage0Uop.valid      := iss_uop_ext.valid(1) && iss_uop_ext.bits.busy
   stage0Uop.bits       := iss_uop_ext.bits
   iss_uop_ext.ready(1) := stage0Uop.ready
 
@@ -393,6 +390,9 @@ class UniqueExeUnit(
     val hasDiv: Boolean = true,
 )(implicit params: CoreParameters)
     extends ExecutionUnit {
+
+  import params.{commonParams}
+  import commonParams.{dataWidth}
   override def fu_types: UInt =
     (if (hasCSR) FUType.FUT_CSR.asUInt else 0.U) |
       (if (hasMul) FUType.FUT_MUL.asUInt else 0.U) |
@@ -403,8 +403,9 @@ class UniqueExeUnit(
 
   val io_unq_resp = IO(Output(Valid(new ExeUnitResp)))
 
-  io_unq_resp.valid := false.B
-  io_unq_resp.bits  := DontCare
+  io_unq_resp.valid             := false.B
+  io_unq_resp.bits              := DontCare
+  io_unq_resp.bits.brInfo.valid := false.B
 
   stage1Uop.ready  := false.B
   stage1Regs.ready := false.B
@@ -420,18 +421,17 @@ class UniqueExeUnit(
     mulUnit.io.req.bits.uop      := stage1Uop.bits
     mulUnit.io.req.bits.ftq_info := DontCare
     mulUnit.io.req.valid         := false.B
-    when(stage1Uop.valid && stage1Regs.valid && !ALUType.isDiv(stage1Uop.bits.aluCmd)) {
+    when(stage1Uop.valid && stage1Regs.valid && !EXUType.isDiv(stage1Uop.bits.exuCmd)) {
       mulUnit.io.req.valid := true.B
       stage1Uop.ready      := mulUnit.io.req.fire
       stage1Regs.ready     := mulUnit.io.req.fire
     }
 
-    when(!ALUType.isDiv(stage2Uop.aluCmd)) {
+    when(!EXUType.isDiv(stage2Uop.exuCmd)) {
       io_unq_resp.valid := mulUnit.io.resp.valid
       io_unq_resp.bits  := mulUnit.io.resp.bits
     }
     mulUnit.io.resp.ready := true.B
-
   }
 
   if (hasDiv) {
@@ -444,20 +444,62 @@ class UniqueExeUnit(
     divUnit.io.req.bits.ftq_info := DontCare
 
     divUnit.io.req.valid := false.B
-    when(stage1Uop.valid && stage1Regs.valid && ALUType.isDiv(stage1Uop.bits.aluCmd)) {
+    when(stage1Uop.valid && stage1Regs.valid && EXUType.isDiv(stage1Uop.bits.exuCmd)) {
       divUnit.io.req.valid := true.B
       stage1Uop.ready      := divUnit.io.req.fire
       stage1Regs.ready     := divUnit.io.req.fire
     }
 
-    when(ALUType.isDiv(stage2Uop.aluCmd)) {
+    when(EXUType.isDiv(stage2Uop.exuCmd)) {
       io_unq_resp.valid := divUnit.io.resp.valid
       io_unq_resp.bits  := divUnit.io.resp.bits
     }
     divUnit.io.resp.ready := true.B
   }
 
-  if (hasCSR) {}
+  val io_csr_access =
+    if (hasCSR) Some(IO(new Bundle {
+      val raddr = Output(UInt(14.W))       // CSR address to read
+      val rdata = Input(UInt(dataWidth.W)) // CSR read data
+
+      val we    = Output(Bool())            // Write enable
+      val waddr = Output(UInt(14.W))        // CSR address to write
+      val wdata = Output(UInt(dataWidth.W)) // CSR write data
+      val wmask = Output(UInt(dataWidth.W)) // CSR write mask
+
+      val counterID = Input(UInt(dataWidth.W))
+      val cntvh     = Input(UInt(dataWidth.W))
+      val cntvl     = Input(UInt(dataWidth.W))
+    }))
+    else None
+
+  if (hasCSR) {
+
+    io_csr_access.get.raddr := stage1Uop.bits.imm
+    io_csr_access.get.waddr := stage1Uop.bits.imm
+    io_csr_access.get.wmask := Mux(
+      stage1Uop.bits.csrCmd === CSRType.XCHG.asUInt,
+      stage1Regs.bits(0),
+      Fill(dataWidth, 1.B),
+    )
+    io_csr_access.get.wdata := stage1Regs.bits(1)
+    io_csr_access.get.we    := false.B
+
+    when(stage1Uop.valid && stage1Regs.valid && stage1Uop.bits.exuCmd === EXUType.EXU_CSR.asUInt) {
+      io_csr_access.get.we := CSRType.isWrite(stage1Uop.bits.csrCmd)
+      stage1Uop.ready      := true.B
+      stage1Regs.ready     := true.B
+      io_unq_resp.valid    := stage1Uop.valid
+      io_unq_resp.bits.uop := stage1Uop.bits
+      io_unq_resp.bits.data := MuxLookup(stage1Uop.bits.exuCmd, io_csr_access.get.rdata)(
+        Seq(
+          CSRType.RDCNTID.asUInt -> io_csr_access.get.counterID,
+          CSRType.RDCNTVL.asUInt -> io_csr_access.get.cntvl,
+          CSRType.RDCNTVH.asUInt -> io_csr_access.get.cntvh,
+        ),
+      )
+    }
+  }
 
   dontTouch(stage1Uop)
   dontTouch(stage1Regs)
@@ -470,13 +512,15 @@ class ALUExeUnit(implicit params: CoreParameters) extends ExecutionUnit {
   val io_ftq_req  = IO(Vec(2, Decoupled(UInt(params.frontendParams.ftqIdxWidth.W))))
   val io_ftq_resp = IO(Input(Vec(2, new FTQInfo)))
 
-  io_ftq_req(0).valid := iss_uop_ext.valid(2) &&
+  io_ftq_req(0).valid := iss_uop_ext.valid(2) && iss_uop_ext.bits.busy &&
     (iss_uop_ext.bits.op1Sel === OP1Type.OP1_PC.asUInt || iss_uop_ext.bits.cfiType =/= CFIType.CFI_NONE.asUInt)
-  io_ftq_req(0).bits  := iss_uop_ext.bits.ftqIdx
-  io_ftq_req(1).valid := iss_uop_ext.valid(2) && iss_uop_ext.bits.cfiType === CFIType.CFI_JIRL.asUInt
-  io_ftq_req(1).bits  := WrapInc(iss_uop_ext.bits.ftqIdx, params.frontendParams.ftqNum)
+  io_ftq_req(0).bits := iss_uop_ext.bits.ftqIdx
+  io_ftq_req(1).valid := iss_uop_ext.valid(2) && iss_uop_ext.bits.busy &&
+    iss_uop_ext.bits.cfiType === CFIType.CFI_JIRL.asUInt
+  io_ftq_req(1).bits := WrapInc(iss_uop_ext.bits.ftqIdx, params.frontendParams.ftqNum)
   val stage0Ftq = Wire(Decoupled(io_ftq_resp.cloneType))
-  stage0Ftq.valid      := iss_uop_ext.valid(2) && (!io_ftq_req(0).valid || io_ftq_req(0).ready) && (!io_ftq_req(1).valid || io_ftq_req(1).ready)
+  stage0Ftq.valid := iss_uop_ext.valid(2) && iss_uop_ext.bits.busy
+  (!io_ftq_req(0).valid || io_ftq_req(0).ready) && (!io_ftq_req(1).valid || io_ftq_req(1).ready)
   stage0Ftq.bits       := io_ftq_resp
   iss_uop_ext.ready(2) := stage0Ftq.ready
 

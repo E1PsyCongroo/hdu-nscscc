@@ -134,11 +134,11 @@ object Instruction {
 
 object Privilege {
   object PLV extends ChiselEnum {
-    val PLV_0 = Value // User mode
-    val PLV_3 = Value // Machine mode
+    val PLV_0 = Value(0.U(2.W)) // User mode
+    val PLV_3 = Value(3.U(2.W)) // Machine mode
   }
 
-  object CACOP extends ChiselEnum {
+  object CACOPType extends ChiselEnum {
     val CACOP_FLUSH    = Value(0.U(2.W)) // flush cache line
     val CACOP_IDX_INV  = Value(1.U(2.W)) // invalidate indexed cache line
     val CACOP_HIT_INV  = Value(2.U(2.W)) // invalidate cache line if hit

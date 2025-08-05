@@ -13,7 +13,7 @@ class FrontEndIO(implicit params: CoreParameters) extends Bundle {
   import params.{commonParams, axiParams, frontendParams}
   val axi = new AXIBundle(axiParams)
   val icacheReq = Flipped(Decoupled(new Bundle {
-    val cacop = UInt(CACOP.getWidth.W)
+    val cacop = UInt(CACOPType.getWidth.W)
     val vaddr = UInt(commonParams.vaddrWidth.W)
   }))
   val itlbReq     = Output(new TLBReq)
@@ -105,7 +105,8 @@ class FrontEnd(implicit params: CoreParameters) extends Module {
     val fetchPC        = UInt(vaddrWidth.W)
     val stage1Redirect = UInt(vaddrWidth.W)
   }))
-  val stage0to1Ext = ReadyValidIOExpand(stage0to1, 3)
+  val stage0to1Ext     = ReadyValidIOExpand(stage0to1, 3)
+  val bpuStage1RespExt = ReadyValidIOExpand(bpu.io.resp.stage1, 2)
 
   val icacheCacopReq = Wire(io.icacheReq.cloneType)
   PipeConnect(None, io.icacheReq, icacheCacopReq)
@@ -114,7 +115,7 @@ class FrontEnd(implicit params: CoreParameters) extends Module {
   icacheFetchReq.valid      := stage0to1Ext.valid(0)
   stage0to1Ext.ready(0)     := icacheFetchReq.ready
   icacheFetchReq.bits.vaddr := stage0to1Ext.bits.fetchPC
-  icacheFetchReq.bits.cacop := CACOP.CACOP_HIT_READ.asUInt
+  icacheFetchReq.bits.cacop := CACOPType.CACOP_HIT_READ.asUInt
 
   val icacheArb = Module(new Arbiter(io.icacheReq.bits.cloneType, 2))
   icacheArb.io.in(0)               <> icacheCacopReq
@@ -122,10 +123,9 @@ class FrontEnd(implicit params: CoreParameters) extends Module {
   icache.io.req.stage1.valid       := icacheArb.io.out.valid
   icacheArb.io.out.ready           := icache.io.req.stage1.ready
   icache.io.req.stage1.bits.vaddr  := icacheArb.io.out.bits.vaddr
+  io.itlbReq                       := DontCare
   io.itlbReq.vaddr                 := stage0to1Ext.bits.fetchPC
   io.itlbReq.isWrite               := false.B
-  io.itlbReq.asid                  := 0.U
-  io.itlbReq.plv                   := 0.U
   icache.io.req.stage1.bits.paddr  := io.itlbResp.paddr
   icache.io.req.stage1.bits.cacop  := icacheArb.io.out.bits.cacop
   icache.io.req.stage1.bits.cached := io.itlbResp.mat(0)
@@ -136,16 +136,18 @@ class FrontEnd(implicit params: CoreParameters) extends Module {
 
   val stage1FetchMask = fetchMask(stage0to1Ext.bits.fetchPC)
   val stage1Redirects = (0 until fetchWidth).map { i =>
-    stage1FetchMask(i) && bpu.io.resp.stage1.bits(i).target.valid &&
-    (bpu.io.resp.stage1.bits(i).isJmp || (bpu.io.resp.stage1.bits(i).isBr && bpu.io.resp.stage1.bits(i).taken))
+    stage1FetchMask(i) && bpuStage1RespExt.bits(i).target.valid &&
+    (bpuStage1RespExt.bits(i).isJmp || (bpuStage1RespExt.bits(i).isBr && bpuStage1RespExt.bits(i).taken))
   }
   stage1Redirect := Mux(
     stage1Redirects.reduce(_ || _),
-    bpu.io.resp.stage1.bits(PriorityEncoder(stage1Redirects)).target.bits,
+    bpuStage1RespExt.bits(PriorityEncoder(stage1Redirects)).target.bits,
     nextFetch(stage0to1Ext.bits.fetchPC),
   )
+  bpuStage1RespExt.ready(0) := icache.io.req.stage1.ready
 
-  stage1Data.valid               := bpu.io.resp.stage1.valid && stage0to1Ext.valid(2)
+  stage1Data.valid               := bpuStage1RespExt.valid(1) && stage0to1Ext.valid(2)
+  bpuStage1RespExt.ready(1)      := stage1Data.ready
   stage0to1Ext.ready(2)          := stage1Data.ready
   stage1Data.bits.fetchPC        := stage0to1Ext.bits.fetchPC
   stage1Data.bits.stage1Redirect := stage1Redirect

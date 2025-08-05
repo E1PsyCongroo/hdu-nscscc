@@ -55,6 +55,14 @@ class TLBEntry(implicit params: CommonParameters) extends Bundle {
   }
 }
 
+object TLBCmd {
+  val CMD_SRCH = 0
+  val CMD_RD   = 1
+  val CMD_WR   = 2
+  val CMD_FILL = 3
+  val CMD_INV  = 4
+}
+
 class DMW extends Bundle {
   val value = UInt(32.W)
 
@@ -65,17 +73,9 @@ class DMW extends Bundle {
   def vseg() = value(31, 29)
 
   def write(value: UInt): UInt = {
-    val write_mask = (0x1 | (0x1 << 3) | (0x3 << 4) | (0x7 << 25) | (0x7 << 29)).U;
+    val write_mask = "hee000039".U
     value & write_mask
   }
-}
-
-object TLBCmd {
-  val CMD_SRCH = 0
-  val CMD_RD   = 1
-  val CMD_WR   = 2
-  val CMD_FILL = 3
-  val CMD_INV  = 4
 }
 
 class TLB(implicit params: CommonParameters) extends Module {
@@ -354,5 +354,5 @@ class TLB(implicit params: CommonParameters) extends Module {
   // io.transResp.miss  := false.B           // TLB miss, always false for now
   // io.transResp.paddr := io.transReq.vaddr // passthrough vaddr as paddr for now
 
-  assert(io.mode.da && !io.mode.pg, "TLB mode must be da for now")
+  // assert(io.mode.da && !io.mode.pg, "TLB mode must be da for now")
 }

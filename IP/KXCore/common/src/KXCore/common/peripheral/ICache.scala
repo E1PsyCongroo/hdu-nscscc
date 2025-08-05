@@ -7,7 +7,7 @@ import chisel3.experimental.dataview._
 import KXCore.common._
 import KXCore.common.peripheral._
 import KXCore.common.Privilege._
-import KXCore.common.Privilege.CACOP._
+import KXCore.common.Privilege.CACOPType._
 import firtoolresolver.shaded.coursier.cache.Cache
 
 object ICache {
@@ -133,7 +133,7 @@ class ICacheStage1(implicit
       val vaddr      = UInt(vaddrWidth.W)
       val paddr      = UInt(paddrWidth.W)
       val cached     = Bool()
-      val cacop      = UInt(CACOP.getWidth.W)
+      val cacop      = UInt(CACOPType.getWidth.W)
       val cacheValid = Vec(nSets, Vec(nWays, Bool()))
       val wayTag     = Vec(nWays, UInt(tagWidth.W))
     }))
@@ -141,7 +141,7 @@ class ICacheStage1(implicit
       val cached       = Bool()
       val set          = UInt(setWidth.W)
       val way          = UInt(wayWidth.W)
-      val uncachedRead = UInt(dataBits.W)
+      val uncachedRead = UInt(blockBits.W)
     })
   })
 
@@ -218,21 +218,21 @@ class ICacheStage1(implicit
 
   io.req.ready := MuxLookup(state, false.B)(
     Seq(
-      sHandleReq    -> ((isRead && hit && io.resp.ready) || isFlush || isIdxInv || isHitInv),
+      sHandleReq    -> ((isRead && hit && !cached && io.resp.ready) || isFlush || isIdxInv || isHitInv),
       sSendReadResp -> io.resp.ready,
     ),
   )
 
   io.resp.valid := MuxLookup(state, false.B)(
     Seq(
-      sHandleReq    -> (io.req.valid && isRead && hit && cached),
+      sHandleReq    -> (io.req.valid && isRead && hit && !cached),
       sSendReadResp -> io.req.valid,
     ),
   )
   io.resp.bits.cached       := cached
   io.resp.bits.set          := set
   io.resp.bits.way          := Mux(state === sSendReadResp, replacedSel, matched)
-  io.resp.bits.uncachedRead := lineData(0)
+  io.resp.bits.uncachedRead := lineData.asUInt
 
   val idxSet = vaddr(blockWidth + setWidth - 1, blockWidth)
   val idxWay = vaddr(wayWidth - 1, 0)
@@ -260,7 +260,7 @@ class ICacheStage1(implicit
   io.axi.ar.valid     := state === sSendBusReq
   io.axi.ar.bits.addr := paddr & ~(cacheParams.blockBytes - 1).U(commonParams.paddrWidth.W)
   io.axi.ar.bits.id   := id.U
-  io.axi.ar.bits.len  := Mux(cached, (burstLen - 1).U, 0.U)
+  io.axi.ar.bits.len  := (burstLen - 1).U
 
   io.axi.ar.bits.size  := log2Ceil(axiParams.dataBits / 8).U
   io.axi.ar.bits.burst := AXIParameters.BURST_INCR
@@ -294,7 +294,7 @@ class ICacheStage1to2(implicit
       val cached       = Bool()
       val set          = UInt(setWidth.W)
       val way          = UInt(wayWidth.W)
-      val uncachedRead = UInt(axiParams.dataBits.W)
+      val uncachedRead = UInt(blockBits.W)
     }))
     val resp = Decoupled(new Bundle {
       val cached = Bool()
@@ -379,7 +379,7 @@ class ICache(implicit commonParams: CommonParameters, cacheParams: CacheParamete
         val vaddr  = UInt(vaddrWidth.W)
         val paddr  = UInt(paddrWidth.W)
         val cached = Bool()
-        val cacop  = UInt(CACOP.getWidth.W)
+        val cacop  = UInt(CACOPType.getWidth.W)
       }))
     }
     val resp = new Bundle {
