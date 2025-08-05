@@ -146,8 +146,8 @@ object Privilege {
   }
 
   object ECODE extends ChiselEnum {
-    def getEcode(e: UInt)    = e(5, 0)
-    def getEsubCode(e: UInt) = e(6)
+    def getEcode(e: UInt)    = e(4, 0)
+    def getEsubCode(e: UInt) = e(5)
 
     val INT  = Value(0x00.U)
     val PIL  = Value(0x01.U)

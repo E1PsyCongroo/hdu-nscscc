@@ -151,7 +151,7 @@ class ReorderBuffer(implicit params: CoreParameters) extends Module {
       when(!rob_exception_info.valid && io.alloc(w).uop.exception) {
         rob_exception_info.valid       := io.alloc(w).uop.exception
         rob_exception_info.bits.badv   := io.alloc(w).uop.badv
-        rob_exception_info.bits.ecode  := io.alloc(w).uop.exception
+        rob_exception_info.bits.ecode  := io.alloc(w).uop.ecode
         rob_exception_info.bits.robIdx := io.alloc(w).uop.robIdx
       }
       assert(rob_val(rob_tail) === false.B, "[rob] overwriting a valid entry.")

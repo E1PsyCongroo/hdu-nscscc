@@ -284,8 +284,9 @@ object CSROPControlField extends DecodeField[Instruction, UInt] {
 }
 
 class DecoderIO(implicit params: CoreParameters) extends Bundle {
-  val req  = Input(Vec(params.backendParams.coreWidth, new MicroOp))
-  val resp = Output(Vec(params.backendParams.coreWidth, new MicroOp))
+  val intr_pending = Input(Bool())
+  val req          = Input(Vec(params.backendParams.coreWidth, new MicroOp))
+  val resp         = Output(Vec(params.backendParams.coreWidth, new MicroOp))
 }
 
 class Decoder(implicit params: CoreParameters) extends Module {
@@ -440,16 +441,18 @@ class Decoder(implicit params: CoreParameters) extends Module {
         WBDest.destRj   -> inst(9, 4),
       ).map { case (key, value) => (decodeResult(WBControlField) === key.asUInt, value) },
     )
-    uop.isUnique  := decodeResult(UniqControlField)
-    uop.flush     := decodeResult(CommitFlushControlField)
-    uop.exuCmd    := decodeResult(EXUOPControlField)
-    uop.csrCmd    := decodeResult(CSROPControlField)
-    uop.lsuCmd    := decodeResult(LSUOPControlField)
-    uop.exception := io.req(i).exception || io.req(i).inst === SYSCALL.inst || io.req(i).inst === BREAK.inst
+    uop.isUnique := decodeResult(UniqControlField)
+    uop.flush    := decodeResult(CommitFlushControlField)
+    uop.exuCmd   := decodeResult(EXUOPControlField)
+    uop.csrCmd   := decodeResult(CSROPControlField)
+    uop.lsuCmd   := decodeResult(LSUOPControlField)
+    uop.exception := io.req(i).exception || io.intr_pending ||
+      io.req(i).inst === SYSCALL.inst || io.req(i).inst === BREAK.inst
     uop.ecode := MuxCase(
       DontCare,
       Seq(
         io.req(i).exception               -> io.req(i).ecode,
+        io.intr_pending                   -> io.intr_pending,
         (io.req(i).inst === SYSCALL.inst) -> ECODE.SYS.asUInt,
         (io.req(i).inst === BREAK.inst)   -> ECODE.BRK.asUInt,
       ),

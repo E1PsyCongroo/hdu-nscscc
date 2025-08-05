@@ -80,7 +80,7 @@ class MemExeUnit(implicit params: CoreParameters) extends ExecutionUnit {
   // io_dtlb_req.asid    := 0.U
   io_dtlb_req.isWrite := isWrite
   // io_dtlb_req.plv     := 0.U
-  io_dtlb_req.vaddr   := stage1Regs.bits(0) + stage1Uop.bits.imm
+  io_dtlb_req.vaddr := stage1Regs.bits(0) + stage1Uop.bits.imm
 
   val stage1Data = Wire(DecoupledIO(new Bundle {
     val uop       = new MicroOp
