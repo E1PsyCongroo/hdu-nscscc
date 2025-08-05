@@ -213,7 +213,7 @@ object WBControlField extends DecodeField[Instruction, UInt] {
       case JIRL                                                                => BitPat(WBDest.destRd.asUInt)
       case LD_B | LD_H | LD_W | LD_BU | LD_HU                                  => BitPat(WBDest.destRd.asUInt)
       case RDCNTVL_W | RDCNTVH_W                                               => BitPat(WBDest.destRd.asUInt)
-      case CSRWR | CSRXCHG_0 | CSRXCHG_1 | CSRXCHG_2 | CSRXCHG_3               => BitPat(WBDest.destRd.asUInt)
+      case CSRRD | CSRWR | CSRXCHG_0 | CSRXCHG_1 | CSRXCHG_2 | CSRXCHG_3       => BitPat(WBDest.destRd.asUInt)
       case RDCNTID_W_0 | RDCNTID_W_1 | RDCNTID_W_2 | RDCNTID_W_3 | RDCNTID_W_4 => BitPat(WBDest.destRj.asUInt)
       case BL                                                                  => BitPat(WBDest.destR1.asUInt)
       case _                                                                   => BitPat(WBDest.destNone.asUInt)
@@ -342,11 +342,11 @@ class Decoder(implicit params: CoreParameters) extends Module {
     ST_W,
     LD_BU,
     LD_HU,
-    // PRELD,
-    // LL_W,
-    // SC_W,
-    // DBAR,
-    // IBAR,
+    PRELD,
+    LL_W,
+    SC_W,
+    DBAR,
+    IBAR,
     BREAK,
     SYSCALL,
     RDCNTID_W_0,
@@ -362,14 +362,14 @@ class Decoder(implicit params: CoreParameters) extends Module {
     CSRXCHG_1,
     CSRXCHG_2,
     CSRXCHG_3,
-    // CACOP,
-    // TLBSRCH,
-    // TLBRD,
-    // TLBWR,
-    // TLBFILL,
-    // INVTLB,
+    CACOP,
+    TLBSRCH,
+    TLBRD,
+    TLBWR,
+    TLBFILL,
+    INVTLB,
     ERTN,
-    // IDLE,
+    IDLE,
   )
 
   val decodeTable = new DecodeTable(
@@ -396,6 +396,7 @@ class Decoder(implicit params: CoreParameters) extends Module {
   val unImpls = Seq(PRELD, LL_W, SC_W, DBAR, IBAR, CACOP, TLBSRCH, TLBRD, TLBWR, TLBFILL, INVTLB, IDLE)
 
   for (i <- 0 until coreWidth) {
+    val ine          = !possiblePatterns.map(_.inst === io.req(i).inst).reduce(_ || _)
     val inst         = Mux(unImpls.map(_.bitPat === io.req(i).inst).reduce(_ || _), NOP, io.req(i).inst)
     val decodeResult = decodeTable.decode(inst)
     val uop          = WireDefault(io.req(i))
@@ -446,12 +447,13 @@ class Decoder(implicit params: CoreParameters) extends Module {
     uop.exuCmd   := decodeResult(EXUOPControlField)
     uop.csrCmd   := decodeResult(CSROPControlField)
     uop.lsuCmd   := decodeResult(LSUOPControlField)
-    uop.exception := io.req(i).exception || io.intr_pending ||
+    uop.exception := io.req(i).exception || io.intr_pending || ine ||
       io.req(i).inst === SYSCALL.inst || io.req(i).inst === BREAK.inst
     uop.ecode := MuxCase(
       DontCare,
       Seq(
         io.req(i).exception               -> io.req(i).ecode,
+        ine                               -> ECODE.INE.asUInt,
         io.intr_pending                   -> io.intr_pending,
         (io.req(i).inst === SYSCALL.inst) -> ECODE.SYS.asUInt,
         (io.req(i).inst === BREAK.inst)   -> ECODE.BRK.asUInt,

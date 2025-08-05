@@ -40,7 +40,9 @@ object EXUType extends ChiselEnum {
   def shiftArith(cmd: UInt)      = cmd(0)
   def mul_divUnsigned(cmd: UInt) = cmd(1)
   def ismulh_mod(cmd: UInt)      = cmd(0)
-  def isDiv(cmd: UInt)           = cmd(3)
+  def isCSR(cmd: UInt)           = cmd.andR
+  def isMul(cmd: UInt)           = !cmd(3)
+  def isDiv(cmd: UInt)           = cmd(3) & !isCSR(cmd)
 
 }
 

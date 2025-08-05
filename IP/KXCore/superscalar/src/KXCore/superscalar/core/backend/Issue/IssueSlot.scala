@@ -45,9 +45,9 @@ class IssueSlot(implicit params: CoreParameters) extends Module {
   valid := MuxCase(
     valid,
     Seq(
-      io.kill                -> false.B,
-      io.in_uop.valid        -> true.B,
-      (io.grant || io.clear) -> false.B,
+      io.kill                                  -> false.B,
+      (io.in_uop.valid && io.in_uop.bits.busy) -> true.B,
+      (io.grant || io.clear)                   -> false.B,
     ),
   )
 

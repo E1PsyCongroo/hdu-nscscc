@@ -236,8 +236,8 @@ class CSRIO(implicit params: CoreParameters) extends Bundle {
   val interrupt = new Bundle {
     // val enable  = Output(Bool())     // Interrupt enable
     // val pending = Output(UInt(13.W)) // Interrupt pending
-    val externel_sample = Input(UInt(12.W)) // External interrupt sample
-    val pending         = Output(Bool())    // Interrupt pending. Is there any pending interrupt?
+    val externel_sample = Input(UInt(8.W)) // External interrupt sample
+    val pending         = Output(Bool())   // Interrupt pending. Is there any pending interrupt?
   }
   /* ------ Interrupt Pending ------ */
 
@@ -333,7 +333,7 @@ class CSR(implicit params: CoreParameters) extends Module {
     era   := io.pc
   }.elsewhen(io.eret_en) {
     crmd := eret_crmd
-    prmd := eret_prmd
+    // prmd := eret_prmd
   }.elsewhen(io.we) {
     val wdata = io.wdata & io.wmask
 
@@ -348,6 +348,7 @@ class CSR(implicit params: CoreParameters) extends Module {
     crmd.value := Mux(io.waddr === CSRAddr.CRMD.U, crmd.write(wdata | (crmd.value & ~io.wmask)), crmd.value)
     prmd.value := Mux(io.waddr === CSRAddr.PRMD.U, prmd.write(wdata | (prmd.value & ~io.wmask)), prmd.value)
 
+    ecfg.value      := Mux(io.waddr === CSRAddr.ECFG.U, ecfg.write(wdata | (ecfg.value & !io.wmask)), ecfg.value)
     estat.value     := Mux(io.waddr === CSRAddr.ESTAT.U, estat.write(wdata | (estat.value & !io.wmask)), estat.value)
     era             := Mux(io.waddr === CSRAddr.ERA.U, wdata | (era & !io.wmask), era)
     eentry.value    := Mux(io.waddr === CSRAddr.EENTRY.U, eentry.write(wdata | (eentry.value & !io.wmask)), eentry.value)

@@ -121,7 +121,7 @@ class Core(implicit params: CoreParameters) extends Module {
     difftestInstrCommit.io.clock          := clock.asBool
     difftestInstrCommit.io.coreid         := 0.U
     difftestInstrCommit.io.index          := 0.U
-    difftestInstrCommit.io.valid          := RegNext(backend.io.commit.valid, 0.U)
+    difftestInstrCommit.io.valid          := RegNext(backend.io.commit.valid && !backend.io.csr_access.excp_en, 0.U)
     difftestInstrCommit.io.pc             := RegNext(backend.io.debug.commit_uops(commit_idx).bits.debug.pc, 0.U)
     difftestInstrCommit.io.instr          := RegNext(backend.io.debug.commit_uops(commit_idx).bits.debug.inst, 0.U)
     difftestInstrCommit.io.skip           := RegNext(false.B, false.B)
@@ -231,5 +231,14 @@ class Core(implicit params: CoreParameters) extends Module {
     difftestCSRRegState.io.tlbrentry := csr.io.debug.tlbrentry
     difftestCSRRegState.io.dmw0      := csr.io.debug.dmw0
     difftestCSRRegState.io.dmw1      := csr.io.debug.dmw1
+
+    dontTouch(csr.io.debug)
+    dontTouch(difftestInstrCommit.io)
+    dontTouch(difftestExcpEvent.io)
+    dontTouch(difftestTrapEvent.io)
+    dontTouch(difftestStoreEvent.io)
+    dontTouch(difftestLoadEvent.io)
+    dontTouch(difftestGRegState.io)
+    dontTouch(difftestCSRRegState.io)
   }
 }

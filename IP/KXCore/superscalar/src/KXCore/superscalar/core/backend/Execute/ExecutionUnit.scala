@@ -9,6 +9,7 @@ import KXCore.superscalar._
 import KXCore.superscalar.core._
 import KXCore.superscalar.core.frontend._
 import dataclass.data
+import KXCore.superscalar.EXUType.isCSR
 
 abstract class ExecutionUnit(implicit params: CoreParameters) extends Module {
   def fu_types: UInt = 0.U(FUType.getWidth.W)
@@ -410,7 +411,9 @@ class UniqueExeUnit(
   stage1Uop.ready  := false.B
   stage1Regs.ready := false.B
 
-  val stage2Uop = RegEnable(stage1Uop.bits, stage1Uop.fire)
+  val doing     = RegInit(false.B)
+  val stage2Uop = RegEnable(stage1Uop.bits, stage1Uop.fire && !doing)
+  doing := Mux(io_kill, false.B, Mux(stage1Uop.fire, true.B, Mux(io_unq_resp.valid, false.B, doing)))
 
   if (hasMul) {
     val mulUnit = Module(new MultiplyUnit)
@@ -421,7 +424,7 @@ class UniqueExeUnit(
     mulUnit.io.req.bits.uop      := stage1Uop.bits
     mulUnit.io.req.bits.ftq_info := DontCare
     mulUnit.io.req.valid         := false.B
-    when(stage1Uop.valid && stage1Regs.valid && !EXUType.isDiv(stage1Uop.bits.exuCmd)) {
+    when(stage1Uop.valid && stage1Regs.valid && EXUType.isMul(stage1Uop.bits.exuCmd)) {
       mulUnit.io.req.valid := true.B
       stage1Uop.ready      := mulUnit.io.req.fire
       stage1Regs.ready     := mulUnit.io.req.fire
@@ -485,11 +488,11 @@ class UniqueExeUnit(
     io_csr_access.get.wdata := stage1Regs.bits(1)
     io_csr_access.get.we    := false.B
 
-    when(stage1Uop.valid && stage1Regs.valid && stage1Uop.bits.exuCmd === EXUType.EXU_CSR.asUInt) {
+    when(stage1Uop.valid && stage1Regs.valid && isCSR(stage1Uop.bits.exuCmd)) {
       io_csr_access.get.we := CSRType.isWrite(stage1Uop.bits.csrCmd)
       stage1Uop.ready      := true.B
       stage1Regs.ready     := true.B
-      io_unq_resp.valid    := stage1Uop.valid
+      io_unq_resp.valid    := true.B
       io_unq_resp.bits.uop := stage1Uop.bits
       io_unq_resp.bits.data := MuxLookup(stage1Uop.bits.exuCmd, io_csr_access.get.rdata)(
         Seq(
@@ -503,6 +506,7 @@ class UniqueExeUnit(
 
   dontTouch(stage1Uop)
   dontTouch(stage1Regs)
+  dontTouch(stage2Uop)
 }
 
 class ALUExeUnit(implicit params: CoreParameters) extends ExecutionUnit {
