@@ -74,7 +74,7 @@ class SimpleBranchPredictor(implicit params: CoreParameters) extends Module {
       val stage1 = Flipped(Decoupled(UInt(vaddrWidth.W)))
     }
     val resp = new Bundle {
-      val stage1 = Valid(Vec(fetchWidth, new BranchPrediction))
+      val stage1 = Decoupled(Vec(fetchWidth, new BranchPrediction))
       val stage2 = Decoupled(new Bundle {
         val pred = Vec(fetchWidth, new BranchPrediction)
         val meta = new Bundle {
@@ -118,13 +118,16 @@ class SimpleBranchPredictor(implicit params: CoreParameters) extends Module {
     stage1Resp.bits(i)       := btb.io.resp.bits.pred(i)
     stage1Resp.bits(i).taken := bim.io.resp.bits.pred(i).taken
   }
-  io.resp.stage1.valid := stage1Resp.valid
-  io.resp.stage1.bits  := stage1Resp.bits
+  io.req.stage1.ready := stage1Resp.ready
+
+  val stage1RespExt = ReadyValidIOExpand(stage1Resp, 2)
+  io.resp.stage1.valid   := stage1RespExt.valid(0)
+  stage1RespExt.ready(0) := io.resp.stage1.ready
+  io.resp.stage1.bits    := stage1RespExt.bits
 
   val stage1Data = Wire(Decoupled(io.resp.stage2.bits.cloneType))
-  stage1Data.valid         := stage1Resp.valid
-  stage1Resp.ready         := stage1Data.ready
-  io.req.stage1.ready      := stage1Data.ready
+  stage1Data.valid         := stage1RespExt.valid(1)
+  stage1RespExt.ready(1)   := stage1Data.ready
   stage1Data.bits.pred     := stage1Resp.bits
   stage1Data.bits.meta.bim := bim.io.resp.bits.meta
   stage1Data.bits.meta.btb := btb.io.resp.bits.meta.writeWay

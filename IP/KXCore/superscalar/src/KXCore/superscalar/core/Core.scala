@@ -40,24 +40,47 @@ class Core(implicit params: CoreParameters) extends Module {
   val io = IO(new CoreIO)
 
   val tlb      = Module(new TLB)
+  val csr      = Module(new CSR)
   val frontend = Module(new FrontEnd)
   val backend  = Module(new BackEnd)
 
-  tlb.io.mode.da     := true.B
-  tlb.io.mode.pg     := false.B
-  tlb.io.mode.dmw(0) := 0.U.asTypeOf(new KXCore.common.peripheral.DMW)
-  tlb.io.mode.dmw(1) := 0.U.asTypeOf(new KXCore.common.peripheral.DMW)
-  tlb.io.mode.matf   := 1.U
-  tlb.io.mode.matd   := 1.U
+  tlb.io.mode.da   := csr.io.tlb.da
+  tlb.io.mode.pg   := csr.io.tlb.pg
+  tlb.io.mode.dmw  := csr.io.tlb.dmw
+  tlb.io.mode.matf := csr.io.tlb.matf
+  tlb.io.mode.matd := csr.io.tlb.matd
 
-  tlb.io.transReq0         := frontend.io.itlbReq
-  tlb.io.transReq0.asid    := 0.U
-  tlb.io.transReq0.isWrite := false.B
-  tlb.io.transReq0.plv     := PLV.PLV_0.asUInt
-  tlb.io.transReq1         := backend.io.dtlbReq
-  tlb.io.transReq0.asid    := 0.U
-  tlb.io.transReq0.plv     := PLV.PLV_0.asUInt
-  tlb.io.cmd_in            := DontCare
+  tlb.io.transReq0      := frontend.io.itlbReq
+  tlb.io.transReq0.asid := csr.io.tlb.asid
+  tlb.io.transReq0.plv  := csr.io.priv
+  tlb.io.transReq1      := backend.io.dtlbReq
+  tlb.io.transReq0.asid := csr.io.tlb.asid
+  tlb.io.transReq0.plv  := csr.io.priv
+  tlb.io.cmd_in         := DontCare
+
+  csr.io.raddr                := backend.io.csr_access.raddr
+  backend.io.csr_access.rdata := csr.io.rdata
+
+  csr.io.we    := backend.io.csr_access.we
+  csr.io.waddr := backend.io.csr_access.waddr
+  csr.io.wdata := backend.io.csr_access.wdata
+  csr.io.wmask := backend.io.csr_access.wmask
+
+  backend.io.csr_access.counterID := csr.io.counterID
+  backend.io.csr_access.cntvh     := csr.io.cntvh
+  backend.io.csr_access.cntvl     := csr.io.cntvl
+
+  csr.io.pc                    := backend.io.csr_access.pc
+  csr.io.ecode                 := backend.io.csr_access.ecode
+  csr.io.ecode_sub             := backend.io.csr_access.ecode_sub
+  csr.io.badv                  := backend.io.csr_access.badv
+  csr.io.excp_en               := backend.io.csr_access.excp_en
+  backend.io.csr_access.eentry := csr.io.eentry
+
+  csr.io.eret_en                     := backend.io.csr_access.eret_en
+  backend.io.csr_access.era          := csr.io.era
+  backend.io.csr_access.intr_pending := csr.io.interrupt.pending
+  csr.io.interrupt.externel_sample   := io.intrpt
 
   AXIInterconnect(axiParams, Seq(backend.io.axi, frontend.io.axi), Seq(io.axi), Seq(Seq(AddressSet(0, -1))), Seq(false))
 
@@ -92,8 +115,7 @@ class Core(implicit params: CoreParameters) extends Module {
     val difftestStoreEvent  = Module(new DifftestStoreEvent)
     val difftestLoadEvent   = Module(new DifftestLoadEvent)
 
-    val stableCounter = Module(new StableCounter)
-    val commit_idx    = OHToUInt(VecInit(backend.io.debug.commit_uops.map(_.valid)).asUInt)
+    val commit_idx = OHToUInt(VecInit(backend.io.debug.commit_uops.map(_.valid)).asUInt)
     difftestInstrCommit.io.clock          := clock.asBool
     difftestInstrCommit.io.coreid         := 0.U
     difftestInstrCommit.io.index          := 0.U
@@ -104,7 +126,7 @@ class Core(implicit params: CoreParameters) extends Module {
     difftestInstrCommit.io.is_TLBFILL     := RegNext(false.B, false.B)
     difftestInstrCommit.io.TLBFILL_index  := RegNext(false.B, false.B)
     difftestInstrCommit.io.is_CNTinst     := RegNext(false.B, false.B)
-    difftestInstrCommit.io.timer_64_value := RegNext(stableCounter.io.high ## stableCounter.io.low, 0.U)
+    difftestInstrCommit.io.timer_64_value := RegNext(csr.io.cntvh ## csr.io.cntvl, 0.U)
     difftestInstrCommit.io.wen            := RegNext(backend.io.debug.commit_uops(commit_idx).bits.ldst =/= 0.U, 0.U)
     difftestInstrCommit.io.wdest          := RegNext(backend.io.debug.commit_uops(commit_idx).bits.ldst, 0.U)
     difftestInstrCommit.io.wdata          := RegNext(backend.io.debug.commit_uops(commit_idx).bits.debug.wdata, 0.U)
@@ -113,12 +135,12 @@ class Core(implicit params: CoreParameters) extends Module {
 
     difftestExcpEvent.io.clock         := clock.asBool
     difftestExcpEvent.io.coreid        := 0.U
-    difftestExcpEvent.io.excp_valid    := 0.U
-    difftestExcpEvent.io.eret          := 0.U
-    difftestExcpEvent.io.intrNo        := 0.U
-    difftestExcpEvent.io.cause         := 0.U
-    difftestExcpEvent.io.exceptionPC   := 0.U
-    difftestExcpEvent.io.exceptionInst := 0.U
+    difftestExcpEvent.io.excp_valid    := RegNext(backend.io.csr_access.excp_en, 0.U)
+    difftestExcpEvent.io.eret          := RegNext(backend.io.csr_access.eret_en, 0.U)
+    difftestExcpEvent.io.intrNo        := csr.io.debug.estat(12, 2)
+    difftestExcpEvent.io.cause         := RegNext(ECODE.getEcode(backend.io.csr_access.ecode), 0.U)
+    difftestExcpEvent.io.exceptionPC   := RegNext(backend.io.csr_access.pc, 0.U)
+    difftestExcpEvent.io.exceptionInst := RegNext(backend.io.debug.commit_uops(commit_idx).bits.debug.inst, 0.U)
 
     difftestTrapEvent.io.clock    := clock.asBool
     difftestTrapEvent.io.coreid   := 0.U
@@ -180,32 +202,32 @@ class Core(implicit params: CoreParameters) extends Module {
 
     difftestCSRRegState.io.clock     := clock.asBool
     difftestCSRRegState.io.coreid    := 0.U
-    difftestCSRRegState.io.crmd      := RegInit(0x00000008.U)
-    difftestCSRRegState.io.prmd      := 0x00000000.U
+    difftestCSRRegState.io.crmd      := csr.io.debug.crmd
+    difftestCSRRegState.io.prmd      := csr.io.debug.prmd
     difftestCSRRegState.io.euen      := 0.U
-    difftestCSRRegState.io.ecfg      := 0.U
-    difftestCSRRegState.io.estat     := 0.U
-    difftestCSRRegState.io.era       := 0.U
-    difftestCSRRegState.io.badv      := 0.U
-    difftestCSRRegState.io.eentry    := 0.U
-    difftestCSRRegState.io.tlbidx    := 0.U
-    difftestCSRRegState.io.tlbehi    := 0.U
-    difftestCSRRegState.io.tlbelo0   := 0.U
-    difftestCSRRegState.io.tlbelo1   := 0.U
-    difftestCSRRegState.io.asid      := 0.U
+    difftestCSRRegState.io.ecfg      := csr.io.debug.ecfg
+    difftestCSRRegState.io.estat     := csr.io.debug.estat
+    difftestCSRRegState.io.era       := csr.io.debug.era
+    difftestCSRRegState.io.badv      := csr.io.debug.badv
+    difftestCSRRegState.io.eentry    := csr.io.debug.eentry
+    difftestCSRRegState.io.tlbidx    := tlb.io.cmd_out.tlb_idx
+    difftestCSRRegState.io.tlbehi    := tlb.io.cmd_out.tlb_ehi
+    difftestCSRRegState.io.tlbelo0   := tlb.io.cmd_out.tlb_elo0
+    difftestCSRRegState.io.tlbelo1   := tlb.io.cmd_out.tlb_elo1
+    difftestCSRRegState.io.asid      := tlb.io.cmd_out.tlb_asid
     difftestCSRRegState.io.pgdl      := 0.U
     difftestCSRRegState.io.pgdh      := 0.U
-    difftestCSRRegState.io.save0     := 0.U
-    difftestCSRRegState.io.save1     := 0.U
-    difftestCSRRegState.io.save2     := 0.U
-    difftestCSRRegState.io.save3     := 0.U
-    difftestCSRRegState.io.tid       := 0.U
-    difftestCSRRegState.io.tcfg      := 0.U
-    difftestCSRRegState.io.tval      := 0.U
+    difftestCSRRegState.io.save0     := csr.io.debug.saved0
+    difftestCSRRegState.io.save1     := csr.io.debug.saved1
+    difftestCSRRegState.io.save2     := csr.io.debug.saved2
+    difftestCSRRegState.io.save3     := csr.io.debug.saved3
+    difftestCSRRegState.io.tid       := csr.io.debug.tid
+    difftestCSRRegState.io.tcfg      := csr.io.debug.tcfg
+    difftestCSRRegState.io.tval      := csr.io.debug.tval
     difftestCSRRegState.io.ticlr     := 0.U
     difftestCSRRegState.io.llbctl    := 0.U
-    difftestCSRRegState.io.tlbrentry := 0.U
-    difftestCSRRegState.io.dmw0      := 0.U
-    difftestCSRRegState.io.dmw1      := 0.U
+    difftestCSRRegState.io.tlbrentry := csr.io.debug.tlbrentry
+    difftestCSRRegState.io.dmw0      := csr.io.debug.dmw0
+    difftestCSRRegState.io.dmw1      := csr.io.debug.dmw1
   }
 }

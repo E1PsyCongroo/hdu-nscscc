@@ -13,20 +13,49 @@ import scala.annotation.varargs
 
 class BackEndIO(implicit params: CoreParameters) extends Bundle {
   import params.{commonParams, axiParams, frontendParams, backendParams}
+  import commonParams.{dataWidth, vaddrWidth}
+  import frontendParams.{ftqIdxWidth}
+  import backendParams.{coreWidth, lregNum}
+
   val axi         = new AXIBundle(axiParams)
   val dtlbReq     = Output(new TLBReq)
   val dtlbResp    = Input(new TLBResp)
   val fetchPacket = Flipped(Decoupled(new FetchBufferResp()))
   val getPC       = Flipped(Vec(3, new GetPCFromFtqIO))
   val commit = Valid(new Bundle {
-    val ftqIdx   = UInt(log2Ceil(frontendParams.ftqNum).W)
+    val ftqIdx   = UInt(ftqIdxWidth.W)
     val brUpdate = Valid(new BrUpdateInfo)
-    val redirect = Valid(UInt(commonParams.vaddrWidth.W))
+    val redirect = Valid(UInt(vaddrWidth.W))
   })
   val debug = Output(new Bundle {
-    val regs        = Vec(backendParams.lregNum, UInt(commonParams.dataWidth.W))
-    val commit_uops = Vec(backendParams.coreWidth, Valid(new MicroOp))
+    val regs        = Vec(lregNum, UInt(dataWidth.W))
+    val commit_uops = Vec(coreWidth, Valid(new MicroOp))
   })
+  val csr_access = new Bundle {
+    val raddr = Output(UInt(14.W))       // CSR address to read
+    val rdata = Input(UInt(dataWidth.W)) // CSR read data
+
+    val we    = Output(Bool())            // Write enable
+    val waddr = Output(UInt(14.W))        // CSR address to write
+    val wdata = Output(UInt(dataWidth.W)) // CSR write data
+    val wmask = Output(UInt(dataWidth.W)) // CSR write mask
+
+    val counterID = Input(UInt(dataWidth.W))
+    val cntvh     = Input(UInt(dataWidth.W))
+    val cntvl     = Input(UInt(dataWidth.W))
+
+    val pc        = Output(UInt(vaddrWidth.W)) // Program counter for exception handling
+    val ecode     = Output(UInt(6.W))          // Exception code
+    val ecode_sub = Output(UInt(9.W))
+    val badv      = Output(UInt(vaddrWidth.W)) // Bad virtual address for exception
+    val excp_en   = Output(Bool())             // Exception enable
+    val eentry    = Input(UInt(32.W))          // Exception entry address
+
+    val eret_en = Output(Bool())            // Exception return enable
+    val era     = Input(UInt(vaddrWidth.W)) // Exception return address
+
+    val intr_pending = Input(Bool())
+  }
 }
 
 class BackEnd(implicit params: CoreParameters) extends Module {
@@ -48,10 +77,10 @@ class BackEnd(implicit params: CoreParameters) extends Module {
   val unqIssUnit      = Module(new IssueUnitCollapsing(unqIQParams))
   val intIssUnit      = Module(new IssueUnitCollapsing(intIQParams))
   // val memExeUnit      = Module(new MemExeUnitWithCache) // use MemExeUnitWithCache
-  val memExeUnit      = Module(new MemExeUnit)
-  val unqExeUnit      = Module(new UniqueExeUnit(false, true, true))
-  val aluExeUnits     = Seq.fill(intIQParams.issueWidth)(Module(new ALUExeUnit))
-  val regFile         = Module(new FullyPortedRF(pregNum, aluExeUnits.map(_.nReaders).sum + memExeUnit.nReaders + memExeUnit.nReaders, aluExeUnits.length + 2))
+  val memExeUnit  = Module(new MemExeUnit)
+  val unqExeUnit  = Module(new UniqueExeUnit(true, true, true))
+  val aluExeUnits = Seq.fill(intIQParams.issueWidth)(Module(new ALUExeUnit))
+  val regFile     = Module(new FullyPortedRF(pregNum, aluExeUnits.map(_.nReaders).sum + memExeUnit.nReaders + memExeUnit.nReaders, aluExeUnits.length + 2))
 
   val flush = Wire(Bool())
 
@@ -167,10 +196,22 @@ class BackEnd(implicit params: CoreParameters) extends Module {
   io.dtlbReq                := memExeUnit.io_dtlb_req
   memExeUnit.io_dtlb_resp   := io.dtlbResp
 
+  io.csr_access.raddr                := unqExeUnit.io_csr_access.get.raddr
+  unqExeUnit.io_csr_access.get.rdata := io.csr_access.rdata
+
+  io.csr_access.we    := unqExeUnit.io_csr_access.get.we
+  io.csr_access.waddr := unqExeUnit.io_csr_access.get.waddr
+  io.csr_access.wdata := unqExeUnit.io_csr_access.get.wdata
+  io.csr_access.wmask := unqExeUnit.io_csr_access.get.wmask
+
+  unqExeUnit.io_csr_access.get.counterID := io.csr_access.counterID
+  unqExeUnit.io_csr_access.get.cntvh     := io.csr_access.cntvh
+  unqExeUnit.io_csr_access.get.cntvl     := io.csr_access.cntvl
+
   /* use memExeUnitWithCache
   memExeUnit.io_dcache_flush.stage1 := flush
   memExeUnit.io_dcache_flush.stage2 := flush
-  */
+   */
   unqIssUnit.io.iss_uops(0) <> unqExeUnit.io_iss_uop
   intIssUnit.io.iss_uops zip aluExeUnits map { case (iss_uop, exu) => iss_uop <> exu.io_iss_uop }
 
@@ -293,6 +334,16 @@ class BackEnd(implicit params: CoreParameters) extends Module {
   io.commit.bits.ftqIdx   := rob.io.commit.ftqIdx
   io.commit.bits.brUpdate := rob.io.commit.brInfo
   io.commit.bits.redirect := rob.io.commit.redirect
+
+  io.csr_access.pc        := rob.io.commit.exception.bits.pc
+  io.csr_access.ecode     := rob.io.commit.exception.bits.ecode
+  io.csr_access.ecode_sub := rob.io.commit.exception.bits.ecode_sub
+  io.csr_access.badv      := rob.io.commit.exception.bits.badv
+  io.csr_access.excp_en   := rob.io.commit.exception.valid
+  rob.io.eentry           := io.csr_access.eentry
+
+  io.csr_access.eret_en := rob.io.commit.ertn
+  rob.io.era            := io.csr_access.era
 
   flush := rob.io.commit.redirect.valid
 

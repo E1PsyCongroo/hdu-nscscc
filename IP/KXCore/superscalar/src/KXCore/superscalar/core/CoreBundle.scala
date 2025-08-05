@@ -9,52 +9,57 @@ import KXCore.superscalar._
   */
 class MicroOp(implicit params: CoreParameters) extends Bundle {
   import params.{commonParams, axiParams, frontendParams, backendParams}
-  import frontendParams.{icacheParams}
-  val idx     = UInt(log2Ceil(frontendParams.fetchWidth).W)
-  val inst    = UInt(commonParams.instWidth.W)
+  import commonParams.{instWidth, dataWidth, vaddrWidth, paddrWidth}
+  import frontendParams.{fetchWidth, icacheParams, ftqIdxWidth}
+  import backendParams.{lregWidth, pregWidth, robIdxWidth}
+
+  val idx     = UInt(log2Ceil(fetchWidth).W)
+  val inst    = UInt(instWidth.W)
   val iqType  = UInt(IQType.getWidth.W) // which issue unit do we use?
   val fuType  = UInt(FUType.getWidth.W) // which functional unit do we use?
   val cfiType = UInt(CFIType.getWidth.W)
 
-  val ftqIdx = UInt(log2Ceil(frontendParams.ftqNum).W)
-
-  val imm = UInt(commonParams.dataWidth.W) // densely pack the imm in decode
+  val ftqIdx = UInt(ftqIdxWidth.W)
 
   val op1Sel = UInt(OP1Type.getWidth.W)
   val op2Sel = UInt(OP2Type.getWidth.W)
-  val aluCmd = UInt(ALUType.getWidth.W)
 
-  val ldst = UInt(backendParams.lregWidth.W) // logical destination register
-  val lrs1 = UInt(backendParams.lregWidth.W) // logical source register 1
-  val lrs2 = UInt(backendParams.lregWidth.W) // logical source register 2
+  val imm = UInt(dataWidth.W) // densely pack the imm in decode
 
-  val stalePdst = UInt(backendParams.pregWidth.W) // stale physical destination register
-  val pdst      = UInt(backendParams.pregWidth.W) // physical destination register
-  val prs1      = UInt(backendParams.pregWidth.W) // physical source register 1
-  val prs2      = UInt(backendParams.pregWidth.W) // physical source register 2
+  val ldst = UInt(lregWidth.W) // logical destination register
+  val lrs1 = UInt(lregWidth.W) // logical source register 1
+  val lrs2 = UInt(lregWidth.W) // logical source register 2
+
+  val stalePdst = UInt(pregWidth.W) // stale physical destination register
+  val pdst      = UInt(pregWidth.W) // physical destination register
+  val prs1      = UInt(pregWidth.W) // physical source register 1
+  val prs2      = UInt(pregWidth.W) // physical source register 2
   val prs1Busy  = Bool()
   val prs2Busy  = Bool()
-  val busy      = Bool()
 
-  val robIdx    = UInt(backendParams.robIdxWidth.W)
+  val robIdx    = UInt(robIdxWidth.W)
   val exception = Bool()
   val ecode     = UInt(ECODE.getWidth.W)
+  val badv      = UInt(vaddrWidth.W)
+  val exuCmd    = UInt(EXUType.getWidth.W)
+  val csrCmd    = UInt(CSRType.getWidth.W)
   val lsuCmd    = UInt(LSUType.getWidth.W)
+  val ertn      = Bool()
   val isUnique  = Bool() // only allow this instruction in the pipeline, tell ROB to un-ready until empty
   val flush     = Bool() // some instructions need to flush the pipeline behind them
-  // val csr_cmd          = UInt(freechips.rocketchip.rocket.CSR.SZ.W)
+  val busy      = Bool() // need execute?
 
   val debug = new Bundle {
-    val pc         = UInt(commonParams.vaddrWidth.W)
-    val inst       = UInt(commonParams.instWidth.W)
+    val pc         = UInt(vaddrWidth.W)
+    val inst       = UInt(instWidth.W)
     val store      = UInt(8.W)
-    val storePaddr = UInt(commonParams.paddrWidth.W)
-    val storeVaddr = UInt(commonParams.vaddrWidth.W)
-    val storeData  = UInt(commonParams.dataWidth.W)
+    val storePaddr = UInt(paddrWidth.W)
+    val storeVaddr = UInt(vaddrWidth.W)
+    val storeData  = UInt(dataWidth.W)
     val load       = UInt(8.W)
-    val loadPaddr  = UInt(commonParams.paddrWidth.W)
-    val loadVaddr  = UInt(commonParams.vaddrWidth.W)
-    val loadData   = UInt(commonParams.dataWidth.W)
-    val wdata      = UInt(commonParams.dataWidth.W)
+    val loadPaddr  = UInt(paddrWidth.W)
+    val loadVaddr  = UInt(vaddrWidth.W)
+    val loadData   = UInt(dataWidth.W)
+    val wdata      = UInt(dataWidth.W)
   }
 }

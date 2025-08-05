@@ -11,7 +11,7 @@ abstract class AbstractALU(implicit params: CoreParameters) extends Module {
   import params.commonParams.{dataWidth}
 
   val io = IO(new Bundle {
-    val cmd       = Input(UInt(ALUType.getWidth.W))
+    val cmd       = Input(UInt(EXUType.getWidth.W))
     val in1       = Input(UInt(dataWidth.W))
     val in2       = Input(UInt(dataWidth.W))
     val out       = Output(UInt(dataWidth.W))
@@ -22,7 +22,7 @@ abstract class AbstractALU(implicit params: CoreParameters) extends Module {
 
 class ALU(implicit params: CoreParameters) extends AbstractALU {
   import params.commonParams.{dataWidth}
-  import ALUType._
+  import EXUType._
 
   // ADD, SUB
   val in2_inv     = Mux(isSub(io.cmd), ~io.in2, io.in2)
@@ -42,16 +42,16 @@ class ALU(implicit params: CoreParameters) extends AbstractALU {
   val shin            = Mux(shiftReverse(io.cmd), Reverse(shin_r), shin_r)
   val shout_r         = (Cat(shiftArith(io.cmd) & shin(dataWidth - 1), shin).asSInt >> shamt)(dataWidth - 1, 0)
   val shout_l         = Reverse(shout_r)
-  val shout = Mux(io.cmd === ALU_SRL.asUInt || io.cmd === ALU_SRA.asUInt, shout_r, 0.U) |
-    Mux(io.cmd === ALU_SLL.asUInt, shout_l, 0.U)
+  val shout = Mux(io.cmd === EXU_SRL.asUInt || io.cmd === EXU_SRA.asUInt, shout_r, 0.U) |
+    Mux(io.cmd === EXU_SLL.asUInt, shout_l, 0.U)
 
   // AND, OR, XOR, NOR
   val logic = MuxLookup(io.cmd, 0.U)(
     Seq(
-      ALU_XOR.asUInt -> in1_xor_in2,
-      ALU_OR.asUInt  -> (io.in1 | io.in2),
-      ALU_NOR.asUInt -> ~(io.in1 | io.in2),
-      ALU_AND.asUInt -> (io.in1 & io.in2),
+      EXU_XOR.asUInt -> in1_xor_in2,
+      EXU_OR.asUInt  -> (io.in1 | io.in2),
+      EXU_NOR.asUInt -> ~(io.in1 | io.in2),
+      EXU_AND.asUInt -> (io.in1 & io.in2),
     ),
   )
 
@@ -59,8 +59,8 @@ class ALU(implicit params: CoreParameters) extends AbstractALU {
 
   val out = MuxLookup(io.cmd, shift_logic)(
     Seq(
-      ALU_ADD.asUInt -> io.adder_out,
-      ALU_SUB.asUInt -> io.adder_out,
+      EXU_ADD.asUInt -> io.adder_out,
+      EXU_SUB.asUInt -> io.adder_out,
     ),
   )
 
