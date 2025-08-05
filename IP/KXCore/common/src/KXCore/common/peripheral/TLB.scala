@@ -10,7 +10,7 @@ class TLBReq(implicit params: CommonParameters) extends Bundle {
   /** request address from CPU. */
   val vaddr = UInt(params.vaddrWidth.W)
 
-  val size = UInt(2.W) // request size, 0 for 1B, 1 for 2B, 2 for 4B
+  val size = UInt(2.W) // request size, 0 for 1B, 1 for 2B, 3 for 4B
 
   // /* address space identifier */
   // val asid = UInt(10.W)
@@ -123,11 +123,7 @@ class TLB(implicit params: CommonParameters) extends Module {
   val tlbEntry = Reg(Vec(params.tlbCount, new TLBEntry))
 
   def is_unaligned(vaddr: UInt, size: UInt): Bool = {
-    val mask = MuxLookup(size, 0.U)(Seq(
-      0.U -> 0.U,
-      1.U -> 1.U,
-      2.U -> 3.U, // 4B
-    ))
+    val mask = size
     (vaddr & mask) =/= 0.U
   }
 
